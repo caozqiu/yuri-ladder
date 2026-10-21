@@ -1,4 +1,5 @@
 import {summarize, windowStart, faction} from './core.mjs';
+import {buildAnalytics, inSegment, SEGMENTS} from './analytics.mjs';
 
 export class QueryError extends Error {
   constructor(message,status=400){super(message);this.status=status;}
@@ -47,8 +48,19 @@ export async function querySnapshot(path,q,manifest,load,now=Math.floor(Date.now
   const scope=q.get('opponents')==='top100'?'top100':'all';
   const granularity=q.get('group')==='country'?'country':'faction';
   const start=windowStart(season,entry.cutoff,range);
-  const filtered=rows.filter(r=>r.start>=start&&r.start<=entry.cutoff&&(scope!=='top100'||profiles.has(r.opponent)));
+  const map=q.get('map')||'',segment=q.get('segment')||'';
+  if(map.length>300)throw new QueryError('地图名称过长');
+  if(segment&&!Object.values(SEGMENTS).flat().some(s=>s.key===segment))throw new QueryError('无效的分段筛选');
+  if(player&&!inSegment(profiles.get(player),segment))throw new QueryError('选手不在当前分段，请先切换到全部分段',400);
+  const base=rows.filter(r=>r.start>=start&&r.start<=entry.cutoff&&(scope!=='top100'||profiles.has(r.opponent)));
+  const mapOptions=[...new Set(base.map(r=>r.map))].sort((a,b)=>a.localeCompare(b,'zh-CN'));
+  const cohortRows=base.filter(r=>!map||r.map===map);
+  const filtered=cohortRows.filter(r=>inSegment(r.profile,segment));
   if(path==='/api/stats'){
+    const ids=q.get('compare');
+    const compare=ids?[...new Set(ids.split(','))]:[];
+    if(compare.length>4||compare.some(id=>!/^\d{1,20}$/.test(id)))throw new QueryError('请选择最多4位不同选手进行对比');
+    if(compare.some(id=>!profiles.has(id)))throw new QueryError('对比选手不在本赛季前100名中',404);
     const counts=new Map();
     for(const r of filtered){
       const key=r.user+':'+r.country+':'+r.enemy;
@@ -57,7 +69,9 @@ export async function querySnapshot(path,q,manifest,load,now=Math.floor(Date.now
     }
     const uniqueMatches=new Set(filtered.filter(r=>!player||r.user===player).map(r=>r.match)).size;
     return {seasons,season,snapshot:entry.snapshot,cutoff:entry.cutoff,meta:entry.meta,progress:manifest.progress||null,
-      ...summarize([...counts.values()],seed.players,granularity,player,uniqueMatches),window:range,scope,granularity,
+      ...summarize([...counts.values()],seed.players.filter(p=>inSegment(p,segment)),granularity,player,uniqueMatches),window:range,scope,granularity,
+      filters:{map,segment},mapOptions,
+      analytics:buildAnalytics({rows:filtered,cohortRows,profiles,player,compare,start,cutoff:entry.cutoff,bucket:q.get('bucket')==='week'?'week':'day'}),
       stale:now-(season.end<=now?entry.created:entry.cutoff)>10800,automation:manifest.automation||{enabled:false}};
   }
   const own=countryFilter(q.get('own'),granularity),enemy=countryFilter(q.get('enemy'),granularity);

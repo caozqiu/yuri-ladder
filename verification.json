@@ -1,13 +1,13 @@
 {
-  "at": "2026-10-21T06:09:10.441Z",
+  "at": "2026-10-21T07:35:23.325Z",
   "build": "npm ci && node build.mjs",
   "tests": {
-    "passed": 21,
+    "passed": 28,
     "failed": 0,
     "skipped": 1,
     "filterParityCases": 96,
-    "skipReason": "Git MSYS named objects blocked by local Windows sandbox; Linux CI integration pending",
-    "total": 22
+    "skipReason": "Local Windows Git sandbox; this integration runs on Linux CI",
+    "total": 29
   },
   "seasons": [
     {
@@ -40,20 +40,23 @@
   },
   "deployment": {
     "edgeone": false,
-    "domainPurchased": false,
+    "domainPurchased": true,
     "domainBound": false,
-    "cloudScheduleVerified": false,
+    "cloudScheduleVerified": true,
     "mainlandDirectVerified": false,
-    "browserLayoutRechecked": false,
+    "browserLayoutRechecked": true,
     "edgeoneServiceOpened": true,
-    "edgeoneProjectCreated": false,
-    "cloudCollectorVerified": true
+    "edgeoneProjectCreated": true,
+    "cloudCollectorVerified": true,
+    "domain": "yuri-ladder.cn",
+    "edgeoneProjectId": "makers-i6sbocft2osz",
+    "newFeaturesDeployed": false
   },
   "domainCheck": {
-    "name": "yuri-ladder.com",
-    "officialRegistry": "rdap.verisign.com",
-    "httpStatus": 404,
-    "meaning": "No registry record at lookup time; registrar checkout still required"
+    "name": "yuri-ladder.cn",
+    "status": "user_reports_review_pending",
+    "dnsConfigured": false,
+    "httpsVerified": false
   },
   "github": {
     "repository": "https://github.com/caozqiu/yuri-ladder",
@@ -134,5 +137,146 @@
       "losses": 3423,
       "draws": 0
     }
-  ]
+  ],
+  "featureUpdate": {
+    "at": "2026-10-21T07:35:23.325Z",
+    "checks": [
+      {
+        "season": 31,
+        "range": "season",
+        "opponents": "all",
+        "games": 8117,
+        "uniqueMatches": 6096,
+        "maps": 42,
+        "comparePlayers": 4
+      },
+      {
+        "season": 31,
+        "range": "season",
+        "opponents": "top100",
+        "games": 4042,
+        "uniqueMatches": 2021,
+        "maps": 42,
+        "comparePlayers": 4
+      },
+      {
+        "season": 31,
+        "range": "7d",
+        "opponents": "all",
+        "games": 871,
+        "uniqueMatches": 647,
+        "maps": 40,
+        "comparePlayers": 4
+      },
+      {
+        "season": 31,
+        "range": "7d",
+        "opponents": "top100",
+        "games": 448,
+        "uniqueMatches": 224,
+        "maps": 40,
+        "comparePlayers": 4
+      },
+      {
+        "season": 31,
+        "range": "30d",
+        "opponents": "all",
+        "games": 4484,
+        "uniqueMatches": 3333,
+        "maps": 42,
+        "comparePlayers": 4
+      },
+      {
+        "season": 31,
+        "range": "30d",
+        "opponents": "top100",
+        "games": 2302,
+        "uniqueMatches": 1151,
+        "maps": 42,
+        "comparePlayers": 4
+      },
+      {
+        "season": 30,
+        "range": "season",
+        "opponents": "all",
+        "games": 10228,
+        "uniqueMatches": 7634,
+        "maps": 42,
+        "comparePlayers": 4
+      },
+      {
+        "season": 30,
+        "range": "season",
+        "opponents": "top100",
+        "games": 5188,
+        "uniqueMatches": 2594,
+        "maps": 42,
+        "comparePlayers": 4
+      },
+      {
+        "season": 30,
+        "range": "7d",
+        "opponents": "all",
+        "games": 522,
+        "uniqueMatches": 383,
+        "maps": 38,
+        "comparePlayers": 4
+      },
+      {
+        "season": 30,
+        "range": "7d",
+        "opponents": "top100",
+        "games": 278,
+        "uniqueMatches": 139,
+        "maps": 36,
+        "comparePlayers": 4
+      },
+      {
+        "season": 30,
+        "range": "30d",
+        "opponents": "all",
+        "games": 3748,
+        "uniqueMatches": 2843,
+        "maps": 42,
+        "comparePlayers": 4
+      },
+      {
+        "season": 30,
+        "range": "30d",
+        "opponents": "top100",
+        "games": 1810,
+        "uniqueMatches": 905,
+        "maps": 41,
+        "comparePlayers": 4
+      }
+    ],
+    "passed": 12,
+    "browser": {
+      "desktop": true,
+      "mobile": {
+        "width": 390,
+        "height": 844,
+        "noHorizontalOverflow": true
+      },
+      "favoriteSurvivedReload": true,
+      "rankBandRows": 10,
+      "mapUrlVerified": true,
+      "consoleErrors": 0,
+      "csvDownloadedAndParsed": true
+    },
+    "localTests": {
+      "passed": 28,
+      "failed": 0,
+      "skipped": 1,
+      "total": 29
+    },
+    "published": false,
+    "features": [
+      "player-comparison",
+      "map-win-rates",
+      "win-rate-trends",
+      "local-favorites",
+      "snapshot-mmr-and-rank-tiers"
+    ]
+  }
 }
