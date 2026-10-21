@@ -8,7 +8,12 @@ export type MatrixCell = Counter & { own:string; enemy:string };
 export type Season = { id:number; name:string; start:number; end:number };
 export type AnalyticsGroup = {total:Counter; factions:Record<string,Counter>; uniqueMatches:number};
 export type TrendPoint = AnalyticsGroup & {start:number; end:number; label:string};
+export type OpponentStats = {id:string;name:string;rank:number|null;mmr:number|null;inTop100:boolean;scoreGap:number|null;total:Counter;factions:Record<string,Counter>;lastPlayed:number};
+export type OpponentDossier = {player:string;basis:string;closeGap:number;opponents:number;knownScoreGames:number;bands:(Counter & {key:string;name:string;opponents:number})[];rows:OpponentStats[]};
+export type HistoryPoint = {at:number;snapshot:string;rank:number|null;mmr:number|null;status:string};
+export type RankingHistory = {player:string;season:number;snapshot:string;asOf:number;range:string;available:boolean;firstObserved:number|null;points:HistoryPoint[];basis:string};
 export type Analytics = {
+ opponents:OpponentDossier|null;
  matchups:{a:string;b:string;uniqueMatches:number;directions:MatchupCell[]}[];
  gapTiers:(Counter & {key:string;name:string;uniqueMatches:number;factions:Record<string,Counter>})[];
  mapMatchups:(Counter & {name:string;uniqueMatches:number;cells:MatchupCell[]})[];

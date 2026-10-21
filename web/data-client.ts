@@ -10,17 +10,18 @@ async function getManifest(force=false){
   return pending;
 }
 async function load(entry:any){
-  if(!snapshots.has(entry.snapshot)){
+  const key=entry.file||entry.snapshot;
+  if(!snapshots.has(key)){
     const promise=fetch(entry.file).then(async r=>{
       if(!r.ok)throw new Error('数据已更新，请刷新页面后重试');
       const data=await r.json();
       if(data.snapshot!==entry.snapshot)throw new Error('数据批次不一致');
       return data;
-    }).catch(e=>{snapshots.delete(entry.snapshot);throw e;});
-    snapshots.set(entry.snapshot,promise);
+    }).catch(e=>{snapshots.delete(key);throw e;});
+    snapshots.set(key,promise);
     if(snapshots.size>8)snapshots.delete(snapshots.keys().next().value!);
   }
-  return snapshots.get(entry.snapshot)!;
+  return snapshots.get(key)!;
 }
 export async function siteFetch(input:string,init:RequestInit={}){
   const signal=init.signal;signal?.throwIfAborted();

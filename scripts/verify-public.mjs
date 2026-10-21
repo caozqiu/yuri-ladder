@@ -25,6 +25,21 @@ for(const entry of manifest.snapshots){
  const response=await request(entry.file);assert.equal(response.status,200);
  assert.equal(createHash('sha256').update(response.body).digest('hex'),entry.sha256);
  seeds.set(entry.snapshot,response.json);
+ // Verify both new research APIs against the same published snapshot.
+ const player=response.json.players.find(p=>response.json.matches.some(m=>m.players.some(v=>v.id===p.id)))?.id||response.json.players[0].id;
+ const personalQ=new URLSearchParams({season:String(entry.season.id),snapshot:entry.snapshot,player});
+ const personal=await request('/api/stats?'+personalQ);assert.equal(personal.status,200);
+ const dossier=personal.json.analytics.opponents;assert.ok(dossier);
+ assert.equal(dossier.rows.reduce((n,r)=>n+r.total.games,0),personal.json.overview.games);
+ assert.equal(dossier.bands.reduce((n,r)=>n+r.games,0),personal.json.overview.games);
+ if(dossier.rows.length){const rival=dossier.rows[0];const detailQ=new URLSearchParams(personalQ);detailQ.set('opponent',rival.id);const matches=await request('/api/matches?'+detailQ);assert.equal(matches.status,200);assert.equal(matches.json.total,rival.total.games);assert.ok(matches.json.matches.every(m=>m.user===player&&m.opponent===rival.id));}
+ assert.ok(entry.history,'completed source sync must publish a ranking history');
+ const archive=await request(entry.history.file);assert.equal(archive.status,200);assert.equal(createHash('sha256').update(archive.body).digest('hex'),entry.history.sha256);
+ const history=await request('/api/history?'+personalQ);assert.equal(history.status,200);assert.equal(history.json.snapshot,entry.snapshot);assert.ok(history.json.available);
+ assert.ok(history.json.points.length>0);assert.ok(history.json.points.every(p=>p.at<=history.json.asOf&&(p.status==='ranked'||p.rank===null&&p.mmr===null)));
+ const rows=archive.json.observations.filter(o=>o.at<=history.json.asOf);assert.equal(history.json.points.length,rows.length);
+ const last=rows.at(-1),expectedRank=last.players.find(p=>p[0]===player);assert.equal(history.json.points.at(-1).rank,expectedRank?.[1]??null);assert.equal(history.json.points.at(-1).mmr,expectedRank?.[2]??null);
+ checks.push({type:'player-research',season:entry.season.id,player,opponents:dossier.opponents,historyPoints:history.json.points.length,firstObserved:history.json.firstObserved});
  for(const changes of [{},{gapMax:'100',gapDirection:'stronger'}]){
   const q=new URLSearchParams({season:String(entry.season.id),snapshot:entry.snapshot,...changes});
   const actual=await request('/api/stats?'+q);assert.equal(actual.status,200);
@@ -40,6 +55,7 @@ for(const entry of manifest.snapshots){
 assert.ok(manifest.snapshots.length>=2);
 const invalid=await request('/api/stats?gapMin=200&gapMax=100');assert.equal(invalid.status,400);
 const write=await request('/api/stats','POST');assert.equal(write.status,405);
+ assert.equal((await request('/api/history?player=bad')).status,400);assert.equal((await request('/api/history','POST')).status,405);
 const result={at:new Date().toISOString(),origin,publicApiVerified:true,automation:manifest.automation,checks,invalidFilterStatus:400,writeDeniedStatus:405};
 await mkdir('.runtime',{recursive:true});await writeFile('.runtime/public-verification.json',JSON.stringify(result,null,2)+'\n');
 console.log(JSON.stringify(result));

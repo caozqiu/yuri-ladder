@@ -1,7 +1,7 @@
 import {readFile,writeFile,mkdir,rename} from 'node:fs/promises';
 import {join} from 'node:path';
 import {createHash} from 'node:crypto';
-const tables={seasons:'id',snapshots:'id',rankings:'snapshot,user',games:'snapshot,match',pending:'snapshot,match,user',sync_jobs:'id',site_config:'key'};
+const tables={seasons:'id',snapshots:'id',rankings:'snapshot,user',games:'snapshot,match',pending:'snapshot,match,user',sync_jobs:'id',site_config:'key',ranking_history:'season,observed,snapshot'};
 const digest=s=>createHash('sha256').update(s).digest('hex');
 export async function saveCheckpoint(db,directory){
   await mkdir(directory,{recursive:true});
@@ -22,6 +22,8 @@ export async function restoreCheckpoint(db,directory){
   if(manifest.version!==1)throw new Error('不支持的同步进度格式');
   const contents=[];
   for(const table of Object.keys(tables)){
+    // The first upgrade accepts old checkpoints without the new history table.
+    if(table==='ranking_history'&&!manifest.files['ranking_history.ndjson']){contents.push([table,[]]);continue;}
     const name=table+'.ndjson',body=await readFile(join(directory,name),'utf8');
     if(digest(body)!==manifest.files[name]?.sha256)throw new Error('同步进度校验失败：'+name);
     const rows=body.trim()?body.trim().split('\n').map(line=>JSON.parse(line)):[];

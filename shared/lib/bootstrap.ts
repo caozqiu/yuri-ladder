@@ -4,6 +4,7 @@ import initial30 from '@/data/season-30.json';
 import type {Match,Profile,Season} from './types';
 type Seed={season:Season;snapshot:string;cutoff:number;players:Profile[];matches:Match[];meta:Record<string,unknown>};
 const seeds=[initial31,initial30] as Seed[];
+export const bootstrapSnapshots=seeds.map(s=>s.snapshot);
 // Owner-only, replay-safe import. Progress advances only after the D1 batch commits.
 export async function bootstrapStep(){
  for(const seed of seeds){

@@ -2,6 +2,7 @@ import {summarize, windowStart, faction} from './core.mjs';
 import {buildAnalytics, inSegment, SEGMENTS} from './analytics.mjs';
 import {parseRatingFilters,rating,ownRatingMatches,opponentRatingMatches,ratingCoverage,missingRequiredRating} from './rating-filters.mjs';
 import {buildMatchups} from './matchup-analytics.mjs';
+import {opponentDossier,rankingHistory} from './player-research.mjs';
 
 export class QueryError extends Error {
   constructor(message,status=400){super(message);this.status=status;}
@@ -36,13 +37,22 @@ function countryFilter(value,group){
   throw new QueryError('无效的阵营筛选');
 }
 export async function querySnapshot(path,q,manifest,load,now=Math.floor(Date.now()/1000)){
-  if(!['/api/stats','/api/matches'].includes(path))throw new QueryError('接口不存在',404);
+  if(!['/api/stats','/api/matches','/api/history'].includes(path))throw new QueryError('接口不存在',404);
   const seasons=manifest.snapshots.map(s=>s.season).sort((a,b)=>b.id-a.id);
   const season=seasons.find(s=>s.id===Number(q.get('season')))||seasons[0];
   if(!season)throw new QueryError('尚无完整数据',503);
   const pinned=q.get('snapshot');
   const entry=[...manifest.snapshots,...(manifest.previous||[])].find(s=>s.season.id===season.id&&(!pinned||s.snapshot===pinned));
   if(!entry)throw new QueryError('这批数据已更新，请刷新后重试',409);
+  if(path==='/api/history'){
+    const player=playerFilter(q);if(!player)throw new QueryError('请指定选手编号');
+    const range=q.get('historyRange')||'all';if(!['all','7d','30d'].includes(range))throw new QueryError('历史周期无效');
+    if(!entry.history)return {player,season:season.id,snapshot:entry.snapshot,asOf:entry.created,range,available:false,firstObserved:null,points:[],basis:'observed-ladder-snapshot'};
+    const archive=await load(entry.history);
+    if(archive.snapshot!==entry.snapshot||archive.season!==season.id)throw new QueryError('历史数据批次不一致，请刷新后重试',503);
+    const result=rankingHistory(archive,player,range);if(!result)throw new QueryError('暂无该选手的历史榜单观察',404);
+    return result;
+  }
   const seed=await load(entry);
   if(seed.snapshot!==entry.snapshot)throw new QueryError('数据批次不一致，请刷新后重试',503);
   const {profiles,rows}=prepare(seed),player=playerFilter(q);
@@ -86,11 +96,13 @@ export async function querySnapshot(path,q,manifest,load,now=Math.floor(Date.now
     return {seasons,season,snapshot:entry.snapshot,cutoff:entry.cutoff,meta:entry.meta,progress:manifest.progress||null,
       ...summarize([...counts.values()],seed.players.filter(p=>inSegment(p,segment)&&ownRatingMatches(p,ratingFilters)),granularity,player,uniqueMatches),window:range,scope,granularity,
       filters:{map,segment,...ratingFilters},coverage,mapOptions,funnel,ratingOptions,
-      analytics:{...buildAnalytics({rows:filtered,cohortRows,profiles,player,compare,start,cutoff:entry.cutoff,bucket:q.get('bucket')==='week'?'week':'day'}),...buildMatchups(resultRows)},
+      analytics:{...buildAnalytics({rows:filtered,cohortRows,profiles,player,compare,start,cutoff:entry.cutoff,bucket:q.get('bucket')==='week'?'week':'day'}),...buildMatchups(resultRows),opponents:opponentDossier(resultRows,profiles,player)},
       stale:now-(season.end<=now?entry.created:entry.cutoff)>10800,automation:manifest.automation||{enabled:false}};
   }
   const own=countryFilter(q.get('own'),granularity),enemy=countryFilter(q.get('enemy'),granularity);
-  const matches=filtered.filter(r=>(!player||r.user===player)&&own(r.country)&&enemy(r.enemy))
+  const opponent=q.get('opponent');
+  if(opponent&&(!/^\d{1,20}$/.test(opponent)||!player))throw new QueryError('对手明细需要有效的己方和对手编号');
+  const matches=filtered.filter(r=>(!player||r.user===player)&&(!opponent||r.opponent===opponent)&&own(r.country)&&enemy(r.enemy))
     .sort((a,b)=>b.start-a.start||b.match.localeCompare(a.match)||a.user.localeCompare(b.user));
   const offset=Math.max(0,Math.min(100000,Math.floor(Number(q.get('offset'))||0)));
   return {matches:matches.slice(offset,offset+30),total:matches.length,offset,snapshot:entry.snapshot,ratingBasis:'ladder-snapshot'};
