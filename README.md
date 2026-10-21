@@ -21,8 +21,8 @@ npm run preview
 
 1. 将源码上传自己的 GitHub 仓库，默认分支 main。若选公开仓库，标准 GitHub 托管运行器免费；源码、玩家公开战绩和同步进度会对外可见。私有仓库需控制免费分钟数。不要向仓库提交账号、Cookie、Token或其他凭据。
 2. 腾讯云账户开通 EdgeOne Makers / Pages 免费版，创建或复用一个项目，项目名建议 yuri-ladder。选择「全球可用区（不含中国大陆）」，无备案域名只能用这一加速区域。CLI 的 --site china 是腾讯云中国站账户选择，与加速区域不同。
-3. 在 EdgeOne 控制台创建限于所需项目的 API Token。在 GitHub Settings → Secrets and variables → Actions 中保存为 EDGEONE_API_TOKEN。凭据只放 Secrets，不要发到聊天或写入源码。
-4. GitHub Actions 仓库变量 EDGEONE_PROJECT_NAME 设置为实际项目名；EDGEONE_SITE 为 china，国际站账户则用 global。
+3. 在 EdgeOne 控制台创建 API Token。在 GitHub Settings → Secrets and variables → Actions 中保存为 EDGEONE_API_TOKEN。凭据只放 Secrets，不要发到聊天或写入源码。
+4. 发布固定核对现有项目ID makers-i6sbocft2osz，通过官方SDK读取实际项目名与加速区域，再调用CLI发布；不依赖猜测的项目名。EDGEONE_SITE 为 china，国际站账户则用 global。SDK只用于核对已有项目，不创建项目或修改凭据。
 5. Actions 中手动执行 Hourly ladder sync and deploy，代码首次推送也会启动。它会恢复进度、采集、保存进度、构建、测试，并部署同一个项目。没有 Token 时仍执行数据更新和测试，生成上传产物，跳过网站部署并注明待配置。
 6. 已选择自有域名 yuri-ladder.cn，用户已购买且已通过审核。审核通过后绑定现有项目，无需再购买云服务器。
 7. 在项目「域名管理」绑定实际购买的域名。将平台实际返回的CNAME写入DNS；不可预先猜CNAME。申请免费HTTPS证书，待域名和证书状态均正常再分享。

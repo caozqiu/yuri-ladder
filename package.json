@@ -3,13 +3,25 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "engines": {"node": ">=22.13.0"},
+  "engines": {
+    "node": ">=22.13.0"
+  },
   "scripts": {
     "build": "node build.mjs",
     "test": "node --test tests/*.test.mjs",
     "preview": "node scripts/preview.mjs",
     "sync": "node collector/collector.mjs sync"
   },
-  "dependencies": {"react": "19.2.6", "react-dom": "19.2.6", "lucide-react": "1.31.0"},
-  "devDependencies": {"@vitejs/plugin-react": "6.0.2", "vite": "8.0.13", "typescript": "5.9.3", "esbuild": "0.28.0"}
+  "dependencies": {
+    "lucide-react": "1.31.0",
+    "react": "19.2.6",
+    "react-dom": "19.2.6"
+  },
+  "devDependencies": {
+    "@edgeone/makers-sdk": "0.1.0",
+    "@vitejs/plugin-react": "6.0.2",
+    "esbuild": "0.28.0",
+    "typescript": "5.9.3",
+    "vite": "8.0.13"
+  }
 }

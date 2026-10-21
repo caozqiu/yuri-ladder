@@ -19,7 +19,6 @@ jobs:
       YURI_CHECKPOINT_DIR: .checkpoint/state
       YURI_PUBLIC_DATA_DIR: .checkpoint/public
       YURI_SYNC_MINUTES: '35'
-      EDGEONE_PROJECT_NAME: ${{ vars.EDGEONE_PROJECT_NAME || 'yuri-ladder' }}
       EDGEONE_SITE: ${{ vars.EDGEONE_SITE || 'china' }}
       EDGEONE_CONFIGURED: ${{ secrets.EDGEONE_API_TOKEN != '' }}
     steps:
@@ -33,6 +32,11 @@ jobs:
         run: node scripts/state-branch.mjs restore
       - name: Build collector and frontend
         run: npm run build
+      - name: Verify access to the existing EdgeOne project
+        if: env.EDGEONE_CONFIGURED == 'true'
+        env:
+          EDGEONE_API_TOKEN: ${{ secrets.EDGEONE_API_TOKEN }}
+        run: node scripts/deploy.mjs --check-only
       - name: Resume official-source sync
         id: sync
         continue-on-error: true
@@ -67,7 +71,7 @@ jobs:
             echo 'Set EDGEONE_API_TOKEN in repository Actions secrets before publishing.'
             exit 1
           fi
-          npx --yes edgeone@1.6.44 makers deploy ./dist -n "$EDGEONE_PROJECT_NAME" --site "$EDGEONE_SITE" -t "$EDGEONE_API_TOKEN"
+          node scripts/deploy.mjs
       - name: Report publishing setup still needed
         if: env.EDGEONE_CONFIGURED != 'true'
         run: |
