@@ -1,9 +1,13 @@
 import {querySnapshot} from '../shared/lib/snapshot-query.mjs';
 let cached=null,expires=0;
 const seeds=new Map();
+// EdgeOne implements the Response constructor but not Response.json().
+function json(value,status,headers={}){
+ return new Response(JSON.stringify(value),{status,headers:{'Content-Type':'application/json; charset=utf-8','X-Content-Type-Options':'nosniff',...headers}});
+}
 export async function onRequest(context){
   const {request}=context;
-  if(!['GET','HEAD'].includes(request.method))return Response.json({error:'只读接口'},{status:405,headers:{Allow:'GET, HEAD'}});
+  if(!['GET','HEAD'].includes(request.method))return json({error:'只读接口'},405,{Allow:'GET, HEAD','Cache-Control':'no-store'});
   const url=new URL(request.url);
   try{
     if(!cached||Date.now()>expires){
@@ -22,5 +26,5 @@ export async function onRequest(context){
       return seeds.get(key);
     });
     return new Response(request.method==='HEAD'?null:JSON.stringify(data),{headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'public,max-age=60','X-Content-Type-Options':'nosniff'}});
-  }catch(e){return Response.json({error:e.status?e.message:'暂时无法读取完整数据，请稍后重试'},{status:e.status||503,headers:{'Cache-Control':'no-store'}});}
+  }catch(e){return json({error:e.status?e.message:'暂时无法读取完整数据，请稍后重试'},e.status||503,{'Cache-Control':'no-store'});}
 }
