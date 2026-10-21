@@ -8,6 +8,50 @@
         "start": 1788224400,
         "end": 1793548800
       },
+      "snapshot": "4ae7b8c9-99c4-476a-8699-14a20f303a0d:31",
+      "cutoff": 1792580670,
+      "created": 1792580678,
+      "meta": {
+        "scanned": 100,
+        "players": 100,
+        "missing": 0,
+        "excluded": 4,
+        "unknown": 0,
+        "full": false
+      },
+      "file": "/data/snapshots/f09a23d9cd06d51164901fc5a8eab9ed2a0a7f7f2cbb06572907e2e4c19f32d8.json",
+      "sha256": "f09a23d9cd06d51164901fc5a8eab9ed2a0a7f7f2cbb06572907e2e4c19f32d8"
+    },
+    {
+      "season": {
+        "id": 30,
+        "name": "2026-S4赛季",
+        "start": 1782864000,
+        "end": 1788191999
+      },
+      "snapshot": "4ae7b8c9-99c4-476a-8699-14a20f303a0d:30",
+      "cutoff": 1788191999,
+      "created": 1792580686,
+      "meta": {
+        "scanned": 100,
+        "players": 100,
+        "missing": 0,
+        "excluded": 4,
+        "unknown": 0,
+        "full": false
+      },
+      "file": "/data/snapshots/cb078fc10583d0fadd1dd7b210807a71ee583186a771edf32e2b52ca174fa62e.json",
+      "sha256": "cb078fc10583d0fadd1dd7b210807a71ee583186a771edf32e2b52ca174fa62e"
+    }
+  ],
+  "previous": [
+    {
+      "season": {
+        "id": 31,
+        "name": "2026-S5赛季",
+        "start": 1788224400,
+        "end": 1793548800
+      },
       "snapshot": "57094774-b91f-44e7-943d-dff2d7cd0afe:31",
       "cutoff": 1792578021,
       "created": 1792578029,
@@ -42,9 +86,7 @@
       },
       "file": "/data/snapshots/c991916d83b9f5e386c91f36db725c11932f875f091a231ff2027b16bb379922.json",
       "sha256": "c991916d83b9f5e386c91f36db725c11932f875f091a231ff2027b16bb379922"
-    }
-  ],
-  "previous": [
+    },
     {
       "season": {
         "id": 31,
@@ -86,48 +128,6 @@
       },
       "file": "/data/snapshots/f637fdfa960958f0dbb49eb7fdaa79f20f826e46541b35d972cd04a9ffbda276.json",
       "sha256": "f637fdfa960958f0dbb49eb7fdaa79f20f826e46541b35d972cd04a9ffbda276"
-    },
-    {
-      "season": {
-        "id": 31,
-        "name": "2026-S5赛季",
-        "start": 1788224400,
-        "end": 1793548800
-      },
-      "snapshot": "52312320-70e4-4570-a42d-18bd3e28dd59:31",
-      "cutoff": 1792574449,
-      "created": 1792574457,
-      "meta": {
-        "scanned": 100,
-        "players": 100,
-        "missing": 0,
-        "excluded": 4,
-        "unknown": 0,
-        "full": false
-      },
-      "file": "/data/snapshots/36b04829ed7c69a5c2f33cd412be2bfc01293ada6a9632944d3a59f72d41bb76.json",
-      "sha256": "36b04829ed7c69a5c2f33cd412be2bfc01293ada6a9632944d3a59f72d41bb76"
-    },
-    {
-      "season": {
-        "id": 30,
-        "name": "2026-S4赛季",
-        "start": 1782864000,
-        "end": 1788191999
-      },
-      "snapshot": "52312320-70e4-4570-a42d-18bd3e28dd59:30",
-      "cutoff": 1788191999,
-      "created": 1792574465,
-      "meta": {
-        "scanned": 100,
-        "players": 100,
-        "missing": 0,
-        "excluded": 4,
-        "unknown": 0,
-        "full": false
-      },
-      "file": "/data/snapshots/0fc8e3813a587a11e15d044c9517fff0923fa169c84da4bedbd5b9cbb748d7a1.json",
-      "sha256": "0fc8e3813a587a11e15d044c9517fff0923fa169c84da4bedbd5b9cbb748d7a1"
     }
   ],
   "progress": {
