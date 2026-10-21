@@ -1,0 +1,59 @@
+{
+  "format": 1,
+  "snapshots": [
+    {
+      "season": {
+        "id": 31,
+        "name": "2026-S5赛季",
+        "start": 1788224400,
+        "end": 1793548800
+      },
+      "snapshot": "bd8ddc0b-fcda-4d61-a34a-f7d4bdcc7e96:31",
+      "cutoff": 1792509699,
+      "created": 1792561979,
+      "meta": {
+        "scanned": 100,
+        "players": 100,
+        "missing": 0,
+        "excluded": 4,
+        "unknown": 0,
+        "full": false
+      },
+      "file": "/data/snapshots/28efa8a4f679c45fd201b46c37dd0c8b71cc3044abfec95d82ba10226848c508.json",
+      "sha256": "28efa8a4f679c45fd201b46c37dd0c8b71cc3044abfec95d82ba10226848c508"
+    },
+    {
+      "season": {
+        "id": 30,
+        "name": "2026-S4赛季",
+        "start": 1782864000,
+        "end": 1788191999
+      },
+      "snapshot": "bd8ddc0b-fcda-4d61-a34a-f7d4bdcc7e96:30",
+      "cutoff": 1788191999,
+      "created": 1792561979,
+      "meta": {
+        "scanned": 100,
+        "players": 100,
+        "missing": 0,
+        "excluded": 4,
+        "unknown": 0,
+        "full": false
+      },
+      "file": "/data/snapshots/c8a01320283e43a8ba9f6533bd1fa254a70dbebb7f13f6ac9d039618ea31bc2a.json",
+      "sha256": "c8a01320283e43a8ba9f6533bd1fa254a70dbebb7f13f6ac9d039618ea31bc2a"
+    }
+  ],
+  "previous": [],
+  "progress": {
+    "state": "retry",
+    "stage": "summary",
+    "done": 200,
+    "total": 200,
+    "error": "兰博数据暂不可读：来源暂时限制请求，请稍后重试"
+  },
+  "automation": {
+    "enabled": false,
+    "schedule": "每小时第55分钟（北京时间），平台调度可能延迟"
+  }
+}

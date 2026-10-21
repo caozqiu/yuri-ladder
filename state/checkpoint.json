@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "files": {
+    "seasons.ndjson": {
+      "sha256": "1b53613a382c8ff2fc5aea2cb3d953a5013a6ce48f21d932d8d6ebe5015f1fec",
+      "rows": 2
+    },
+    "snapshots.ndjson": {
+      "sha256": "11637065b44893602219e0f1e719302663cd52991c20c2b597f8bb3236858f40",
+      "rows": 4
+    },
+    "rankings.ndjson": {
+      "sha256": "549de783e1e36a21b9cad9fbd5cd22efab6bd1cfaea71241f8fda1342936d3fb",
+      "rows": 400
+    },
+    "games.ndjson": {
+      "sha256": "4a91444a4f39a27343176fdd61830103cfd17a19b9676b11a179a8aaa103491d",
+      "rows": 29300
+    },
+    "pending.ndjson": {
+      "sha256": "6a7423b44b088a5469a9feeddbc1fc3811674a9cfc4b6e9dcdfb8ffe63bc2e48",
+      "rows": 4178
+    },
+    "sync_jobs.ndjson": {
+      "sha256": "b25230854284ac65a72f350284acb54538153e1bdf0fad078cf202f06537bd88",
+      "rows": 1
+    },
+    "site_config.ndjson": {
+      "sha256": "8ae3f084c44f4f680d39b0d0bb9f40333ef83f2f7125d0d940ea662de6dc3e70",
+      "rows": 5
+    }
+  }
+}
