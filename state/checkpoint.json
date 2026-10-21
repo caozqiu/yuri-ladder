@@ -6,27 +6,27 @@
       "rows": 2
     },
     "snapshots.ndjson": {
-      "sha256": "d9fb2ca40add56a7a3f170c0e44fdf37c8d848fbf6b5764481c623b6f827f49d",
+      "sha256": "61949e8134348c625d29db0d9386ab8034bcfc909ed98cf5274d1d8c89aa000d",
       "rows": 4
     },
     "rankings.ndjson": {
-      "sha256": "747f38b53588c4579d416dc4e9236de66ea85734837193d73a22204b63581da1",
+      "sha256": "887cf160982059d0f46bc927f485431f1baae4e9701f843cce459d817cadd5ad",
       "rows": 400
     },
     "games.ndjson": {
-      "sha256": "d61321ae5425ff17c663369ba361a562d52cd82db95af039f684f04e5144bc7b",
-      "rows": 29380
+      "sha256": "8cfb9bd152531ad82f1af935d2af8239abe0301f63cf584341f5af2fcf9d2b90",
+      "rows": 29384
     },
     "pending.ndjson": {
       "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
       "rows": 0
     },
     "sync_jobs.ndjson": {
-      "sha256": "772e8b072bb8341a579c70d0790416382ca14427a64ee76111adb57a800402b3",
-      "rows": 9
+      "sha256": "247168be47508ca245535a85e2cb4cc37fb7c03497bee66da86d5a42f01b6300",
+      "rows": 10
     },
     "site_config.ndjson": {
-      "sha256": "130a640890537c023df728dbbf45684d0c116ed03e61efa62a9d6fff0c1d49a7",
+      "sha256": "2a9c9c0802e281da14c4ece53b5183f10a94e5aa765b8d634957681bd0808365",
       "rows": 5
     }
   }
