@@ -366,9 +366,9 @@
       "js": "index-BsWfcI4z.js",
       "css": "index-HAJatV8j.css"
     },
-    "sourceCommit": "140769e14c8cdf9675c638f2c1309c2cf49c8a64 (initial feature commit; final polish recorded separately)",
+    "sourceCommit": "31fdf6b767f629bddf1f089f10898d219cef3fb8",
     "cloudRun": "https://github.com/caozqiu/yuri-ladder/actions/runs/39595563307",
-    "cloudStatus": "in_progress",
+    "cloudStatus": "success",
     "published": false,
     "data": [
       {
@@ -383,6 +383,13 @@
         "cutoff": 1788191999,
         "sha256": "6251e23893f77950a38209ccaca68ab990d547d263a5269596276d4a4273d092"
       }
-    ]
+    ],
+    "cloudTests": {
+      "commit": "140769e14c8cdf9675c638f2c1309c2cf49c8a64",
+      "passed": 45,
+      "failed": 0,
+      "skipped": 0
+    },
+    "deploymentBlockedBy": "Missing EDGEONE_API_TOKEN; production still serves previous assets"
   }
 }
