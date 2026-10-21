@@ -1,0 +1,36 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {mkdtemp,readFile,writeFile,mkdir} from 'node:fs/promises';
+import {join,resolve} from 'node:path';
+import {SQLiteDatabase} from '../src/sqlite.mjs';
+import {saveCheckpoint,restoreCheckpoint} from '../src/checkpoint.mjs';
+import {writePublication} from '../src/publication.mjs';
+test('fresh database resumes exact cursor, pending data and large match ID after a process boundary',async()=>{
+ await mkdir(resolve('.runtime-test'),{recursive:true});
+ const directory=await mkdtemp(resolve('.runtime-test/checkpoint-'));
+ const a=new SQLiteDatabase(':memory:');a.migrate(resolve('migrations'));
+ const game={id:'9223372036854775807',start:100,players:[{id:'1',country:0,result:1},{id:'2',country:9,result:0}],map:'Test'};
+ a.connection.prepare('INSERT INTO games VALUES (?,?,?,?)').run('staging',game.id,100,JSON.stringify(game));
+ a.connection.prepare('INSERT INTO pending VALUES (?,?,?,?)').run('staging','9223372036854775806','1',JSON.stringify({matchId:'9223372036854775806'}));
+ a.connection.prepare('INSERT INTO sync_jobs VALUES (?,?,?,?)').run('same-run','retry',JSON.stringify({index:4,players:[{token:'next-page-token'}]}),123);
+ await saveCheckpoint(a,directory);a.close();
+ const b=new SQLiteDatabase(':memory:');b.migrate(resolve('migrations'));assert.equal(await restoreCheckpoint(b,directory),true);
+ const run=b.connection.prepare('SELECT * FROM sync_jobs').get();assert.equal(run.id,'same-run');assert.equal(JSON.parse(run.data).players[0].token,'next-page-token');
+ assert.equal(b.connection.prepare('SELECT match FROM pending').get().match,'9223372036854775806');
+ assert.equal(b.connection.prepare('SELECT COUNT(*) AS n FROM appearances').get().n,2);
+ assert.equal(b.connection.prepare('SELECT match FROM games').get().match,game.id);
+ const body=await readFile(join(directory,'games.ndjson'),'utf8');await writeFile(join(directory,'games.ndjson'),body+'corruption');
+ await assert.rejects(()=>restoreCheckpoint(b,directory),/校验失败/);
+ assert.equal(b.connection.prepare('SELECT COUNT(*) AS n FROM games').get().n,1);b.close();
+});
+test('failed or unfinished sync never replaces published complete snapshot',async()=>{
+ await mkdir(resolve('.runtime-test'),{recursive:true});
+ const directory=await mkdtemp(resolve('.runtime-test/publication-'));
+ const seed={season:{id:1,name:'Test',start:0,end:200},snapshot:'complete',cutoff:100,players:[{id:'1',rank:1}],matches:[],meta:{scanned:1,missing:0}};
+ await writePublication(directory,[seed]);
+ await writePublication(directory,[{...seed,snapshot:'half'}],{state:'retry',phase:'list',playersDone:4,totalPlayers:200,error:'source timeout'});
+ const index=JSON.parse(await readFile(join(directory,'index.json'),'utf8'));
+ assert.equal(index.snapshots[0].snapshot,'complete');assert.equal(index.progress.state,'retry');assert.equal(index.progress.done,4);
+ await assert.rejects(()=>writePublication(directory,[{...seed,meta:{scanned:0,missing:1}}],{state:'complete'}),/完整度/);
+ const unchanged=JSON.parse(await readFile(join(directory,'index.json'),'utf8'));assert.equal(unchanged.snapshots[0].snapshot,'complete');
+});

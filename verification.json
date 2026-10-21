@@ -1,0 +1,56 @@
+{
+  "at": "2026-10-21T05:07:39.238Z",
+  "build": "npm ci && node build.mjs",
+  "tests": {
+    "passed": 20,
+    "failed": 0,
+    "skipped": 1,
+    "filterParityCases": 96,
+    "skipReason": "Git MSYS named objects blocked by local Windows sandbox; Linux CI integration pending"
+  },
+  "seasons": [
+    {
+      "season": 31,
+      "players": 100,
+      "rawMatches": 6483,
+      "decisiveMatches": 6067,
+      "appearances": 8075,
+      "wins": 5530,
+      "losses": 2545,
+      "draws": 0
+    },
+    {
+      "season": 30,
+      "players": 100,
+      "rawMatches": 8167,
+      "decisiveMatches": 7634,
+      "appearances": 10228,
+      "wins": 6805,
+      "losses": 3423,
+      "draws": 0
+    }
+  ],
+  "resume": {
+    "run": "bfe54033-d910-4d48-9dd3-8dd25b9f02b0",
+    "first": 2,
+    "second": 4,
+    "total": 200,
+    "pending": 102,
+    "freshDatabases": true,
+    "officialSource": true
+  },
+  "deployment": {
+    "edgeone": false,
+    "domainPurchased": false,
+    "domainBound": false,
+    "cloudScheduleVerified": false,
+    "mainlandDirectVerified": false,
+    "browserLayoutRechecked": false
+  },
+  "domainCheck": {
+    "name": "yuri-ladder.com",
+    "officialRegistry": "rdap.verisign.com",
+    "httpStatus": 404,
+    "meaning": "No registry record at lookup time; registrar checkout still required"
+  }
+}

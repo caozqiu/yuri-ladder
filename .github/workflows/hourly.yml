@@ -1,0 +1,79 @@
+name: Hourly ladder sync and deploy
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '55 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: yuri-ladder-production
+  cancel-in-progress: false
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    env:
+      YURI_DATA_DIR: .runtime
+      YURI_CHECKPOINT_DIR: .checkpoint/state
+      YURI_PUBLIC_DATA_DIR: .checkpoint/public
+      YURI_SYNC_MINUTES: '35'
+      EDGEONE_PROJECT_NAME: ${{ vars.EDGEONE_PROJECT_NAME || 'yuri-ladder' }}
+      EDGEONE_SITE: ${{ vars.EDGEONE_SITE || 'china' }}
+      EDGEONE_CONFIGURED: ${{ secrets.EDGEONE_API_TOKEN != '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.22.3'
+          cache: npm
+      - run: npm ci
+      - name: Restore durable checkpoint branch
+        run: node scripts/state-branch.mjs restore
+      - name: Build collector and frontend
+        run: npm run build
+      - name: Resume official-source sync
+        id: sync
+        continue-on-error: true
+        env:
+          YURI_AUTOMATION_ENABLED: ${{ secrets.EDGEONE_API_TOKEN != '' && '1' || '0' }}
+        run: |
+          set +e
+          node collector/collector.mjs sync
+          result=$?
+          echo "exit_code=$result" >> "$GITHUB_OUTPUT"
+          if [ "$result" -eq 75 ]; then exit 0; fi
+          exit "$result"
+      - name: Save complete data and unfinished pagination
+        if: always() && steps.sync.outcome != 'skipped'
+        run: node scripts/state-branch.mjs save
+      - name: Rebuild with complete publication
+        run: npm run build
+      - name: Verify counts and readonly API
+        run: npm test
+      - name: Save ready-to-upload website
+        uses: actions/upload-artifact@v4
+        with:
+          name: edgeone-ready-site
+          path: dist/
+          retention-days: 1
+      - name: Deploy the same free project
+        if: env.EDGEONE_CONFIGURED == 'true'
+        env:
+          EDGEONE_API_TOKEN: ${{ secrets.EDGEONE_API_TOKEN }}
+        run: |
+          if [ -z "$EDGEONE_API_TOKEN" ]; then
+            echo 'Set EDGEONE_API_TOKEN in repository Actions secrets before publishing.'
+            exit 1
+          fi
+          npx --yes edgeone@1.6.44 makers deploy ./dist -n "$EDGEONE_PROJECT_NAME" --site "$EDGEONE_SITE" -t "$EDGEONE_API_TOKEN"
+      - name: Report publishing setup still needed
+        if: env.EDGEONE_CONFIGURED != 'true'
+        run: |
+          echo 'Data sync and upload artifact are ready. Website deployment is waiting for EDGEONE_API_TOKEN.' >> "$GITHUB_STEP_SUMMARY"
+      - name: Report source failure after retaining last complete publication
+        if: steps.sync.outputs.exit_code == '1'
+        run: |
+          echo 'Source sync paused or failed; checkpoint retained and last complete data published. Review sync_progress logs.'
+          exit 1
