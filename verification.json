@@ -1,12 +1,13 @@
 {
-  "at": "2026-10-21T05:07:39.238Z",
+  "at": "2026-10-21T06:01:44.908Z",
   "build": "npm ci && node build.mjs",
   "tests": {
-    "passed": 20,
+    "passed": 21,
     "failed": 0,
     "skipped": 1,
     "filterParityCases": 96,
-    "skipReason": "Git MSYS named objects blocked by local Windows sandbox; Linux CI integration pending"
+    "skipReason": "Git MSYS named objects blocked by local Windows sandbox; Linux CI integration pending",
+    "total": 22
   },
   "seasons": [
     {
@@ -45,12 +46,34 @@
     "domainBound": false,
     "cloudScheduleVerified": false,
     "mainlandDirectVerified": false,
-    "browserLayoutRechecked": false
+    "browserLayoutRechecked": false,
+    "edgeoneServiceOpened": true,
+    "edgeoneProjectCreated": false
   },
   "domainCheck": {
     "name": "yuri-ladder.com",
     "officialRegistry": "rdap.verisign.com",
     "httpStatus": 404,
     "meaning": "No registry record at lookup time; registrar checkout still required"
+  },
+  "github": {
+    "repository": "https://github.com/caozqiu/yuri-ladder",
+    "visibility": "public",
+    "sourceCommit": "8e826463306f12976c0271acc49d53262e5b2a9f",
+    "firstRun": {
+      "id": 39552054978,
+      "jobId": 119063244588,
+      "testsPassed": 21,
+      "testsSkipped": 0,
+      "scannedPlayers": 200,
+      "totalPlayers": 200,
+      "pendingMatches": 3772,
+      "state": "retry",
+      "sourceLimited": true,
+      "checkpointPushed": true,
+      "completePublicationRetained": true,
+      "uploadArtifactCreated": true,
+      "websiteDeployed": false
+    }
   }
 }
