@@ -9,6 +9,10 @@ export type Season = { id:number; name:string; start:number; end:number };
 export type AnalyticsGroup = {total:Counter; factions:Record<string,Counter>; uniqueMatches:number};
 export type TrendPoint = AnalyticsGroup & {start:number; end:number; label:string};
 export type Analytics = {
+ matchups:{a:string;b:string;uniqueMatches:number;directions:MatchupCell[]}[];
+ gapTiers:(Counter & {key:string;name:string;uniqueMatches:number;factions:Record<string,Counter>})[];
+ mapMatchups:(Counter & {name:string;uniqueMatches:number;cells:MatchupCell[]})[];
+ crossSummary:Counter & {uniqueMatches:number;unknownGap:number};
  maps:(AnalyticsGroup & {name:string})[];
  trend:{bucket:string; timezone:string; points:TrendPoint[]};
  comparisons:(Profile & AnalyticsGroup)[];
@@ -19,4 +23,5 @@ export type BaseStatsResponse = { seasons:Season[]; season:Season|null; snapshot
 
 export type RatingFilters = {mmrMin:number|null;mmrMax:number|null;enemyMmrMin:number|null;enemyMmrMax:number|null;gapMin:number|null;gapMax:number|null;gapDirection:string;minSamples:number};
 export type RatingCoverage = {basis:string;before:number;matched:number;comparable:number;comparablePercent:number|null;excludedUnknown:number;excludedByScore:number;active:boolean};
-export type StatsResponse = BaseStatsResponse & {filters:RatingFilters & {map:string;segment:string};coverage:RatingCoverage;mapOptions:string[];analytics:Analytics};
+export type MatchupCell = MatrixCell & {uniqueMatches:number};
+export type StatsResponse = BaseStatsResponse & {filters:RatingFilters & {map:string;segment:string};coverage:RatingCoverage;mapOptions:string[];analytics:Analytics;funnel:{key:string;name:string;games:number;uniqueMatches:number}[];ratingOptions:{min:number;max:number;gapMax:number}};

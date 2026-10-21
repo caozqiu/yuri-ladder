@@ -23,6 +23,10 @@ export function reportRows(data,players,cutoffLabel){
  ...data.analytics.comparisons.map(p=>[p.name,p.total.games,p.total.wins,p.total.losses,pct(p.total.winRate),...interval(p.total)]),[],
  ['分段类型','分段（榜单快照）','选手数','出场次数','胜','负','胜率','95%下界','95%上界',...FACTIONS.flatMap(x=>[x.name+'场次',x.name+'胜率'])],
  ...Object.entries(data.analytics.tiers).flatMap(([type,tiers])=>tiers.map(t=>[type,t.name,t.players,t.total.games,t.total.wins,t.total.losses,pct(t.total.winRate),...interval(t.total),...FACTIONS.flatMap(x=>[t.factions[x.key].games,pct(t.factions[x.key].winRate)])]))];
+ if(data.funnel)rows.push([],['筛选漏斗','选手出场次数','独立比赛数'],...data.funnel.map(s=>[s.name,s.games,s.uniqueMatches]));
+ if(data.analytics.matchups)rows.push([],['异阵营方向（各有分母）','独立比赛','场次','胜','负','胜率','95%下界','95%上界'],...data.analytics.matchups.flatMap(p=>p.directions.map(d=>[d.own+' → '+d.enemy,d.uniqueMatches,d.games,d.wins,d.losses,pct(d.winRate),...interval(d)])));
+ if(data.analytics.gapTiers)rows.push([],['绝对分差','己方阵营','场次','胜','负','胜率','95%下界','95%上界'],...data.analytics.gapTiers.flatMap(t=>FACTIONS.map(f=>{const c=t.factions[f.key];return [t.name,f.name,c.games,c.wins,c.losses,pct(c.winRate),...interval(c)];})),['异阵营分层未知积分排除',data.analytics.crossSummary.unknownGap]);
+ if(data.analytics.mapMatchups){const allowed=new Set(data.analytics.maps.filter(m=>m.total.games>=f.minSamples).map(m=>m.name));rows.push([],['地图对阵','己方','对手','场次','胜','负','胜率','95%下界','95%上界'],...data.analytics.mapMatchups.filter(m=>allowed.has(m.name)).flatMap(m=>m.cells.map(d=>[m.name,d.own,d.enemy,d.games,d.wins,d.losses,pct(d.winRate),...interval(d)])));}
  return rows;
 }
 export function makeReportCsv(data,players,cutoffLabel){return '\uFEFF'+reportRows(data,players,cutoffLabel).map(row=>row.map(csvCell).join(',')).join('\r\n');}

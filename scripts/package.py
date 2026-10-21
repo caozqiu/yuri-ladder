@@ -2,6 +2,12 @@ from pathlib import Path
 import hashlib
 import json
 import zipfile
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--edition', default='')
+args = parser.parse_args()
+edition = args.edition + '_' if args.edition else ''
 
 root = Path(__file__).resolve().parents[1]
 outputs = root.parents[1] / 'outputs'
@@ -16,7 +22,7 @@ def archive(path, files):
     return {'file': path.name, 'bytes': path.stat().st_size,
             'sha256': hashlib.sha256(path.read_bytes()).hexdigest()}
 
-upload = archive(outputs / '尤复天梯观察站_EdgeOne上传包.zip',
+upload = archive(outputs / f'尤复天梯观察站_{edition}EdgeOne上传包.zip',
                  [(p, p.relative_to(root / 'dist')) for p in (root / 'dist').rglob('*') if p.is_file()])
 folders = ['shared', 'src', 'web', 'vendor', 'migrations', 'scripts', 'tests', '.github', 'dist']
 files = []
@@ -27,9 +33,9 @@ for name in ['package.json', 'package-lock.json', 'edgeone.json', 'build.mjs', '
     files.append((root / name, Path(name)))
 files.append((root / 'collector/collector.mjs', Path('collector/collector.mjs')))
 files.extend((p, p.relative_to(root)) for p in (root / 'collector/migrations').rglob('*') if p.is_file())
-source = archive(outputs / '尤复天梯观察站_免费托管源码及预览.zip', files)
+source = archive(outputs / f'尤复天梯观察站_{edition}源码及预览.zip', files)
 assert not any('.checkpoint' in str(name) or 'node_modules' in str(name) for _, name in files)
-(outputs / '免费托管包_SHA256.json').write_text(json.dumps([upload, source], ensure_ascii=False, indent=2), encoding='utf-8')
-(outputs / '免费托管验收.json').write_text((root / 'verification.json').read_text(encoding='utf-8'), encoding='utf-8')
-(outputs / '免费托管运行说明.md').write_text((root / 'README.md').read_text(encoding='utf-8'), encoding='utf-8')
+(outputs / f'{edition}包_SHA256.json').write_text(json.dumps([upload, source], ensure_ascii=False, indent=2), encoding='utf-8')
+(outputs / f'{edition}验收.json').write_text((root / 'verification.json').read_text(encoding='utf-8'), encoding='utf-8')
+(outputs / f'{edition}运行说明.md').write_text((root / 'README.md').read_text(encoding='utf-8'), encoding='utf-8')
 print(json.dumps([upload, source], ensure_ascii=False))

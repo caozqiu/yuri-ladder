@@ -1,0 +1,22 @@
+import {useState} from 'react';
+import {FACTIONS} from '../lib/core.mjs';
+import {DIRECTIONS} from '../lib/matchup-analytics.mjs';
+import {wilson95} from '../lib/rating-filters.mjs';
+import type {Counter,StatsResponse} from '../lib/types';
+type Open=(own:string,enemy:string,map?:string)=>void;
+const label=(key:string)=>FACTIONS.find(f=>f.key===key)!;
+const pct=(value:number|null)=>value===null?'—':value.toFixed(2)+'%';
+function Readout({value}:{value:Counter}){const ci=wilson95(value);return <><strong>{pct(value.winRate)}</strong><span>{value.games.toLocaleString()} 场 · {value.wins} 胜 / {value.losses} 负</span>{ci&&<small>95% 区间 {ci.low.toFixed(1)}–{ci.high.toFixed(1)}%</small>}{value.games>0&&value.games<20&&<em>样本较少</em>}</>;}
+export function MatchupPairs({data,onOpen}:{data:StatsResponse;onOpen:Open}){
+ return <><p className="analysis-explanation">仅统计异阵营交手。两个方向分别按“己方符合当前筛选”计数；样本可能不同，胜率无需相加为100%。</p><div className="matchup-pairs">{data.analytics.matchups.map(pair=><article className="panel pair-card" key={pair.a+pair.b}><header><h3><span style={{color:label(pair.a).color}}>{label(pair.a).name}</span><small>vs</small><span style={{color:label(pair.b).color}}>{label(pair.b).name}</span></h3><span>{pair.uniqueMatches} 场独立比赛</span></header><div className="pair-directions">{pair.directions.map(d=><button key={d.own} disabled={!d.games} onClick={()=>onOpen(d.own,d.enemy)} style={{'--faction':label(d.own).color} as React.CSSProperties}><span className="direction-label">{label(d.own).name} → {label(d.enemy).name}</span><Readout value={d}/><div className="direction-track"><i style={{width:(d.winRate||0)+'%'}}/></div></button>)}</div></article>)}</div></>;
+}
+export function GapTiers({data}:{data:StatsResponse}){
+ return <section className="panel screen-panel"><div className="panel-heading"><h2>分差分层</h2><span className="mini-badge">异阵营 · 按绝对分差</span></div><p className="analysis-explanation">继承当前全部筛选。{data.analytics.crossSummary.unknownGap.toLocaleString()} 次异阵营出场缺少双方积分，未进入分层；同一场可有两个选手视角。</p><div className="table-scroll"><table className="insight-table gap-table"><thead><tr><th>绝对分差</th>{FACTIONS.map(f=><th key={f.key} style={{color:f.color}}>{f.name}</th>)}<th>独立比赛</th></tr></thead><tbody>{data.analytics.gapTiers.map(t=><tr key={t.key}><th>{t.name}</th>{FACTIONS.map(f=><td key={f.key}><div className="cell-readout"><Readout value={t.factions[f.key]}/></div></td>)}<td>{t.uniqueMatches}</td></tr>)}</tbody></table></div></section>;
+}
+export function MapHeatmap({data,onOpen}:{data:StatsResponse;onOpen:Open}){
+ const [search,setSearch]=useState(''),[limit,setLimit]=useState(12);
+ // The display threshold uses all valid map appearances, exactly as the map list.
+ const allowed=new Set(data.analytics.maps.filter(m=>m.total.games>=data.filters.minSamples).map(m=>m.name));
+ const rows=data.analytics.mapMatchups.filter(m=>allowed.has(m.name)&&m.name.toLowerCase().includes(search.trim().toLowerCase()));
+ return <section className="panel screen-panel"><div className="panel-heading"><h2>地图 × 阵营对抗</h2><label className="heatmap-search"><span className="sr-only">热图地图搜索</span><input aria-label="搜索热图地图" placeholder="搜索地图…" value={search} onChange={e=>{setSearch(e.target.value);setLimit(12);}}/></label></div><p className="analysis-explanation">六个方向独立计算，排除内战。每格显示胜率与样本数；点击查看同一批次的原始比赛。地图保留官方原名与版本。</p>{rows.length?<><div className="table-scroll heatmap-scroll"><table className="map-heatmap"><thead><tr><th>地图 / 独立比赛</th>{DIRECTIONS.map(d=><th key={d.own+d.enemy}><span style={{color:label(d.own).color}}>{label(d.own).name}</span> → {label(d.enemy).name}</th>)}</tr></thead><tbody>{rows.slice(0,limit).map(m=><tr key={m.name}><th title={m.name}>{m.name}<small>{m.uniqueMatches} 场异阵营独立比赛</small></th>{m.cells.map(c=><td key={c.own+c.enemy}><button className={c.games>0&&c.games<20?'low-sample':''} disabled={!c.games} aria-label={`${m.name}，${label(c.own).name}对${label(c.enemy).name}，${pct(c.winRate)}，${c.games}场，查看比赛`} title={c.games?`${c.wins} 胜 / ${c.losses} 负${c.games<20?' · 样本较少':''}`:'没有样本'} onClick={()=>onOpen(c.own,c.enemy,m.name)} style={{'--faction':label(c.own).color,'--heat':String(.03+(c.winRate||0)/100*.2)} as React.CSSProperties}><strong>{pct(c.winRate)}</strong><span>{c.games} 场{c.games>0&&c.games<20?' · 小样本':''}</span></button></td>)}</tr>)}</tbody></table></div>{rows.length>limit&&<button className="secondary insight-more" onClick={()=>setLimit(n=>n+12)}>再显示12张地图</button>}</>:<div className="insight-empty">当前条件下没有异阵营地图样本，可放宽筛选。</div>}</section>;
+}

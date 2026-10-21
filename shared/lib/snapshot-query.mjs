@@ -1,6 +1,7 @@
 import {summarize, windowStart, faction} from './core.mjs';
 import {buildAnalytics, inSegment, SEGMENTS} from './analytics.mjs';
-import {parseRatingFilters,rating,ownRatingMatches,opponentRatingMatches,ratingCoverage} from './rating-filters.mjs';
+import {parseRatingFilters,rating,ownRatingMatches,opponentRatingMatches,ratingCoverage,missingRequiredRating} from './rating-filters.mjs';
+import {buildMatchups} from './matchup-analytics.mjs';
 
 export class QueryError extends Error {
   constructor(message,status=400){super(message);this.status=status;}
@@ -76,10 +77,16 @@ export async function querySnapshot(path,q,manifest,load,now=Math.floor(Date.now
       counts.get(key)[r.result===1?'wins':'losses']++;
     }
     const uniqueMatches=new Set(filtered.filter(r=>!player||r.user===player).map(r=>r.match)).size;
+    const personal=rs=>rs.filter(r=>!player||r.user===player);
+    const stage=(key,name,rs)=>({key,name,games:rs.length,uniqueMatches:new Set(rs.map(r=>r.match)).size});
+    const ownRows=personal(eligible),knownRows=ownRows.filter(r=>!missingRequiredRating(r,ratingFilters)),resultRows=personal(filtered);
+    const funnel=[stage('base','基础胜负出场',mapRows),stage('own','己方范围',ownRows),stage('known','所需积分已知',knownRows),stage('matched','最终匹配',resultRows)];
+    const values=seed.players.map(p=>rating(p.mmr)).filter(v=>v!==null),gaps=rows.filter(r=>r.scoreGap!==null).map(r=>Math.abs(r.scoreGap));
+    const ratingOptions={min:values.length?Math.floor(Math.min(...values)/100)*100:0,max:values.length?Math.max(100,Math.ceil(Math.max(...values)/100)*100):5000,gapMax:gaps.length?Math.max(100,Math.ceil(Math.max(...gaps)/100)*100):1000};
     return {seasons,season,snapshot:entry.snapshot,cutoff:entry.cutoff,meta:entry.meta,progress:manifest.progress||null,
       ...summarize([...counts.values()],seed.players.filter(p=>inSegment(p,segment)&&ownRatingMatches(p,ratingFilters)),granularity,player,uniqueMatches),window:range,scope,granularity,
-      filters:{map,segment,...ratingFilters},coverage,mapOptions,
-      analytics:buildAnalytics({rows:filtered,cohortRows,profiles,player,compare,start,cutoff:entry.cutoff,bucket:q.get('bucket')==='week'?'week':'day'}),
+      filters:{map,segment,...ratingFilters},coverage,mapOptions,funnel,ratingOptions,
+      analytics:{...buildAnalytics({rows:filtered,cohortRows,profiles,player,compare,start,cutoff:entry.cutoff,bucket:q.get('bucket')==='week'?'week':'day'}),...buildMatchups(resultRows)},
       stale:now-(season.end<=now?entry.created:entry.cutoff)>10800,automation:manifest.automation||{enabled:false}};
   }
   const own=countryFilter(q.get('own'),granularity),enemy=countryFilter(q.get('enemy'),granularity);
