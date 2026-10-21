@@ -76,6 +76,27 @@ jobs:
       - name: Verify public statistics after deployment
         if: env.EDGEONE_CONFIGURED == 'true'
         run: node scripts/verify-public.mjs
+      - name: Save compiled upload package
+        if: env.EDGEONE_CONFIGURED == 'true'
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from zipfile import ZipFile, ZIP_DEFLATED
+          root = Path('dist/.edgeone')
+          assert (root / 'assets/index.html').is_file()
+          assert (root / 'edge-functions/config.json').is_file()
+          with ZipFile('.runtime/edgeone-compiled-site.zip', 'w', ZIP_DEFLATED) as archive:
+              for path in sorted(root.rglob('*')):
+                  if path.is_file():
+                      archive.write(path, path.relative_to(root).as_posix())
+          PY
+      - name: Save executable deployment artifact
+        if: env.EDGEONE_CONFIGURED == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: edgeone-compiled-site
+          path: .runtime/edgeone-compiled-site.zip
+          retention-days: 7
       - name: Save production verification
         if: env.EDGEONE_CONFIGURED == 'true'
         uses: actions/upload-artifact@v4
