@@ -2,7 +2,7 @@ import {summarize, windowStart, faction} from './core.mjs';
 import {buildAnalytics, inSegment, SEGMENTS} from './analytics.mjs';
 import {parseRatingFilters,rating,ownRatingMatches,opponentRatingMatches,ratingCoverage,missingRequiredRating} from './rating-filters.mjs';
 import {buildMatchups} from './matchup-analytics.mjs';
-import {opponentDossier,rankingHistory} from './player-research.mjs';
+import {opponentDossier,rankingHistory,rankingSummary} from './player-research.mjs';
 
 export class QueryError extends Error {
   constructor(message,status=400){super(message);this.status=status;}
@@ -45,6 +45,12 @@ export async function querySnapshot(path,q,manifest,load,now=Math.floor(Date.now
   const entry=[...manifest.snapshots,...(manifest.previous||[])].find(s=>s.season.id===season.id&&(!pinned||s.snapshot===pinned));
   if(!entry)throw new QueryError('这批数据已更新，请刷新后重试',409);
   if(path==='/api/history'){
+    if(q.get('summary')==='1'){
+      if(!entry.history)return {available:false,season:season.id,snapshot:entry.snapshot,asOf:entry.created,observations:0,firstObserved:null,players:[],changes:null};
+      const archive=await load(entry.history),seed=await load(entry);
+      if(archive.snapshot!==entry.snapshot||seed.snapshot!==entry.snapshot)throw new QueryError('历史数据批次不一致，请刷新后重试',503);
+      return rankingSummary(archive,seed.players);
+    }
     const player=playerFilter(q);if(!player)throw new QueryError('请指定选手编号');
     const range=q.get('historyRange')||'all';if(!['all','7d','30d'].includes(range))throw new QueryError('历史周期无效');
     if(!entry.history)return {player,season:season.id,snapshot:entry.snapshot,asOf:entry.created,range,available:false,firstObserved:null,points:[],basis:'observed-ladder-snapshot'};

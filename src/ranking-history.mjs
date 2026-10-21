@@ -6,7 +6,7 @@ export function recordRanking(db,{snapshot,season,observed,players}){
  if(!snapshot||!Number.isInteger(observed)||observed<=0||!players.length||players.length>100)return false;
  const sorted=[...players].sort((a,b)=>a.rank-b.rank);
  if(new Set(sorted.map(p=>p.id)).size!==sorted.length||sorted.some((p,i)=>typeof p.id!=='string'||!/^\d{1,20}$/.test(p.id)||p.rank!==i+1))return false;
- const data=JSON.stringify(sorted.map(p=>[p.id,p.rank,Number.isFinite(p.mmr)?p.mmr:null]));
+ const data=JSON.stringify(sorted.map(p=>[p.id,p.rank,Number.isFinite(p.mmr)?p.mmr:null,p.name||'']));
  db.connection.prepare('INSERT INTO ranking_history(snapshot,season,observed,data) VALUES (?,?,?,?) ON CONFLICT(snapshot) DO NOTHING').run(snapshot,season,observed,data);
  return true;
 }

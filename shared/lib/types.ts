@@ -12,6 +12,8 @@ export type OpponentStats = {id:string;name:string;rank:number|null;mmr:number|n
 export type OpponentDossier = {player:string;basis:string;closeGap:number;opponents:number;knownScoreGames:number;bands:(Counter & {key:string;name:string;opponents:number})[];rows:OpponentStats[]};
 export type HistoryPoint = {at:number;snapshot:string;rank:number|null;mmr:number|null;status:string};
 export type RankingHistory = {player:string;season:number;snapshot:string;asOf:number;range:string;available:boolean;firstObserved:number|null;points:HistoryPoint[];basis:string};
+export type HistoryProfile = {id:string;name:string;rank:number;mmr:number|null;lastSeen:number;inLatest:boolean};
+export type HistorySummary = {available:boolean;season:number;snapshot:string;asOf:number;observations:number;firstObserved:number|null;players:HistoryProfile[];changes:{from:number;to:number;entered:HistoryProfile[];exited:HistoryProfile[]}|null};
 export type Analytics = {
  opponents:OpponentDossier|null;
  matchups:{a:string;b:string;uniqueMatches:number;directions:MatchupCell[]}[];

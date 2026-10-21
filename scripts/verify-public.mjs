@@ -36,6 +36,7 @@ for(const entry of manifest.snapshots){
  assert.ok(entry.history,'completed source sync must publish a ranking history');
  const archive=await request(entry.history.file);assert.equal(archive.status,200);assert.equal(createHash('sha256').update(archive.body).digest('hex'),entry.history.sha256);
  const history=await request('/api/history?'+personalQ);assert.equal(history.status,200);assert.equal(history.json.snapshot,entry.snapshot);assert.ok(history.json.available);
+ const summaryQ=new URLSearchParams({season:String(entry.season.id),snapshot:entry.snapshot,summary:'1'}),summary=await request('/api/history?'+summaryQ);assert.equal(summary.status,200);assert.ok(summary.json.players.some(p=>p.id===player));assert.equal(summary.json.snapshot,entry.snapshot);
  assert.ok(history.json.points.length>0);assert.ok(history.json.points.every(p=>p.at<=history.json.asOf&&(p.status==='ranked'||p.rank===null&&p.mmr===null)));
  const rows=archive.json.observations.filter(o=>o.at<=history.json.asOf);assert.equal(history.json.points.length,rows.length);
  const last=rows.at(-1),expectedRank=last.players.find(p=>p[0]===player);assert.equal(history.json.points.at(-1).rank,expectedRank?.[1]??null);assert.equal(history.json.points.at(-1).mmr,expectedRank?.[2]??null);

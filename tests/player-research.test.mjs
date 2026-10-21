@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {querySnapshot} from '../shared/lib/snapshot-query.mjs';
 import {reportRows} from '../shared/lib/report-csv.mjs';
-import {rankingHistory} from '../shared/lib/player-research.mjs';
+import {rankingHistory,rankingSummary} from '../shared/lib/player-research.mjs';
 import {presetQuery,statsQuery} from '../shared/lib/navigation.mjs';
 const players=[4000,4100,4101,3900,3899].map((mmr,i)=>({id:String(i+1),rank:i+1,mmr,name:'选手'+(i+1)}));
 const g=(id,b,result=1,map='A')=>({id,season:1,start:100,map,players:[{id:'1',country:0,result},{id:b,name:'来源对手'+b,country:6,result:result===2?2:1-result}]});
@@ -49,4 +49,10 @@ test('history API pins the same batch independently from all match filters and s
  await assert.rejects(()=>query({player:'1',snapshot:'old'},'/api/history'),{status:409});
  assert.equal(new URLSearchParams(presetQuery('screen=players&research=history&historyRange=7d&rival=2')).get('research'),'history');
  assert.equal(statsQuery('player=1&research=history&historyRange=7d&rival=2'),statsQuery('player=1'));
+});
+test('history directory retains dropped players and compares only adjacent complete observations',()=>{
+ const summary=rankingSummary({...history,observations:history.observations.slice(0,2)},players);
+ assert.equal(summary.players.find(p=>p.id==='1').inLatest,false);assert.equal(summary.players.find(p=>p.id==='1').name,'选手1');
+ assert.deepEqual(summary.changes.entered.map(p=>p.id),['2']);assert.deepEqual(summary.changes.exited.map(p=>p.id),['1']);
+ assert.equal(rankingSummary({...history,observations:[history.observations[0]]}).changes,null);
 });
