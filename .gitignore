@@ -9,3 +9,4 @@ web/site.css
 .env
 *.tmp
 release/
+cloud-release/

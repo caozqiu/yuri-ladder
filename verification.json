@@ -1,5 +1,5 @@
 {
-  "at": "2026-10-21T06:01:44.908Z",
+  "at": "2026-10-21T06:09:10.441Z",
   "build": "npm ci && node build.mjs",
   "tests": {
     "passed": 21,
@@ -13,22 +13,20 @@
     {
       "season": 31,
       "players": 100,
-      "rawMatches": 6483,
-      "decisiveMatches": 6067,
-      "appearances": 8075,
-      "wins": 5530,
-      "losses": 2545,
-      "draws": 0
+      "cutoff": 1792561982,
+      "matches": 6096,
+      "appearances": 8117,
+      "draws": 0,
+      "missing": 0
     },
     {
       "season": 30,
       "players": 100,
-      "rawMatches": 8167,
-      "decisiveMatches": 7634,
+      "cutoff": 1788191999,
+      "matches": 7634,
       "appearances": 10228,
-      "wins": 6805,
-      "losses": 3423,
-      "draws": 0
+      "draws": 0,
+      "missing": 0
     }
   ],
   "resume": {
@@ -48,7 +46,8 @@
     "mainlandDirectVerified": false,
     "browserLayoutRechecked": false,
     "edgeoneServiceOpened": true,
-    "edgeoneProjectCreated": false
+    "edgeoneProjectCreated": false,
+    "cloudCollectorVerified": true
   },
   "domainCheck": {
     "name": "yuri-ladder.com",
@@ -74,6 +73,66 @@
       "completePublicationRetained": true,
       "uploadArtifactCreated": true,
       "websiteDeployed": false
+    },
+    "latestRun": {
+      "run": 39553006464,
+      "testsPassed": 22,
+      "checkpointResumed": true,
+      "complete": true,
+      "seasons": [
+        {
+          "season": 31,
+          "players": 100,
+          "cutoff": 1792561982,
+          "matches": 6096,
+          "appearances": 8117,
+          "draws": 0,
+          "missing": 0
+        },
+        {
+          "season": 30,
+          "players": 100,
+          "cutoff": 1788191999,
+          "matches": 7634,
+          "appearances": 10228,
+          "draws": 0,
+          "missing": 0
+        }
+      ],
+      "progress": {
+        "state": "complete",
+        "stage": "complete",
+        "done": 200,
+        "total": 200
+      },
+      "siteDeployed": false,
+      "id": 39553006464,
+      "jobId": 119066227482,
+      "url": "https://github.com/caozqiu/yuri-ladder/actions/runs/39553006464",
+      "artifact": 12324307947,
+      "artifactSha256": "55a21e49f017586a7b8c76fd142ac71f064820ffdf5daf7de6433d5eb6d229b6"
     }
-  }
+  },
+  "initialSeasons": [
+    {
+      "season": 31,
+      "players": 100,
+      "rawMatches": 6483,
+      "decisiveMatches": 6067,
+      "appearances": 8075,
+      "wins": 5530,
+      "losses": 2545,
+      "draws": 0
+    },
+    {
+      "season": 30,
+      "players": 100,
+      "rawMatches": 8167,
+      "decisiveMatches": 7634,
+      "appearances": 10228,
+      "wins": 6805,
+      "losses": 3423,
+      "draws": 0
+    }
+  ]
 }
