@@ -87,35 +87,15 @@
       "websiteDeployed": false
     },
     "latestRun": {
-      "id": 39582864444,
-      "jobId": 119164471965,
-      "url": "https://github.com/caozqiu/yuri-ladder/actions/runs/39582864444",
-      "commit": "f51e7bcb9ef3e3777072e6047777bd5e75003395",
-      "complete": true,
-      "testsPassed": 29,
+      "id": 39589199322,
+      "jobId": 119185612159,
+      "url": "https://github.com/caozqiu/yuri-ladder/actions/runs/39589199322",
+      "commit": "12a6d7de17012333cc76c8f5181b0a2931f6440e",
+      "jobStatus": "success",
+      "testsPassed": 39,
       "testsSkipped": 0,
       "siteDeployed": false,
-      "deployStep": "skipped: EDGEONE_CONFIGURED=false",
-      "seasons": [
-        {
-          "season": 31,
-          "players": 100,
-          "cutoff": 1792577567,
-          "matches": 6102,
-          "appearances": 8125,
-          "draws": 0,
-          "missing": 0
-        },
-        {
-          "season": 30,
-          "players": 100,
-          "cutoff": 1788191999,
-          "matches": 7634,
-          "appearances": 10228,
-          "draws": 0,
-          "missing": 0
-        }
-      ]
+      "deployStep": "skipped: EDGEONE_CONFIGURED=false"
     }
   },
   "initialSeasons": [
@@ -342,7 +322,12 @@
       "csvDownloaded": true,
       "consoleErrors": 0
     },
-    "cloudTests": null,
-    "deployed": false
+    "cloudTests": {
+      "passed": 39,
+      "failed": 0,
+      "skipped": 0
+    },
+    "deployed": false,
+    "cloudRun": "https://github.com/caozqiu/yuri-ladder/actions/runs/39589199322"
   }
 }
