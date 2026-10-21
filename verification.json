@@ -1,13 +1,13 @@
 {
-  "at": "2026-10-21T10:25:18.961Z",
+  "at": "2026-10-21T11:02:35.312467+00:00",
   "build": "npm ci && node build.mjs",
   "tests": {
-    "passed": 28,
+    "passed": 38,
     "failed": 0,
     "skipped": 1,
     "filterParityCases": 96,
     "skipReason": "Local Windows Git sandbox; this integration runs on Linux CI",
-    "total": 29
+    "total": 39
   },
   "seasons": [
     {
@@ -41,7 +41,7 @@
   "deployment": {
     "edgeone": false,
     "domainPurchased": true,
-    "domainBound": false,
+    "domainBound": true,
     "cloudScheduleVerified": true,
     "mainlandDirectVerified": false,
     "browserLayoutRechecked": true,
@@ -51,17 +51,21 @@
     "domain": "yuri-ladder.cn",
     "edgeoneProjectId": "makers-i6sbocft2osz",
     "newFeaturesDeployed": false,
-    "domainReviewed": true
+    "domainReviewed": true,
+    "httpsVerified": true,
+    "ratingFeaturesDeployed": false
   },
   "domainCheck": {
     "name": "yuri-ladder.cn",
-    "status": "approved per user",
+    "status": "HTTPS verified; rating optimization not yet deployed",
     "nameservers": [
       "bike.dnspod.net",
       "puding.dnspod.net"
     ],
-    "dnsConfigured": false,
-    "httpsVerified": false
+    "dnsConfigured": true,
+    "httpsVerified": true,
+    "cname": "yuri-ladder.cn.pages.dnsoe6.com",
+    "homepageStatus": 200
   },
   "github": {
     "repository": "https://github.com/caozqiu/yuri-ladder",
@@ -305,5 +309,40 @@
       ],
       "verifiedPrevious": 3
     }
+  },
+  "ratingFeatureUpdate": {
+    "features": [
+      "custom-own-mmr",
+      "custom-opponent-mmr",
+      "absolute-gap-range",
+      "gap-direction",
+      "rating-coverage",
+      "minimum-samples",
+      "wilson95",
+      "filter-aware-csv"
+    ],
+    "ratingBasis": "ladder-snapshot",
+    "opponentRatingCoverage": "top100 profiles only; unknown required ratings excluded",
+    "localTests": {
+      "passed": 38,
+      "failed": 0,
+      "skipped": 1
+    },
+    "realDataCombinations": 84,
+    "browser": {
+      "desktop": true,
+      "mobile": {
+        "width": 390,
+        "height": 844,
+        "noHorizontalOverflow": true
+      },
+      "invalidRangeRetainsResult": true,
+      "shareReload": true,
+      "matchScoreEvidence": true,
+      "csvDownloaded": true,
+      "consoleErrors": 0
+    },
+    "cloudTests": null,
+    "deployed": false
   }
 }

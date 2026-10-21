@@ -19,6 +19,13 @@ test('deployable artifact serves both readonly APIs and blocks public writes',as
   const tier=stats.analytics.tiers.mmr.find(t=>t.total.games);
   const tierStats=await(await fetch(origin+'/api/stats?segment='+encodeURIComponent(tier.key))).json();
   assert.equal(tierStats.overview.games,tier.total.games);assert.equal(tierStats.players.length,tier.players);
+  const scoreStats=await(await fetch(origin+'/api/stats?gapMax=200&minSamples=20')).json();
+  const scoreMatches=await(await fetch(origin+'/api/matches?gapMax=200')).json();
+  assert.equal(scoreStats.coverage.matched,scoreStats.overview.games);
+  assert.equal(scoreStats.coverage.before,scoreStats.coverage.matched+scoreStats.coverage.excludedUnknown+scoreStats.coverage.excludedByScore);
+  assert.equal(scoreMatches.total,scoreStats.overview.games);
+  assert.ok(scoreMatches.matches.every(m=>m.ownMmr!==null&&m.opponentMmr!==null&&Math.abs(m.scoreGap)<=200));
+  assert.equal((await fetch(origin+'/api/stats?gapMin=300&gapMax=100')).status,400);
   const matches=await(await fetch(origin+'/api/matches?season='+stats.season.id)).json();assert.ok(matches.total>0);assert.ok(matches.matches.every(m=>m.result===0||m.result===1));
   assert.equal((await fetch(origin+'/api/stats',{method:'POST'})).status,405);
   for(const path of ['/api/sync','/api/admin','/mcp','/collector/collector.mjs','/state/checkpoint.json'])assert.equal((await fetch(origin+path)).status,404,path);
