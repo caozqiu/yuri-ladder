@@ -24,7 +24,7 @@ npm run preview
 3. 在 EdgeOne 控制台创建限于所需项目的 API Token。在 GitHub Settings → Secrets and variables → Actions 中保存为 EDGEONE_API_TOKEN。凭据只放 Secrets，不要发到聊天或写入源码。
 4. GitHub Actions 仓库变量 EDGEONE_PROJECT_NAME 设置为实际项目名；EDGEONE_SITE 为 china，国际站账户则用 global。
 5. Actions 中手动执行 Hourly ladder sync and deploy，代码首次推送也会启动。它会恢复进度、采集、保存进度、构建、测试，并部署同一个项目。没有 Token 时仍执行数据更新和测试，生成上传产物，跳过网站部署并注明待配置。
-6. 已选择自有域名 yuri-ladder.cn，用户已购买并正在审核。审核通过后绑定现有项目，无需再购买云服务器。
+6. 已选择自有域名 yuri-ladder.cn，用户已购买且已通过审核。审核通过后绑定现有项目，无需再购买云服务器。
 7. 在项目「域名管理」绑定实际购买的域名。将平台实际返回的CNAME写入DNS；不可预先猜CNAME。申请免费HTTPS证书，待域名和证书状态均正常再分享。
 8. 从国内手机流量和家庭宽带分别关闭代理测试首页、筛选、选手详情和比赛明细，通过后才确认国内直连可用。
 
@@ -80,9 +80,9 @@ GET /api/matches?season=31&map=%E5%90%B5%E9%97%B9%E9%AC%BCLE-%E5%B0%A4%E5%A4%8D%
 
 新增功能本地构建通过；28项测试通过、0失败、1项Windows Git沙箱集成跳过，原有96组与SQLite接口逐项对照保持通过。新测试覆盖地图及分段计数、积分/排名边界、直接交手去重、四人对比校验、北京时间午夜/周一、已结束赛季窗口、零样本、收藏异常存储格式和只读边缘API。
 
-现有云端采集已完成200/200人的全部核查，待核查记录0、缺失记录0。Linux旧版本22项测试全部通过，无跳过；独立定时运行39554572409成功完成采集、构建和验证，但发布步骤因尚未配置EDGEONE_API_TOKEN跳过。新功能的云端验证以本次提交后的Actions运行结果为准。
+现有云端采集已完成200/200人的全部核查，待核查记录0、缺失记录0。Linux旧版本22项测试全部通过，无跳过；独立定时运行39554572409成功完成采集、构建和验证，但发布步骤因尚未配置EDGEONE_API_TOKEN跳过。新功能云端运行39582864444已成功完成采集、构建和验证，29项测试全部通过、0跳过；网站发布仍因未配置EDGEONE_API_TOKEN而跳过。
 
-源码和定时工作流：https://github.com/caozqiu/yuri-ladder 。复用现有EdgeOne项目makers-i6sbocft2osz，原部署dpwkujw1zctd，不要创建重复项目。域名yuri-ladder.cn正在审核；尚需配置发布授权、核实实际项目名和加速区域、上传新版本、绑定DNS与HTTPS、验证每小时自动发布和国内无代理访问。提供本地预览与可上传产物不代表线上新版本已经发布。
+源码和定时工作流：https://github.com/caozqiu/yuri-ladder 。复用现有EdgeOne项目makers-i6sbocft2osz，原部署dpwkujw1zctd，不要创建重复项目。域名yuri-ladder.cn已通过审核，DNSPod尚无指向网站的解析记录；尚需配置发布授权、核实实际项目名和加速区域、上传新版本、绑定DNS与HTTPS、验证每小时自动发布和国内无代理访问。提供本地预览与可上传产物不代表线上新版本已经发布。
 
 ## 参考
 

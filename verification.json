@@ -1,5 +1,5 @@
 {
-  "at": "2026-10-21T07:35:23.325Z",
+  "at": "2026-10-21T10:25:18.961Z",
   "build": "npm ci && node build.mjs",
   "tests": {
     "passed": 28,
@@ -13,9 +13,9 @@
     {
       "season": 31,
       "players": 100,
-      "cutoff": 1792561982,
-      "matches": 6096,
-      "appearances": 8117,
+      "cutoff": 1792577567,
+      "matches": 6102,
+      "appearances": 8125,
       "draws": 0,
       "missing": 0
     },
@@ -50,11 +50,16 @@
     "cloudCollectorVerified": true,
     "domain": "yuri-ladder.cn",
     "edgeoneProjectId": "makers-i6sbocft2osz",
-    "newFeaturesDeployed": false
+    "newFeaturesDeployed": false,
+    "domainReviewed": true
   },
   "domainCheck": {
     "name": "yuri-ladder.cn",
-    "status": "user_reports_review_pending",
+    "status": "approved per user",
+    "nameservers": [
+      "bike.dnspod.net",
+      "puding.dnspod.net"
+    ],
     "dnsConfigured": false,
     "httpsVerified": false
   },
@@ -78,17 +83,22 @@
       "websiteDeployed": false
     },
     "latestRun": {
-      "run": 39553006464,
-      "testsPassed": 22,
-      "checkpointResumed": true,
+      "id": 39582864444,
+      "jobId": 119164471965,
+      "url": "https://github.com/caozqiu/yuri-ladder/actions/runs/39582864444",
+      "commit": "f51e7bcb9ef3e3777072e6047777bd5e75003395",
       "complete": true,
+      "testsPassed": 29,
+      "testsSkipped": 0,
+      "siteDeployed": false,
+      "deployStep": "skipped: EDGEONE_CONFIGURED=false",
       "seasons": [
         {
           "season": 31,
           "players": 100,
-          "cutoff": 1792561982,
-          "matches": 6096,
-          "appearances": 8117,
+          "cutoff": 1792577567,
+          "matches": 6102,
+          "appearances": 8125,
           "draws": 0,
           "missing": 0
         },
@@ -101,19 +111,7 @@
           "draws": 0,
           "missing": 0
         }
-      ],
-      "progress": {
-        "state": "complete",
-        "stage": "complete",
-        "done": 200,
-        "total": 200
-      },
-      "siteDeployed": false,
-      "id": 39553006464,
-      "jobId": 119066227482,
-      "url": "https://github.com/caozqiu/yuri-ladder/actions/runs/39553006464",
-      "artifact": 12324307947,
-      "artifactSha256": "55a21e49f017586a7b8c76fd142ac71f064820ffdf5daf7de6433d5eb6d229b6"
+      ]
     }
   },
   "initialSeasons": [
@@ -277,6 +275,35 @@
       "win-rate-trends",
       "local-favorites",
       "snapshot-mmr-and-rank-tiers"
-    ]
+    ],
+    "cloudTests": {
+      "passed": 29,
+      "failed": 0,
+      "skipped": 0
+    },
+    "latestData": {
+      "checkedCombinations": 12,
+      "seasons": [
+        {
+          "season": 31,
+          "players": 100,
+          "cutoff": 1792577567,
+          "matches": 6102,
+          "appearances": 8125,
+          "draws": 0,
+          "missing": 0
+        },
+        {
+          "season": 30,
+          "players": 100,
+          "cutoff": 1788191999,
+          "matches": 7634,
+          "appearances": 10228,
+          "draws": 0,
+          "missing": 0
+        }
+      ],
+      "verifiedPrevious": 3
+    }
   }
 }
