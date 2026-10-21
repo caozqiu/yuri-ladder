@@ -1,12 +1,12 @@
 {
-  "at": "2026-10-21T14:44:29.949Z",
+  "at": "2026-10-21T16:00:26.434Z",
   "build": "npm ci && node build.mjs",
   "tests": {
-    "passed": 47,
+    "passed": 57,
     "failed": 0,
     "skipped": 1,
-    "total": 48,
-    "cloudPassed": 48,
+    "total": 58,
+    "cloudPassed": 58,
     "cloudFailed": 0,
     "cloudSkipped": 0,
     "filterParityCases": 96,
@@ -17,15 +17,15 @@
     {
       "season": 31,
       "players": 100,
-      "cutoff": 1792592529,
-      "rawMatches": 6772,
-      "matches": 6246,
-      "appearances": 8329,
-      "wins": 5685,
-      "losses": 2644,
-      "draws": 0,
+      "cutoff": 1792597122,
+      "rawMatches": 6792,
+      "matches": 5902,
+      "appearances": 7737,
+      "wins": 5340,
+      "losses": 2397,
       "missing": 0,
-      "snapshot": "250c030c-78be-4809-8e5b-dc8561f2c770:31"
+      "snapshot": "e5a87fa5-b1e1-45e2-b840-f6b09393561c:31",
+      "rankingObservations": 4
     },
     {
       "season": 30,
@@ -36,9 +36,9 @@
       "appearances": 10228,
       "wins": 6805,
       "losses": 3423,
-      "draws": 0,
       "missing": 0,
-      "snapshot": "250c030c-78be-4809-8e5b-dc8561f2c770:30"
+      "snapshot": "e5a87fa5-b1e1-45e2-b840-f6b09393561c:30",
+      "rankingObservations": 4
     }
   ],
   "resume": {
@@ -69,17 +69,19 @@
     "sectionFeaturesDeployed": true,
     "publicApiVerified": true,
     "automatedPublishVerified": true,
-    "lastDeployment": "dploz8qz646a",
-    "productionVersion": "7f311be5459cfac8abb6462847ef5e4324491634",
+    "lastDeployment": "dpta8cfkiqna",
+    "productionVersion": "0146d0668d07bcff41e7862b21a2eeebfed744c0",
     "cloudTests": {
-      "passed": 48,
+      "total": 58,
+      "passed": 58,
       "failed": 0,
       "skipped": 0
-    }
+    },
+    "playerResearchDeployed": true
   },
   "domainCheck": {
     "name": "yuri-ladder.cn",
-    "status": "HTTPS 200; section redesign assets match local build; statistics and match endpoints verified",
+    "status": "HTTPS 200; current player research assets and APIs verified",
     "nameservers": [
       "bike.dnspod.net",
       "puding.dnspod.net"
@@ -89,8 +91,8 @@
     "cname": "yuri-ladder.cn.pages.dnsoe6.com",
     "homepageStatus": 200,
     "currentAssets": [
-      "index-BsWfcI4z.js",
-      "index-HAJatV8j.css"
+      "index-B47tuGD_.js",
+      "index-eMm4EVKW.css"
     ],
     "publicApiVerified": true,
     "at": "2026-10-21T14:44:17.511Z"
@@ -98,7 +100,7 @@
   "github": {
     "repository": "https://github.com/caozqiu/yuri-ladder",
     "visibility": "public",
-    "sourceCommit": "7f311be5459cfac8abb6462847ef5e4324491634",
+    "sourceCommit": "0146d0668d07bcff41e7862b21a2eeebfed744c0",
     "firstRun": {
       "id": 39552054978,
       "jobId": 119063244588,
@@ -115,17 +117,16 @@
       "websiteDeployed": false
     },
     "latestRun": {
-      "id": 39618628706,
-      "jobId": 119286103127,
-      "url": "https://github.com/caozqiu/yuri-ladder/actions/runs/39618628706",
-      "commit": "7f311be5459cfac8abb6462847ef5e4324491634",
+      "id": 39630087333,
+      "jobId": 119325689745,
+      "url": "https://github.com/caozqiu/yuri-ladder/actions/runs/39630087333",
+      "commit": "0146d0668d07bcff41e7862b21a2eeebfed744c0",
       "jobStatus": "success",
-      "testsPassed": 48,
+      "testsPassed": 58,
       "testsSkipped": 0,
       "siteDeployed": true,
-      "deployStep": "success",
       "publicReadbackVerified": true,
-      "publishOnly": true
+      "historyExportAndCheckpointSaved": true
     },
     "latestScheduledSourceRun": {
       "id": 39616133026,
@@ -497,5 +498,238 @@
     "verifiedPublishRun": "https://github.com/caozqiu/yuri-ladder/actions/runs/39618628706",
     "independentScheduledSyncVerified": true,
     "completeSnapshotReadbackVerified": true
+  },
+  "playerResearch": {
+    "at": "2026-10-21T16:00:26.434Z",
+    "implemented": true,
+    "published": true,
+    "domain": "https://yuri-ladder.cn/",
+    "commit": "0146d0668d07bcff41e7862b21a2eeebfed744c0",
+    "run": "https://github.com/caozqiu/yuri-ladder/actions/runs/39630087333",
+    "deployment": "dpta8cfkiqna",
+    "localTests": {
+      "total": 58,
+      "passed": 57,
+      "failed": 0,
+      "skipped": 1
+    },
+    "cloudTests": {
+      "total": 58,
+      "passed": 58,
+      "failed": 0,
+      "skipped": 0
+    },
+    "browser": {
+      "at": "2026-10-21T15:45:45.327Z",
+      "localTests": {
+        "total": 58,
+        "passed": 57,
+        "failed": 0,
+        "skipped": 1
+      },
+      "desktop": true,
+      "mobile": {
+        "width": 390,
+        "height": 844,
+        "pageWidth": 375,
+        "noOverflow": true
+      },
+      "opponentSearch": true,
+      "opponentSort": true,
+      "opponentDrawerVerified": {
+        "player": "945674",
+        "opponent": "1322368",
+        "total": 23,
+        "wins": 15,
+        "losses": 8
+      },
+      "historyKeyboard": true,
+      "historyCsvDownloaded": true,
+      "historyPreviewPoints": 3,
+      "formerPlayerHistoryVerified": "973015",
+      "snapshotPinning": true,
+      "cloudPending": false,
+      "cloudTests": {
+        "total": 58,
+        "passed": 58,
+        "failed": 0,
+        "skipped": 0
+      },
+      "historyDirectory": true,
+      "rankingMovements": true,
+      "favoriteHistoryQuickLinks": true,
+      "formerPlayerPublicHistoryVerified": "3764069",
+      "consoleErrors": 0
+    },
+    "assets": {
+      "at": "2026-10-21T15:52:55.463Z",
+      "origin": "https://yuri-ladder.cn",
+      "httpsVerified": true,
+      "assetsMatchLocalBuild": true,
+      "assets": [
+        "/assets/index-B47tuGD_.js",
+        "/assets/index-eMm4EVKW.css"
+      ],
+      "completePlayers": [
+        {
+          "season": 31,
+          "players": 100,
+          "scanned": 100,
+          "snapshot": "e5a87fa5-b1e1-45e2-b840-f6b09393561c:31",
+          "cutoff": 1792597122
+        },
+        {
+          "season": 30,
+          "players": 100,
+          "scanned": 100,
+          "snapshot": "e5a87fa5-b1e1-45e2-b840-f6b09393561c:30",
+          "cutoff": 1788191999
+        }
+      ],
+      "automation": {
+        "enabled": true,
+        "schedule": "每小时第55分钟（北京时间），平台调度可能延迟"
+      },
+      "checks": [
+        {
+          "season": 31,
+          "query": "season=31&snapshot=e5a87fa5-b1e1-45e2-b840-f6b09393561c%3A31",
+          "appearances": 7737,
+          "uniqueMatches": 5902
+        },
+        {
+          "type": "map-drilldown",
+          "map": "吵闹鬼LE-尤复天梯",
+          "own": "allied",
+          "enemy": "soviet",
+          "total": 30,
+          "rows": 30,
+          "paginationAndResultsVerified": true
+        },
+        {
+          "season": 31,
+          "query": "season=31&snapshot=e5a87fa5-b1e1-45e2-b840-f6b09393561c%3A31&mmrMin=3700&mmrMax=4300&gapMax=100&gapDirection=stronger",
+          "appearances": 323,
+          "uniqueMatches": 323
+        },
+        {
+          "season": 30,
+          "query": "season=30&snapshot=e5a87fa5-b1e1-45e2-b840-f6b09393561c%3A30&range=7d&opponents=top100&group=country",
+          "appearances": 278,
+          "uniqueMatches": 139
+        }
+      ],
+      "invalidFilterStatus": 400,
+      "writeDeniedStatus": 405,
+      "publicApiVerified": true
+    },
+    "publicApi": {
+      "at": "2026-10-21T15:57:22.491Z",
+      "origin": "https://yuri-ladder.cn",
+      "publicApiVerified": true,
+      "automation": {
+        "enabled": true,
+        "schedule": "每小时第55分钟（北京时间），平台调度可能延迟"
+      },
+      "checks": [
+        {
+          "type": "player-research",
+          "season": 31,
+          "player": "945674",
+          "opponents": 46,
+          "historyPoints": 4,
+          "firstObserved": 1792591530
+        },
+        {
+          "season": 31,
+          "snapshot": "e5a87fa5-b1e1-45e2-b840-f6b09393561c:31",
+          "query": "season=31&snapshot=e5a87fa5-b1e1-45e2-b840-f6b09393561c%3A31",
+          "games": 7737,
+          "uniqueMatches": 5902
+        },
+        {
+          "season": 31,
+          "snapshot": "e5a87fa5-b1e1-45e2-b840-f6b09393561c:31",
+          "query": "season=31&snapshot=e5a87fa5-b1e1-45e2-b840-f6b09393561c%3A31&gapMax=100&gapDirection=stronger",
+          "games": 368,
+          "uniqueMatches": 368
+        },
+        {
+          "type": "player-research",
+          "season": 30,
+          "player": "400385",
+          "opponents": 30,
+          "historyPoints": 4,
+          "firstObserved": 1792591538
+        },
+        {
+          "season": 30,
+          "snapshot": "e5a87fa5-b1e1-45e2-b840-f6b09393561c:30",
+          "query": "season=30&snapshot=e5a87fa5-b1e1-45e2-b840-f6b09393561c%3A30",
+          "games": 10228,
+          "uniqueMatches": 7634
+        },
+        {
+          "season": 30,
+          "snapshot": "e5a87fa5-b1e1-45e2-b840-f6b09393561c:30",
+          "query": "season=30&snapshot=e5a87fa5-b1e1-45e2-b840-f6b09393561c%3A30&gapMax=100&gapDirection=stronger",
+          "games": 505,
+          "uniqueMatches": 505
+        }
+      ],
+      "invalidFilterStatus": 400,
+      "writeDeniedStatus": 405
+    },
+    "history": {
+      "durableCheckpointRows": 8,
+      "actualObservations": 4,
+      "knownSeason31Players": 101,
+      "firstObserved": 1792591530,
+      "formerPlayer": {
+        "id": "3764069",
+        "points": [
+          {
+            "at": 1792591530,
+            "snapshot": "6d278254-be21-4a47-9f3c-cd95d761fa27:31",
+            "rank": 96,
+            "mmr": 3764,
+            "status": "ranked"
+          },
+          {
+            "at": 1792592536,
+            "snapshot": "250c030c-78be-4809-8e5b-dc8561f2c770:31",
+            "rank": 95,
+            "mmr": 3764,
+            "status": "ranked"
+          },
+          {
+            "at": 1792595941,
+            "snapshot": "e8fa994e-6dd6-4478-b7dc-74e30478441b:31",
+            "rank": null,
+            "mmr": null,
+            "status": "outside"
+          },
+          {
+            "at": 1792597130,
+            "snapshot": "e5a87fa5-b1e1-45e2-b840-f6b09393561c:31",
+            "rank": null,
+            "mmr": null,
+            "status": "outside"
+          }
+        ]
+      },
+      "archivedNamesRecovered": true,
+      "missingPeriodsRemainUnknown": true,
+      "matchFiltersDoNotChangeHistory": true,
+      "sourceSync": {
+        "run": 39627465576,
+        "job": 119316362050,
+        "collectorStep": "success",
+        "players": 200,
+        "pendingMatches": 0,
+        "checkpointSaved": true,
+        "initialReadbackPropagationFailureResolvedByRun": 39630087333
+      }
+    }
   }
 }

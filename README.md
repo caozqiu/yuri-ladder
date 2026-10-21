@@ -130,6 +130,9 @@ GET /api/matches?mmrMin=3500&mmrMax=4300&gapMax=100
 
 ## 当前验证与限制
 
+选手对手档案与积分排名历史已正式发布。最新运行 https://github.com/caozqiu/yuri-ladder/actions/runs/39630087333 完成58项云端测试、0失败、0跳过，以及两赛季对手档案、历史、掉榜目录、拒写与完整快照回读。本地58项中57通过、1项Windows Git环境测试在云端通过；另外逐场独立核对200名选手、9538组交手计数。桌面及390×844手机、搜索排序、分享、键盘、收藏历史入口和CSV均已验收。历史仅从已保存的真实榜单开始，当前每赛季4个采集点，后续逐小时积累。完整证据见verification.json的playerResearch。
+
+
 2026-10-21正式发布完成：云端48项测试全部通过；本地48项中47通过、1项Windows Git沙箱集成跳过，云端无跳过。正式域名的两赛季统计、非对称分差筛选、地图明细、400非法条件和405拒写均已回读。版本 7f311be5459cfac8abb6462847ef5e4324491634，部署 dploz8qz646a。完整证据见verification.json及输出发布记录。官方来源采集、SQLite持久化、全量查询对照、发布后统计回读分别验证。前端视觉验收在本地完成，正式站通过HTTPS及资源内容校验。国内手机流量和家庭宽带关闭代理后的访问仍需真实网络测试；海外节点成功不能证明所有国内线路可用。
 
 源码和工作流：https://github.com/caozqiu/yuri-ladder 。复用项目makers-i6sbocft2osz，实际项目名yuri-ladder，加速区域overseas。域名yuri-ladder.cn的CNAME和HTTPS已生效，凭据已保存于GitHub Secret并验证；运行中不会要求将Token放入聊天或本地源码。
