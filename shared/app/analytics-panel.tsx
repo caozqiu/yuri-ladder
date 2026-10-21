@@ -1,5 +1,5 @@
 import {useEffect,useMemo,useRef,useState} from 'react';
-import {ArrowLeftRight,ChartNoAxesCombined,Map,Star,TrendingUp,Users,X} from 'lucide-react';
+import {X} from 'lucide-react';
 import {FACTIONS} from '../lib/core.mjs';
 import {wilson95} from '../lib/rating-filters.mjs';
 import type {AnalyticsGroup,Counter,StatsResponse,TrendPoint} from '../lib/types';
@@ -9,7 +9,6 @@ const num=(n:number)=>n.toLocaleString('zh-CN');
 type Props={data:StatsResponse;query:string;update:(changes:Record<string,string|null>)=>void};
 function Value({value}:{value:Counter}){const ci=wilson95(value);return <div className="insight-value"><strong>{pct(value.winRate)}</strong><span>{num(value.games)} 场 · {num(value.wins)} 胜 / {num(value.losses)} 负</span>{ci&&<small className="confidence-range" title="Wilson 95%置信区间，仅反映胜负样本的不确定性，不是未来胜率保证">95% 区间 {ci.low.toFixed(1)}–{ci.high.toFixed(1)}%</small>}{value.games>0&&value.games<20&&<small>样本较少</small>}</div>;}
 function Blank({children}:{children:React.ReactNode}){return <div className="insight-empty">{children}</div>;}
-const tabs=[{key:'compare',name:'选手对比',icon:ArrowLeftRight},{key:'maps',name:'地图胜率',icon:Map},{key:'trend',name:'近期走势',icon:TrendingUp},{key:'tiers',name:'分段统计',icon:Users}];
 
 export function Comparison({data,query,update}:Props){
  const q=new URLSearchParams(query),ids=(q.get('compare')||'').split(',').filter(Boolean),items=data.analytics.comparisons;
@@ -38,8 +37,4 @@ export function Trend({data,query,update}:Props){
 export function TierStats({data,query,update}:Props){
  const type=new URLSearchParams(query).get('tierBy')==='rank'?'rank':'mmr',tiers=data.analytics.tiers[type];
  return <><div className="insight-tools"><div className="segmented" aria-label="分段依据"><button className={type==='mmr'?'selected':''} onClick={()=>update({tierBy:null})}>按天梯积分</button><button className={type==='rank'?'selected':''} onClick={()=>update({tierBy:'rank'})}>按官方排名</button></div>{data.filters.segment&&<button className="secondary" onClick={()=>update({segment:null})}>返回全部分段 <X size={13}/></button>}</div><p className="insight-note">按本次赛季榜单快照{type==='mmr'?'积分':'排名'}分组，使用该组前100名选手的胜负出场统计，不能代表全平台{type==='mmr'?'同积分段':''}胜率。各分段遵循时间、地图和对手筛选，不受个人详情、单个己方分段或自定义己方积分范围影响；对手积分与分差条件仍生效。点击分段可查看该组榜单与矩阵。</p><div className="table-scroll"><table className="insight-table tier-table"><thead><tr><th>分段 / 选手数</th><th>加权总胜率</th>{FACTIONS.map(f=><th key={f.key} style={{color:f.color}}>{f.name}</th>)}</tr></thead><tbody>{tiers.map(t=><tr key={t.key} className={data.filters.segment===t.key?'active-tier':''}><th><button className="map-name" onClick={()=>update({segment:data.filters.segment===t.key?null:t.key,mmrMin:null,mmrMax:null,player:null,compare:null})}>{t.name}</button><small>{t.players} 位选手 · {t.uniqueMatches} 场独立比赛</small></th><td><Value value={t.total}/></td>{FACTIONS.map(f=><td key={f.key}><Value value={t.factions[f.key]}/></td>)}</tr>)}</tbody></table></div><p className="insight-note">同场双方在不同分段时，各自在所属分段计一次出场；各分段独立比赛数不可直接相加。积分不是比赛发生时的历史积分。</p></>;
-}
-export default function AnalyticsPanel(props:Props){
- const active=new URLSearchParams(props.query).get('view')||'compare',view=tabs.some(t=>t.key===active)?active:'compare';
- return <section className="panel insights-panel" id="insights"><div className="panel-heading"><div><span className="section-kicker">DEEPER INTO THE LADDER</span><h2><ChartNoAxesCombined size={18}/>进阶分析</h2></div><span className="mini-badge">真实胜负局</span></div><div className="insight-tabs" aria-label="进阶分析视图">{tabs.map(t=><button key={t.key} className={view===t.key?'active':''} aria-pressed={view===t.key} onClick={()=>props.update({view:t.key==='compare'?null:t.key})}><t.icon size={16}/>{t.name}</button>)}</div><div className="insight-body">{view==='compare'?<Comparison {...props}/>:view==='maps'?<MapStats {...props}/>:view==='trend'?<Trend {...props}/>:<TierStats {...props}/>}</div></section>;
 }

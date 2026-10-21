@@ -1,13 +1,14 @@
 {
-  "at": "2026-10-21T11:02:35.312467+00:00",
+  "at": "2026-10-21T12:04:51.254582+00:00",
   "build": "npm ci && node build.mjs",
   "tests": {
-    "passed": 38,
+    "passed": 44,
     "failed": 0,
     "skipped": 1,
+    "total": 45,
     "filterParityCases": 96,
-    "skipReason": "Local Windows Git sandbox; this integration runs on Linux CI",
-    "total": 39
+    "ratingParityCases": 84,
+    "skipReason": "Windows sandbox Git integration; runs on Linux CI"
   },
   "seasons": [
     {
@@ -53,11 +54,12 @@
     "newFeaturesDeployed": false,
     "domainReviewed": true,
     "httpsVerified": true,
-    "ratingFeaturesDeployed": false
+    "ratingFeaturesDeployed": false,
+    "sectionFeaturesDeployed": false
   },
   "domainCheck": {
     "name": "yuri-ladder.cn",
-    "status": "HTTPS verified; rating optimization not yet deployed",
+    "status": "HTTPS 200; existing version remains online; section redesign not deployed",
     "nameservers": [
       "bike.dnspod.net",
       "puding.dnspod.net"
@@ -65,7 +67,11 @@
     "dnsConfigured": true,
     "httpsVerified": true,
     "cname": "yuri-ladder.cn.pages.dnsoe6.com",
-    "homepageStatus": 200
+    "homepageStatus": 200,
+    "currentAssets": [
+      "index-D1XjI7sL.js",
+      "index-DQ2idXdS.css"
+    ]
   },
   "github": {
     "repository": "https://github.com/caozqiu/yuri-ladder",
@@ -329,5 +335,54 @@
     },
     "deployed": false,
     "cloudRun": "https://github.com/caozqiu/yuri-ladder/actions/runs/39589199322"
+  },
+  "sections": {
+    "implemented": true,
+    "screens": [
+      "overview",
+      "players",
+      "matchups",
+      "maps",
+      "trends"
+    ],
+    "asymmetricDirections": true,
+    "drawsExcluded": true,
+    "gapTierBoundariesVerified": true,
+    "largeStringIdsVerified": true,
+    "csvDownloadedAndChecked": true,
+    "filterPresetsCrudAndReloadVerified": true,
+    "historyAndShareVerified": true,
+    "mapDrilldownPinnedVerified": true,
+    "countryModeSummaryDrilldownVerified": true,
+    "keyboardFocusLoopVerified": true,
+    "escapeAndFocusReturnVerified": true,
+    "desktopVerified": true,
+    "mobileViewport": [
+      390,
+      844
+    ],
+    "mobileNoPageOverflow": true,
+    "currentBuild": {
+      "js": "index-BsWfcI4z.js",
+      "css": "index-HAJatV8j.css"
+    },
+    "sourceCommit": "140769e14c8cdf9675c638f2c1309c2cf49c8a64 (initial feature commit; final polish recorded separately)",
+    "cloudRun": "https://github.com/caozqiu/yuri-ladder/actions/runs/39595563307",
+    "cloudStatus": "in_progress",
+    "published": false,
+    "data": [
+      {
+        "season": 31,
+        "snapshot": "09a9f41c-6346-4ea8-9493-e3db0b3dc5eb:31",
+        "cutoff": 1792581449,
+        "sha256": "13456c88a5ba92bb21ec3405b68ef0d42a31be08007935ae194a5415c9c52f3e"
+      },
+      {
+        "season": 30,
+        "snapshot": "09a9f41c-6346-4ea8-9493-e3db0b3dc5eb:30",
+        "cutoff": 1788191999,
+        "sha256": "6251e23893f77950a38209ccaca68ab990d547d263a5269596276d4a4273d092"
+      }
+    ]
   }
 }
