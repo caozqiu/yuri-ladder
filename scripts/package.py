@@ -3,9 +3,11 @@ import hashlib
 import json
 import zipfile
 import argparse
+import shutil
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--edition', default='')
+parser.add_argument('--compiled-zip', type=Path)
 args = parser.parse_args()
 edition = args.edition + '_' if args.edition else ''
 
@@ -22,8 +24,18 @@ def archive(path, files):
     return {'file': path.name, 'bytes': path.stat().st_size,
             'sha256': hashlib.sha256(path.read_bytes()).hexdigest()}
 
-upload = archive(outputs / f'尤复天梯观察站_{edition}EdgeOne上传包.zip',
-                 [(p, p.relative_to(root / 'dist')) for p in (root / 'dist').rglob('*') if p.is_file()])
+upload_path = outputs / f'尤复天梯观察站_{edition}EdgeOne上传包.zip'
+if args.compiled_zip:
+    with zipfile.ZipFile(args.compiled_zip) as compiled:
+        assert compiled.testzip() is None
+        assert {'assets/index.html', 'edge-functions/config.json', 'edge-functions/index.js'} <= set(compiled.namelist())
+        assert not any(name.startswith('/') or '..' in Path(name).parts for name in compiled.namelist())
+    shutil.copyfile(args.compiled_zip, upload_path)
+    upload = {'file': upload_path.name, 'bytes': upload_path.stat().st_size,
+              'sha256': hashlib.sha256(upload_path.read_bytes()).hexdigest()}
+else:
+    upload = archive(upload_path,
+                     [(p, p.relative_to(root / 'dist')) for p in (root / 'dist').rglob('*') if p.is_file()])
 folders = ['shared', 'src', 'web', 'vendor', 'migrations', 'scripts', 'tests', '.github', 'dist']
 files = []
 for folder in folders:

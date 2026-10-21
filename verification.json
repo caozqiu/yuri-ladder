@@ -1,33 +1,44 @@
 {
-  "at": "2026-10-21T12:04:51.254582+00:00",
+  "at": "2026-10-21T14:44:29.949Z",
   "build": "npm ci && node build.mjs",
   "tests": {
-    "passed": 44,
+    "passed": 47,
     "failed": 0,
     "skipped": 1,
-    "total": 45,
+    "total": 48,
+    "cloudPassed": 48,
+    "cloudFailed": 0,
+    "cloudSkipped": 0,
     "filterParityCases": 96,
     "ratingParityCases": 84,
-    "skipReason": "Windows sandbox Git integration; runs on Linux CI"
+    "skipReason": "Windows sandbox Git integration; verified on Linux CI"
   },
   "seasons": [
     {
       "season": 31,
       "players": 100,
-      "cutoff": 1792577567,
-      "matches": 6102,
-      "appearances": 8125,
+      "cutoff": 1792592529,
+      "rawMatches": 6772,
+      "matches": 6246,
+      "appearances": 8329,
+      "wins": 5685,
+      "losses": 2644,
       "draws": 0,
-      "missing": 0
+      "missing": 0,
+      "snapshot": "250c030c-78be-4809-8e5b-dc8561f2c770:31"
     },
     {
       "season": 30,
       "players": 100,
       "cutoff": 1788191999,
+      "rawMatches": 8167,
       "matches": 7634,
       "appearances": 10228,
+      "wins": 6805,
+      "losses": 3423,
       "draws": 0,
-      "missing": 0
+      "missing": 0,
+      "snapshot": "250c030c-78be-4809-8e5b-dc8561f2c770:30"
     }
   ],
   "resume": {
@@ -40,7 +51,7 @@
     "officialSource": true
   },
   "deployment": {
-    "edgeone": false,
+    "edgeone": true,
     "domainPurchased": true,
     "domainBound": true,
     "cloudScheduleVerified": true,
@@ -51,15 +62,24 @@
     "cloudCollectorVerified": true,
     "domain": "yuri-ladder.cn",
     "edgeoneProjectId": "makers-i6sbocft2osz",
-    "newFeaturesDeployed": false,
+    "newFeaturesDeployed": true,
     "domainReviewed": true,
     "httpsVerified": true,
-    "ratingFeaturesDeployed": false,
-    "sectionFeaturesDeployed": false
+    "ratingFeaturesDeployed": true,
+    "sectionFeaturesDeployed": true,
+    "publicApiVerified": true,
+    "automatedPublishVerified": true,
+    "lastDeployment": "dploz8qz646a",
+    "productionVersion": "7f311be5459cfac8abb6462847ef5e4324491634",
+    "cloudTests": {
+      "passed": 48,
+      "failed": 0,
+      "skipped": 0
+    }
   },
   "domainCheck": {
     "name": "yuri-ladder.cn",
-    "status": "HTTPS 200; existing version remains online; section redesign not deployed",
+    "status": "HTTPS 200; section redesign assets match local build; statistics and match endpoints verified",
     "nameservers": [
       "bike.dnspod.net",
       "puding.dnspod.net"
@@ -69,14 +89,16 @@
     "cname": "yuri-ladder.cn.pages.dnsoe6.com",
     "homepageStatus": 200,
     "currentAssets": [
-      "index-D1XjI7sL.js",
-      "index-DQ2idXdS.css"
-    ]
+      "index-BsWfcI4z.js",
+      "index-HAJatV8j.css"
+    ],
+    "publicApiVerified": true,
+    "at": "2026-10-21T14:44:17.511Z"
   },
   "github": {
     "repository": "https://github.com/caozqiu/yuri-ladder",
     "visibility": "public",
-    "sourceCommit": "8e826463306f12976c0271acc49d53262e5b2a9f",
+    "sourceCommit": "7f311be5459cfac8abb6462847ef5e4324491634",
     "firstRun": {
       "id": 39552054978,
       "jobId": 119063244588,
@@ -93,15 +115,30 @@
       "websiteDeployed": false
     },
     "latestRun": {
-      "id": 39589199322,
-      "jobId": 119185612159,
-      "url": "https://github.com/caozqiu/yuri-ladder/actions/runs/39589199322",
-      "commit": "12a6d7de17012333cc76c8f5181b0a2931f6440e",
+      "id": 39618628706,
+      "jobId": 119286103127,
+      "url": "https://github.com/caozqiu/yuri-ladder/actions/runs/39618628706",
+      "commit": "7f311be5459cfac8abb6462847ef5e4324491634",
       "jobStatus": "success",
-      "testsPassed": 39,
+      "testsPassed": 48,
       "testsSkipped": 0,
-      "siteDeployed": false,
-      "deployStep": "skipped: EDGEONE_CONFIGURED=false"
+      "siteDeployed": true,
+      "deployStep": "success",
+      "publicReadbackVerified": true,
+      "publishOnly": true
+    },
+    "latestScheduledSourceRun": {
+      "id": 39616133026,
+      "jobId": 119277778666,
+      "url": "https://github.com/caozqiu/yuri-ladder/actions/runs/39616133026",
+      "event": "schedule",
+      "status": "success",
+      "scannedPlayers": 200,
+      "totalPlayers": 200,
+      "pendingMatches": 0,
+      "checkpointSaved": true,
+      "snapshotRun": "250c030c-78be-4809-8e5b-dc8561f2c770",
+      "publishedAndReadBack": true
     }
   },
   "initialSeasons": [
@@ -258,7 +295,7 @@
       "skipped": 1,
       "total": 29
     },
-    "published": false,
+    "published": true,
     "features": [
       "player-comparison",
       "map-win-rates",
@@ -333,7 +370,7 @@
       "failed": 0,
       "skipped": 0
     },
-    "deployed": false,
+    "deployed": true,
     "cloudRun": "https://github.com/caozqiu/yuri-ladder/actions/runs/39589199322"
   },
   "sections": {
@@ -366,30 +403,99 @@
       "js": "index-BsWfcI4z.js",
       "css": "index-HAJatV8j.css"
     },
-    "sourceCommit": "31fdf6b767f629bddf1f089f10898d219cef3fb8",
-    "cloudRun": "https://github.com/caozqiu/yuri-ladder/actions/runs/39595563307",
+    "sourceCommit": "7f311be5459cfac8abb6462847ef5e4324491634",
+    "cloudRun": "https://github.com/caozqiu/yuri-ladder/actions/runs/39618628706",
     "cloudStatus": "success",
-    "published": false,
+    "published": true,
     "data": [
       {
         "season": 31,
-        "snapshot": "09a9f41c-6346-4ea8-9493-e3db0b3dc5eb:31",
-        "cutoff": 1792581449,
-        "sha256": "13456c88a5ba92bb21ec3405b68ef0d42a31be08007935ae194a5415c9c52f3e"
+        "snapshot": "250c030c-78be-4809-8e5b-dc8561f2c770:31",
+        "cutoff": 1792592529,
+        "sha256": "258a2658229d5015b341ec00bf5a973f1b2f33bd01c8e503b1abc14b44301576"
       },
       {
         "season": 30,
-        "snapshot": "09a9f41c-6346-4ea8-9493-e3db0b3dc5eb:30",
+        "snapshot": "250c030c-78be-4809-8e5b-dc8561f2c770:30",
         "cutoff": 1788191999,
-        "sha256": "6251e23893f77950a38209ccaca68ab990d547d263a5269596276d4a4273d092"
+        "sha256": "109832148651effea247c6f74c74fae24f36b2742167f09a5787a5dee6ed8aa8"
       }
     ],
     "cloudTests": {
-      "commit": "140769e14c8cdf9675c638f2c1309c2cf49c8a64",
-      "passed": 45,
+      "commit": "7f311be5459cfac8abb6462847ef5e4324491634",
+      "passed": 48,
       "failed": 0,
       "skipped": 0
     },
-    "deploymentBlockedBy": "Missing EDGEONE_API_TOKEN; production still serves previous assets"
+    "publicVerification": {
+      "at": "2026-10-21T14:44:17.511Z",
+      "origin": "https://yuri-ladder.cn",
+      "httpsVerified": true,
+      "assetsMatchLocalBuild": true,
+      "assets": [
+        "/assets/index-BsWfcI4z.js",
+        "/assets/index-HAJatV8j.css"
+      ],
+      "completePlayers": [
+        {
+          "season": 31,
+          "players": 100,
+          "scanned": 100,
+          "snapshot": "250c030c-78be-4809-8e5b-dc8561f2c770:31",
+          "cutoff": 1792592529
+        },
+        {
+          "season": 30,
+          "players": 100,
+          "scanned": 100,
+          "snapshot": "250c030c-78be-4809-8e5b-dc8561f2c770:30",
+          "cutoff": 1788191999
+        }
+      ],
+      "automation": {
+        "enabled": true,
+        "schedule": "每小时第55分钟（北京时间），平台调度可能延迟"
+      },
+      "checks": [
+        {
+          "season": 31,
+          "query": "season=31&snapshot=250c030c-78be-4809-8e5b-dc8561f2c770%3A31",
+          "appearances": 8329,
+          "uniqueMatches": 6246
+        },
+        {
+          "type": "map-drilldown",
+          "map": "吵闹鬼LE-尤复天梯",
+          "own": "allied",
+          "enemy": "soviet",
+          "total": 32,
+          "rows": 32,
+          "paginationAndResultsVerified": true
+        },
+        {
+          "season": 31,
+          "query": "season=31&snapshot=250c030c-78be-4809-8e5b-dc8561f2c770%3A31&mmrMin=3700&mmrMax=4300&gapMax=100&gapDirection=stronger",
+          "appearances": 375,
+          "uniqueMatches": 375
+        },
+        {
+          "season": 30,
+          "query": "season=30&snapshot=250c030c-78be-4809-8e5b-dc8561f2c770%3A30&range=7d&opponents=top100&group=country",
+          "appearances": 278,
+          "uniqueMatches": 139
+        }
+      ],
+      "invalidFilterStatus": 400,
+      "writeDeniedStatus": 405,
+      "publicApiVerified": true
+    }
+  },
+  "automation": {
+    "enabled": true,
+    "schedule": "每小时第55分钟（北京时间），平台调度可能延迟",
+    "scheduledSourceRun": "https://github.com/caozqiu/yuri-ladder/actions/runs/39616133026",
+    "verifiedPublishRun": "https://github.com/caozqiu/yuri-ladder/actions/runs/39618628706",
+    "independentScheduledSyncVerified": true,
+    "completeSnapshotReadbackVerified": true
   }
 }

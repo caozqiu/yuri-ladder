@@ -15,7 +15,7 @@ npm run preview
 ```
 
 打开 http://127.0.0.1:5188/ 。预览只读，无写入或采集入口。
-已编译 dist 可以直接托管；collector 中的采集程序、状态文件不在公开产物中。
+dist 是公开前端及函数源码。完整发布使用 node scripts/deploy.mjs，由官方CLI编译为 dist/.edgeone 后部署；直接上传原始dist仅能保证静态页面。collector 中的采集程序、状态文件不在公开产物中。
 
 ## 一次性配置
 
@@ -56,9 +56,11 @@ SQLite仅在每次运行器内使用。同步状态导出为带SHA256校验的ND
 
 本轮不增加对局时长或历史积分，不推断地图类型。仍仅收录两个赛季前100名；流局与无效局全部排除。
 
-分区改版本地45项测试中44通过、1项Windows Git集成因沙箱跳过；另以最新完整数据通过84组逐场复核。初版功能提交的云端运行39595563307已完成45项测试、0失败、0跳过；随后修正总览在国家模式下的阵营汇总，并完成浏览器复核。本地最终构建与全部45项测试通过（Windows集成1项跳过）。未配置EDGEONE_API_TOKEN，发布步骤跳过；正式域名仍为旧版，具体状态见verification.json及发布记录。
+分区改版已在正式域名发布。桌面和390×844手机布局、键盘焦点、分享、保存方案和CSV完成本地验收。云端已完成两个赛季200名选手采集及断点保存，未核查记录0。最新发布与线上验收结果见verification.json。
 
-打包：`python scripts/package.py --edition 分区改版`，产出独立文件，不覆盖此前精细筛选版。上传包根目录包含index.html、assets、data和edge-functions，上传到既有EdgeOne项目，不需新建项目。
+自动发布只编译公开的dist，保留函数入口名称；边缘运行时用Response构造函数生成JSON错误和405拒写响应。每次发布后回读正式域名，核对两个赛季的完整快照SHA256、总体/矩阵/漏斗/对抗/分差层/地图汇总和比赛明细，同时检查非法条件400、写入405；不通过则Actions标红。源码修复可在提交信息加[publish-only]，复用最近完整快照并执行构建、测试、部署、线上验收，按时运行仍照常采集。
+
+打包：python scripts/package.py --edition 分区改版_自动发布版 --compiled-zip <已下载的edgeone-compiled-site.zip>。该上传包是官方CLI编译产物，根目录含assets、edge-functions及其config.json；选择既有项目上传。日常更新由Actions完成，无需人工上传。
 
 ### 原有数据接口
 
@@ -114,13 +116,11 @@ GET /api/matches?mmrMin=3500&mmrMax=4300&gapMax=100
 
 使用`node scripts/verify-rating-data.mjs dist/data`可逐场独立复核两个赛季、三个时间窗口、两种对手范围、七组积分条件，共84组合。
 
-## 当前验证与未完成项
+## 当前验证与限制
 
-精细筛选版本本地构建通过；38项测试通过、0失败、1项Windows Git沙箱集成跳过，原有96组与SQLite接口逐项对照保持通过。新测试覆盖地图及分段计数、积分/排名边界、直接交手去重、四人对比校验、北京时间午夜/周一、已结束赛季窗口、零样本、收藏异常存储格式和只读边缘API。
+2026-10-21正式发布完成：云端48项测试全部通过；本地48项中47通过、1项Windows Git沙箱集成跳过，云端无跳过。正式域名的两赛季统计、非对称分差筛选、地图明细、400非法条件和405拒写均已回读。版本 7f311be5459cfac8abb6462847ef5e4324491634，部署 dploz8qz646a。完整证据见verification.json及输出发布记录。官方来源采集、SQLite持久化、全量查询对照、发布后统计回读分别验证。前端视觉验收在本地完成，正式站通过HTTPS及资源内容校验。国内手机流量和家庭宽带关闭代理后的访问仍需真实网络测试；海外节点成功不能证明所有国内线路可用。
 
-现有云端采集已完成200/200人的全部核查，待核查记录0、缺失记录0。Linux旧版本22项测试全部通过，无跳过；独立定时运行39554572409成功完成采集、构建和验证，但发布步骤因尚未配置EDGEONE_API_TOKEN跳过。上一轮功能云端运行39582864444通过29项测试；本次精细筛选云端运行39589199322已成功完成构建和验证，39项测试全部通过、0跳过。网站发布仍因未配置EDGEONE_API_TOKEN而跳过。
-
-源码和定时工作流：https://github.com/caozqiu/yuri-ladder 。复用现有EdgeOne项目makers-i6sbocft2osz，原部署dpwkujw1zctd，不要创建重复项目。域名yuri-ladder.cn已完成CNAME配置，HTTPS证书已部署，并已实测证书校验通过、首页返回200；尚需配置发布授权、核实实际项目名和加速区域、上传新版本、验证每小时自动发布和国内无代理访问。提供本地预览与可上传产物不代表线上新版本已经发布。
+源码和工作流：https://github.com/caozqiu/yuri-ladder 。复用项目makers-i6sbocft2osz，实际项目名yuri-ladder，加速区域overseas。域名yuri-ladder.cn的CNAME和HTTPS已生效，凭据已保存于GitHub Secret并验证；运行中不会要求将Token放入聊天或本地源码。
 
 ## 参考
 
@@ -132,3 +132,5 @@ GET /api/matches?mmrMin=3500&mmrMax=4300&gapMax=100
 - 域名价表：https://buy.cloud.tencent.com/domain/price?type=renew
 
 非官方统计项目，与兰博平台无隶属关系。
+
+最新成功运行：https://github.com/caozqiu/yuri-ladder/actions/runs/39618628706 。独立定时采集：https://github.com/caozqiu/yuri-ladder/actions/runs/39616133026 。
