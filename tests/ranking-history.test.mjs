@@ -24,6 +24,11 @@ test('old checkpoints upgrade without a history file; corrupt new history cannot
  await writeFile(join(dir,'ranking_history.ndjson'),'corrupt');await assert.rejects(()=>restoreCheckpoint(b,dir),/校验失败/);
  assert.equal(b.connection.prepare('SELECT COUNT(*) AS n FROM ranking_history').get().n,1);a.close();b.close();
 });
+test('legacy archive names can be recovered without rewriting historical scores or timestamps',()=>{
+ const db=database();db.connection.prepare('INSERT INTO ranking_history VALUES (?,?,?,?)').run('old',1,500,JSON.stringify([[players[0].id,1,4000]]));
+ recordRanking(db,{snapshot:'old',season:1,observed:999,players:[{...players[0],name:'原榜单昵称',mmr:9999}]});
+ const row=db.connection.prepare('SELECT * FROM ranking_history').get();assert.equal(row.observed,500);assert.deepEqual(JSON.parse(row.data),[[players[0].id,1,4000,'原榜单昵称']]);db.close();
+});
 test('published histories are immutable, use actual capture times after season end, and stay pinned on failed sync',async()=>{
  const db=database(),dir=await folder();recordRanking(db,{snapshot:'s1',season:1,observed:500,players});recordRanking(db,{snapshot:'future',season:1,observed:700,players});
  const archive=db.connection.prepare('SELECT * FROM ranking_history').all();const before=await writePublication(dir,[seed],{state:'complete'},{enabled:true},archive);

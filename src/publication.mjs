@@ -41,7 +41,7 @@ export async function writePublication(directory,seeds,progress=null,automation=
   await rename(join(directory,'index.json.tmp'),join(directory,'index.json'));
   // Thin records are durable in SQLite/checkpoints; public assets only need
   // histories referenced by the current and retained complete publications.
-  const retained=new Set([...manifest.snapshots,...manifest.previous].flatMap(e=>e.history?[e.history.file.split('/').at(-1)]:[]));
+  const retained=new Set([...manifest.snapshots,...manifest.previous,...(previous?.snapshots||[]),...(previous?.previous||[])].flatMap(e=>e.history?[e.history.file.split('/').at(-1)]:[]));
   try{for(const name of await readdir(join(directory,'history')))if(/^[a-f0-9]{64}\.json$/.test(name)&&!retained.has(name))await unlink(join(directory,'history',name));}catch(e){if(e.code!=='ENOENT')console.warn('历史静态文件清理延后');}
   return manifest;
 }
