@@ -12,14 +12,16 @@ export async function publishExisting({makers,token,site='china',invoke,checkOnl
  if(project.area&&!['overseas','global'].includes(project.area))throw new Error('Unsupported acceleration region; publishing stopped');
  log(JSON.stringify({projectId:PROJECT_ID,name:project.name,area:project.area||'unchanged',access:'verified'}));
  if(checkOnly)return project;
- const args=['--yes','edgeone@1.6.44','makers','deploy','./dist','--name',project.name,'--site',site,'--skip-ai-gateway-sync','--json'];
+ // An explicit folder is uploaded as static assets. Let the CLI compile the
+ // public-only dist project so edge-functions become executable routes.
+ const args=['--yes','edgeone@1.6.44','makers','deploy','--name',project.name,'--site',site,'--skip-ai-gateway-sync','--json'];
  if(project.area)args.push('--area',project.area);
  args.push('--token',token);
- await invoke(args);
+ await invoke(args,{cwd:resolve('dist')});
  return project;
 }
-function cli(args){return new Promise((done,fail)=>{
- const child=spawn(process.platform==='win32'?'npx.cmd':'npx',args,{stdio:['ignore','inherit','inherit'],env:process.env});
+function cli(args,{cwd}){return new Promise((done,fail)=>{
+ const child=spawn(process.platform==='win32'?'npx.cmd':'npx',args,{cwd,stdio:['ignore','inherit','inherit'],env:process.env});
  child.once('error',fail);child.once('exit',code=>code===0?done():fail(new Error('EdgeOne CLI deployment failed: '+code)));
 });}
 if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).href){

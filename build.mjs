@@ -14,10 +14,12 @@ await writeFile('web/site.css',await readFile('vendor/tailwind-preflight.css','u
 await viteBuild({configFile:false,root:join(root,'web'),publicDir:false,plugins:[react()],resolve:{alias:{'@':join(root,'shared'),'react':dirname(require.resolve('react/package.json')),'react-dom':dirname(require.resolve('react-dom/package.json')),'lucide-react':dirname(require.resolve('lucide-react/package.json'))}},css:{postcss:{plugins:[]}},build:{outDir:join(root,'dist'),emptyOutDir:true}});
 await copyFile('web/favicon.svg','dist/favicon.svg');
 const configuration=JSON.parse(await readFile('edgeone.json','utf8'));
-await writeFile('dist/edgeone.json',JSON.stringify({headers:configuration.headers},null,2)+'\n');
+await writeFile('dist/edgeone.json',JSON.stringify({outputDirectory:'.',headers:configuration.headers},null,2)+'\n');
 await writeFile('dist/package.json',JSON.stringify({name:'yuri-ladder-public',private:true,type:'module'})+'\n');
 await mkdir('dist/edge-functions/api',{recursive:true});
-for(const endpoint of ['stats','matches'])await bundle({entryPoints:['src/edge-api.mjs'],outfile:'dist/edge-functions/api/'+endpoint+'.js',bundle:true,platform:'browser',target:'es2022',format:'esm',minify:true});
+// EdgeOne's function compiler detects the onRequest identifier in its bundle.
+// Keep handler names intact through this intermediate bundle.
+for(const endpoint of ['stats','matches'])await bundle({entryPoints:['src/edge-api.mjs'],outfile:'dist/edge-functions/api/'+endpoint+'.js',bundle:true,platform:'browser',target:'es2022',format:'esm',minifyWhitespace:true,minifySyntax:true,minifyIdentifiers:false});
 const source=process.env.YURI_PUBLIC_DATA_DIR||'.checkpoint/public';
 let index;
 try{index=JSON.parse(await readFile(join(source,'index.json'),'utf8'));}catch(e){if(e.code!=='ENOENT')throw e;}
