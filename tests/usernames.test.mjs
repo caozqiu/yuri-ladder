@@ -32,6 +32,7 @@ test('legacy accounts claim a username once without changing credentials or owne
   const username=await f.call('profile',{nickname:'老昵称',username:'老用户'},legacy.cookie);assert.equal(username.status,200);assert.equal(username.data.user.id,legacy.data.user.id);assert.equal((await f.call('login',{id:'老用户',password})).status,200);
   const again=await f.call('register',{nickname:'不能覆盖',username:'不能覆盖',password:'another-password-123',registrationKey:key,challenge:await f.challenge()});assert.equal(again.data.duplicate,true);assert.equal(again.data.user.username,'老用户');assert.equal(again.data.user.nickname,'老昵称');
   const unknown=await f.call('profile',{nickname:'伪造',username:'伪造'});assert.equal(unknown.status,401);
+  const minimal=await f.call('register',{username:'唯一昵称',password,registrationKey:'e'.repeat(64),challenge:await f.challenge()});assert.equal(minimal.status,201);assert.equal(minimal.data.user.nickname,'唯一昵称');
   assert.equal(validateUsername(' 草籽_01 '),'草籽_01');for(const bad of ['', 'a'.repeat(25),'two words','bad/name','\u202e假名'])assert.throws(()=>validateUsername(bad));
  }finally{f.db.close();}
 });

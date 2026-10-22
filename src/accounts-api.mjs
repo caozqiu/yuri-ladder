@@ -47,7 +47,7 @@ export function createAccountsHandler({store,secret,now=Date.now,registry=null})
   if(!configured)throw accountError('账号服务暂未开放',503);const input=await readBody(request);
   if(action==='register'){
    const [time,signature,...rest]=String(input.challenge||'').split('.'),at=Number(time);if(rest.length||!Number.isSafeInteger(at)||now()-at<2000||now()-at>20*60000||!equal(signature,await hmac('register.'+time))||input.website)throw accountError('注册验证未就绪或已过期，请刷新重试');
-   const nickname=validateNickname(input.nickname),password=validatePassword(input.password);if(!HEX_KEY.test(input.registrationKey||''))throw accountError('注册恢复码格式不正确');await rate(request,'register',5,60);
+   const nickname=validateNickname(typeof input.nickname==='string'&&input.nickname.trim()?input.nickname:input.username),password=validatePassword(input.password);if(!HEX_KEY.test(input.registrationKey||''))throw accountError('注册恢复码格式不正确');await rate(request,'register',5,60);
    const id=await accountId(input.registrationKey),key='users/'+id+'.json',recoveryHash=await digest(input.registrationKey),existing=await get(store,key);
    if(existing){if(!equal(existing.recoveryHash,recoveryHash))throw accountError('注册编号冲突，请重新生成恢复码',409);return login(request,existing,{duplicate:true});}
    const username=input.username===undefined?null:validateUsername(input.username);
