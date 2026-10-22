@@ -8,6 +8,62 @@
         "start": 1788224400,
         "end": 1793548800
       },
+      "snapshot": "2a69857a-efc1-4d78-8968-98367140b510:31",
+      "cutoff": 1792649844,
+      "created": 1792649852,
+      "meta": {
+        "scanned": 100,
+        "players": 100,
+        "missing": 0,
+        "excluded": 4,
+        "unknown": 0,
+        "full": false
+      },
+      "file": "/data/snapshots/ec5aaa3d391e85c61765c6fbfb6bb91c96d35f50d628026433c258051f5c8184.json",
+      "sha256": "ec5aaa3d391e85c61765c6fbfb6bb91c96d35f50d628026433c258051f5c8184",
+      "history": {
+        "snapshot": "2a69857a-efc1-4d78-8968-98367140b510:31",
+        "file": "/data/history/4171499a9609c7bc31c0072690beaf7cb5aec237bf997c519e89d16d45988332.json",
+        "sha256": "4171499a9609c7bc31c0072690beaf7cb5aec237bf997c519e89d16d45988332",
+        "observations": 19
+      }
+    },
+    {
+      "season": {
+        "id": 30,
+        "name": "2026-S4赛季",
+        "start": 1782864000,
+        "end": 1788191999
+      },
+      "snapshot": "2a69857a-efc1-4d78-8968-98367140b510:30",
+      "cutoff": 1788191999,
+      "created": 1792649860,
+      "meta": {
+        "scanned": 100,
+        "players": 100,
+        "missing": 0,
+        "excluded": 4,
+        "unknown": 0,
+        "full": false
+      },
+      "file": "/data/snapshots/12fb3d06e96a25823bc7e1169e21f1fa306ae0c9117ef7addbc32398e63fe326.json",
+      "sha256": "12fb3d06e96a25823bc7e1169e21f1fa306ae0c9117ef7addbc32398e63fe326",
+      "history": {
+        "snapshot": "2a69857a-efc1-4d78-8968-98367140b510:30",
+        "file": "/data/history/beb6ef664e8872f39d4e2d959eacb8770467966b19e963efab4dbc5b7bcaa763.json",
+        "sha256": "beb6ef664e8872f39d4e2d959eacb8770467966b19e963efab4dbc5b7bcaa763",
+        "observations": 19
+      }
+    }
+  ],
+  "previous": [
+    {
+      "season": {
+        "id": 31,
+        "name": "2026-S5赛季",
+        "start": 1788224400,
+        "end": 1793548800
+      },
       "snapshot": "0635551d-8ced-481f-9f18-11d969656ef6:31",
       "cutoff": 1792646341,
       "created": 1792646349,
@@ -54,9 +110,7 @@
         "sha256": "890c74558996d687389be228ab01df589d25c69e0fc2336954749250e7ff8692",
         "observations": 18
       }
-    }
-  ],
-  "previous": [
+    },
     {
       "season": {
         "id": 31,
@@ -109,60 +163,6 @@
         "file": "/data/history/63ca93080845983b3124ca11da2bf9ad0630ea8080f99223dc91722f8d5cc88c.json",
         "sha256": "63ca93080845983b3124ca11da2bf9ad0630ea8080f99223dc91722f8d5cc88c",
         "observations": 17
-      }
-    },
-    {
-      "season": {
-        "id": 31,
-        "name": "2026-S5赛季",
-        "start": 1788224400,
-        "end": 1793548800
-      },
-      "snapshot": "e7a36cd6-43ee-43b9-a883-2e5e36660f24:31",
-      "cutoff": 1792639317,
-      "created": 1792639324,
-      "meta": {
-        "scanned": 100,
-        "players": 100,
-        "missing": 0,
-        "excluded": 4,
-        "unknown": 0,
-        "full": false
-      },
-      "file": "/data/snapshots/d6d8a1af49994000865a53191d7ea6191a9a01e5997e720223b5e8164067978b.json",
-      "sha256": "d6d8a1af49994000865a53191d7ea6191a9a01e5997e720223b5e8164067978b",
-      "history": {
-        "snapshot": "e7a36cd6-43ee-43b9-a883-2e5e36660f24:31",
-        "file": "/data/history/8cd2660a642d6973024b5302b56d2b2cdfdf86c9d21493a2f86ff26fb6547433.json",
-        "sha256": "8cd2660a642d6973024b5302b56d2b2cdfdf86c9d21493a2f86ff26fb6547433",
-        "observations": 16
-      }
-    },
-    {
-      "season": {
-        "id": 30,
-        "name": "2026-S4赛季",
-        "start": 1782864000,
-        "end": 1788191999
-      },
-      "snapshot": "e7a36cd6-43ee-43b9-a883-2e5e36660f24:30",
-      "cutoff": 1788191999,
-      "created": 1792639333,
-      "meta": {
-        "scanned": 100,
-        "players": 100,
-        "missing": 0,
-        "excluded": 4,
-        "unknown": 0,
-        "full": false
-      },
-      "file": "/data/snapshots/b1c3b6b4afbde192b0aee0f8e3b2d6d9449c4cb05edd2f5a81b86ba2bce9ba17.json",
-      "sha256": "b1c3b6b4afbde192b0aee0f8e3b2d6d9449c4cb05edd2f5a81b86ba2bce9ba17",
-      "history": {
-        "snapshot": "e7a36cd6-43ee-43b9-a883-2e5e36660f24:30",
-        "file": "/data/history/de4ea22b2cbb1db1aacda543f3a1d096ddf999c6ffa3f5522a3b42b534ae8e94.json",
-        "sha256": "de4ea22b2cbb1db1aacda543f3a1d096ddf999c6ffa3f5522a3b42b534ae8e94",
-        "observations": 16
       }
     }
   ],
