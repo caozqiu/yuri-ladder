@@ -26,7 +26,7 @@ test('hourly collector resumes ranking and match cursors, scans every ranked pla
   db.connection.prepare('INSERT INTO site_config VALUES (?,?)').run('active:'+sid,id);
  }
  db.connection.prepare('INSERT INTO site_config VALUES (?,?)').run('last_full',String(at));
- let failRank=true,failMatch=true;
+ let failRank=true,failMatch=true,driftRank=true;
  globalThis.__rosterSource=async path=>{
   const url=new URL(path,'https://official.test');calls.push(url);
   if(url.pathname.endsWith('/seasons'))return seasons;
@@ -34,6 +34,7 @@ test('hourly collector resumes ranking and match cursors, scans every ranked pla
   if(url.pathname.endsWith('/rank')){
    const page=Number(url.searchParams.get('pageNum'));
    if(sid===11&&page===2&&failRank){failRank=false;throw Error('temporary ranking outage');}
+   if(sid===11&&page===2&&driftRank){driftRank=false;return {page,count:127,totalPages:6,list:Array.from({length:25},(_,i)=>({userId:String(base+26+i),username:'changed',userLevel:{rank:26+i,mmr:4000}}))};}
    return {page,count:126,totalPages:6,list:Array.from({length:Math.min(25,126-(page-1)*25)},(_,i)=>{const rank=(page-1)*25+i+1;return {userId:String(base+rank),username:'P'+rank,userLevel:{rank,mmr:5000-rank}};})};
   }
   if(url.pathname.endsWith('/list')){
@@ -51,7 +52,7 @@ test('hourly collector resumes ranking and match cursors, scans every ranked pla
   assert.equal(db.connection.prepare("SELECT value FROM site_config WHERE key='active:11'").get().value,'legacy:11');
   const checkpoint=join(dir,'state');await saveCheckpoint(db,checkpoint);db.close();db=new SQLiteDatabase(':memory:');db.migrate(resolve('migrations'));await restoreCheckpoint(db,checkpoint);globalThis.__rosterDB=db;
   assert.equal((await sync.startSync()).resumed,true);
-  let status=await sync.syncStatus(),failed=false;
+  let status=await sync.syncStatus(),failed=false,countRecovered=false;
   for(let step=0;status.state!=='complete'&&step<300;step++){
    try{
     status=await sync.syncStep();
@@ -61,11 +62,12 @@ test('hourly collector resumes ranking and match cursors, scans every ranked pla
      assert.ok(work.players.find(p=>p.uid==='11001').stop>0,'existing player uses 48-hour overlap');
     }
    }catch(e){
-    assert.match(e.message,/match outage/);failed=true;status=await sync.syncStatus();assert.equal(status.state,'retry');
+    if(e.message.includes('来源榜单人数'))countRecovered=true;else{assert.match(e.message,/match outage/);failed=true;}
+    status=await sync.syncStatus();assert.equal(status.state,'retry');
     await saveCheckpoint(db,checkpoint);db.close();db=new SQLiteDatabase(':memory:');db.migrate(resolve('migrations'));await restoreCheckpoint(db,checkpoint);globalThis.__rosterDB=db;
    }
   }
-  assert.equal(failed,true);assert.equal(status.state,'complete');assert.equal(status.playersDone,252);assert.equal(status.totalPlayers,252);
+  assert.equal(failed,true);assert.equal(countRecovered,true);assert.equal(status.state,'complete');assert.equal(status.playersDone,252);assert.equal(status.totalPlayers,252);
   for(const sid of [11,10]){
    const snapshot=db.connection.prepare('SELECT value FROM site_config WHERE key=?').get('active:'+sid).value;
    const meta=JSON.parse(db.connection.prepare('SELECT meta FROM snapshots WHERE id=?').get(snapshot).meta);
@@ -74,7 +76,7 @@ test('hourly collector resumes ranking and match cursors, scans every ranked pla
    assert.equal(db.connection.prepare('SELECT COUNT(*) AS n FROM games WHERE snapshot=?').get(snapshot).n,1);
   }
   const requested=new Set(calls.filter(u=>u.pathname.endsWith('/list')).map(u=>u.searchParams.get('userId')));assert.equal(requested.size,252);
-  assert.equal(calls.filter(u=>u.pathname.endsWith('/rank')&&u.searchParams.get('pageNum')==='1').length,2,'resume must not restart already-saved rank page');
+  assert.equal(calls.filter(u=>u.pathname.endsWith('/rank')&&u.searchParams.get('pageNum')==='1').length,3,'resume keeps the saved page; a changed official count restarts only the affected season');
   assert.equal(db.connection.prepare('SELECT COUNT(*) AS n FROM pending').get().n,0);
  }finally{db.close();delete globalThis.__rosterDB;delete globalThis.__rosterSource;}
 });

@@ -39,7 +39,15 @@ async function collectRankings(run:Run){
  const work=run.rankings!.find(w=>!w.done);
  if(work){
   const sid=work.season.id,snapshot=run.snapshots[sid];
-  const page=rankingPage(await source('/battlecenter/qualifying/v1/rank?seasonId='+sid+'&version=0&pageNum='+work.page+'&pageSize=25&startRank=0'),work.page,work.count);
+  const data=await source('/battlecenter/qualifying/v1/rank?seasonId='+sid+'&version=0&pageNum='+work.page+'&pageSize=25&startRank=0');
+  let page;
+  try{page=rankingPage(data,work.page,work.count);}catch(e){
+   // A growing or shrinking ladder must not leave a saved cursor pinned to
+   // an obsolete total forever. Reset only this unfinished ranking list.
+   const count=Number(data?.count);
+   if(work.count!==null&&Number.isSafeInteger(count)&&count>0&&count!==work.count){await db().prepare('DELETE FROM rankings WHERE snapshot=?').bind(snapshot).run();work.page=1;work.count=null;}
+   throw e;
+  }
   await db().batch(rankingStatements(snapshot,page.players));work.count=page.count;
   if(work.page===page.totalPages){
    const rows=(await db().prepare('SELECT data FROM rankings WHERE snapshot=? ORDER BY rank').bind(snapshot).all<{data:string}>()).results.map(r=>JSON.parse(r.data));
