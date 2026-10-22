@@ -11,3 +11,7 @@ web/site.css
 *.tmp
 release/
 cloud-release/
+
+.npm-cache/
+outputs-source-summary.json
+blob-package-metadata.json

@@ -37,6 +37,11 @@ jobs:
         env:
           EDGEONE_API_TOKEN: ${{ secrets.EDGEONE_API_TOKEN }}
         run: node scripts/deploy.mjs --check-only
+      - name: Configure sponsor owner access without exposing credentials
+        if: env.EDGEONE_CONFIGURED == 'true'
+        env:
+          EDGEONE_API_TOKEN: ${{ secrets.EDGEONE_API_TOKEN }}
+        run: node scripts/provision-sponsors.mjs
       - name: Upgrade and export complete ranking observations
         id: history
         env:
@@ -81,6 +86,11 @@ jobs:
       - name: Verify public statistics after deployment
         if: env.EDGEONE_CONFIGURED == 'true'
         run: node scripts/verify-public.mjs
+      - name: Verify sponsor storage, import and moderation
+        if: env.EDGEONE_CONFIGURED == 'true'
+        env:
+          EDGEONE_API_TOKEN: ${{ secrets.EDGEONE_API_TOKEN }}
+        run: node scripts/verify-sponsors.mjs
       - name: Save compiled upload package
         if: env.EDGEONE_CONFIGURED == 'true'
         run: |
@@ -107,7 +117,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: production-verification
-          path: .runtime/public-verification.json
+          path: |
+            .runtime/public-verification.json
+            .runtime/sponsor-verification.json
           retention-days: 7
       - name: Report publishing setup still needed
         if: env.EDGEONE_CONFIGURED != 'true'

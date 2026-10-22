@@ -13,6 +13,7 @@
     "sync": "node collector/collector.mjs sync"
   },
   "dependencies": {
+    "@edgeone/pages-blob": "0.0.18",
     "lucide-react": "1.31.0",
     "react": "19.2.6",
     "react-dom": "19.2.6"

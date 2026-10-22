@@ -1,0 +1,26 @@
+import {parseSourceJSON} from './source-json.mjs';
+import {sponsorError} from './sponsors.mjs';
+export const PLATFORM_ID=/^[1-9]\d{0,19}$/;
+export const MATCH_ID=/^[1-9]\d{7,29}$/;
+export function proofValue(round,a,b){return JSON.stringify({platformA:a,platformB:b,matchId:round.matchId,map:round.map,winner:round.winner,start:round.start,countryA:round.countryA,countryB:round.countryB});}
+export function normalizeSponsorMatch(s,matchId,platformA,platformB){
+ if(String(s?.matchId)!==matchId)throw sponsorError('来源返回的对局编号不一致',502);
+ if(s.gameVersion!==0||s.playerCount!==2||s.isEnd!==1)throw sponsorError('只支持已结束的尤里复仇双人对局');
+ const ps=(s.players||[]).filter(p=>p.colorId!==null&&PLATFORM_ID.test(String(p.userId)));
+ if(ps.length!==2)throw sponsorError('该对局不是两名真人选手的对局');
+ const a=ps.find(p=>String(p.userId)===platformA),b=ps.find(p=>String(p.userId)===platformB);
+ if(!a||!b||a===b)throw sponsorError('该对局的双方ID与绑定的选手不一致');
+ if(![0,1].includes(a.matchStats)||![0,1].includes(b.matchStats)||a.matchStats+b.matchStats!==1)throw sponsorError('该对局为流局、无效局或结果尚未确认');
+ if(![a.country,b.country].every(n=>Number.isInteger(n)&&n>=0&&n<=9))throw sponsorError('该对局的国家信息不完整');
+ if(!Number.isSafeInteger(s.startTime)||s.startTime<946656000||s.startTime>4102444800||typeof s.mapName!=='string'||!s.mapName.trim()||s.mapName.length>100)throw sponsorError('该对局的地图或时间信息不完整');
+ return {round:{map:s.mapName.trim(),winner:a.matchStats===1?'a':'b',matchId,start:s.startTime,countryA:a.country,countryB:b.country},nameA:a.username||'',nameB:b.username||''};
+}
+export async function fetchSponsorMatch(matchId,platformA,platformB){
+ let response;
+ try{response=await fetch('https://api.ram-bo.com/datacenter/redalert/match/v1/summary?matchId='+matchId,{headers:{device:'6',device_id:'next-h5',language:'zh_CN',platform:'3',app_version_code:'9.9.9',Referer:'https://ra2.com/',Accept:'application/json'},signal:AbortSignal.timeout(18000)});}catch{throw sponsorError('兰博接口暂时无法连接，请稍后重试',502);}
+ if([403,429].includes(response.status))throw sponsorError('兰博接口暂时限流，请稍后重试',429);
+ if(!response.ok)throw sponsorError('暂时无法读取这场对局',502);
+ let data;try{data=parseSourceJSON(await response.text());}catch{throw sponsorError('兰博接口暂时不可用',502);}
+ if(!data.success||!data.data)throw sponsorError('兰博平台未找到该对局');
+ return normalizeSponsorMatch(data.data,matchId,platformA,platformB);
+}

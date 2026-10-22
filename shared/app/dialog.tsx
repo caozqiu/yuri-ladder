@@ -4,11 +4,11 @@ export default function Dialog({title,id,children,onClose,className=''}:{title:s
  const host=useRef<HTMLDivElement>(null);
  useEffect(()=>{
   const previous=document.activeElement as HTMLElement,overflow=document.body.style.overflow;
-  document.body.style.overflow='hidden';host.current?.querySelector<HTMLElement>('button,input,select,a[href]')?.focus();
+  document.body.style.overflow='hidden';host.current?.querySelector<HTMLElement>('button,input,textarea,select,a[href]')?.focus();
   const key=(e:KeyboardEvent)=>{
    if(e.key==='Escape'){e.preventDefault();onClose();}
    if(e.key==='Tab'){
-    const items=[...(host.current?.querySelectorAll<HTMLElement>('button:not([disabled]),input:not([disabled]),select:not([disabled]),a[href],summary,[tabindex="0"]')||[])].filter(el=>el.getClientRects().length);
+    const items=[...(host.current?.querySelectorAll<HTMLElement>('button:not([disabled]),input:not([disabled]),textarea:not([disabled]),select:not([disabled]),a[href],summary,[tabindex="0"]')||[])].filter(el=>el.getClientRects().length);
     if(!items.length)return;
     if(e.shiftKey&&document.activeElement===items[0]){e.preventDefault();items.at(-1)?.focus();}
     else if(!e.shiftKey&&document.activeElement===items.at(-1)){e.preventDefault();items[0].focus();}
