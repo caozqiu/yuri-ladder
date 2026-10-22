@@ -66,7 +66,7 @@ test('same-origin JSON, body size, challenge signature, expiry, honeypot and thr
 });
 test('session cookie is HttpOnly, secure, expiring and independent of public URLs',async()=>{
  const f=fixture();assert.equal((await f.call('login',{password:'wrong'})).status,401);
- const r=await f.call('login',{password:secret});for(const flag of ['HttpOnly','SameSite=Strict','Secure','Path=/api/sponsors'])assert.ok(r.headers.get('Set-Cookie').includes(flag));
+ const r=await f.call('login',{password:secret});for(const flag of ['HttpOnly','SameSite=Strict','Secure','Path=/api'])assert.ok(r.headers.get('Set-Cookie').includes(flag));
  assert.equal((await f.call('session',undefined,{}, {Cookie:r.cookie})).json.owner,true);
  assert.equal((await f.call('queue',undefined,{password:secret})).status,401);
  assert.equal((await f.call('queue',undefined,{}, {Cookie:r.cookie+'forged'})).status,401);

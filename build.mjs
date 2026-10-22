@@ -20,7 +20,7 @@ await mkdir('dist/edge-functions/api',{recursive:true});
 // EdgeOne's function compiler detects the onRequest identifier in its bundle.
 // Keep handler names intact through this intermediate bundle.
 for(const endpoint of ['stats','matches','history'])await bundle({entryPoints:['src/edge-api.mjs'],outfile:'dist/edge-functions/api/'+endpoint+'.js',bundle:true,platform:'browser',target:'es2022',format:'esm',minifyWhitespace:true,minifySyntax:true,minifyIdentifiers:false});
-await bundle({entryPoints:['src/sponsors-edge.mjs'],outfile:'dist/edge-functions/api/sponsors.js',bundle:true,platform:'browser',target:'es2022',format:'esm',minifyWhitespace:true,minifySyntax:true,minifyIdentifiers:false});
+for(const endpoint of ['sponsors','events'])await bundle({entryPoints:['src/sponsors-edge.mjs'],outfile:'dist/edge-functions/api/'+endpoint+'.js',bundle:true,platform:'browser',target:'es2022',format:'esm',minifyWhitespace:true,minifySyntax:true,minifyIdentifiers:false});
 const source=process.env.YURI_PUBLIC_DATA_DIR||'.checkpoint/public';
 let index;
 try{index=JSON.parse(await readFile(join(source,'index.json'),'utf8'));}catch(e){if(e.code!=='ENOENT')throw e;}

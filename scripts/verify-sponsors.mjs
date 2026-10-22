@@ -5,10 +5,10 @@ import {getStore} from '@edgeone/pages-blob';
 import {PROJECT_ID} from './deploy.mjs';
 import {createSponsorsHandler} from '../src/sponsors-api.mjs';
 const origin=process.env.YURI_VERIFY_ORIGIN||'https://yuri-ladder.cn';
-async function live(action){
+async function live(action,path='sponsors'){
  let error;
  for(let i=0;i<6;i++){
-  try{const r=await fetch(origin+'/api/sponsors?'+new URLSearchParams({action,_verify:Date.now()+'-'+i}),{cache:'no-store',signal:AbortSignal.timeout(45000)});const data=await r.json();if(action==='session'&&(r.status!==200||!data.configured))throw Error('Sponsor endpoint not ready');return {status:r.status,data};}
+  try{const r=await fetch(origin+'/api/'+path+'?'+new URLSearchParams({action,_verify:Date.now()+'-'+i}),{cache:'no-store',signal:AbortSignal.timeout(45000)});const data=await r.json();if(action==='session'&&(r.status!==200||!data.configured))throw Error('Sponsor endpoint not ready');return {status:r.status,data};}
   catch(e){error=e;if(i<5)await new Promise(r=>setTimeout(r,10000));}
  }
  throw error;
@@ -19,13 +19,14 @@ const publicList=await live('list');assert.equal(publicList.status,200);assert.o
 // Exercise approval transitions in an isolated private verification namespace.
 // Do not log in to the production owner account or publish a fabricated event.
 const token=process.env.EDGEONE_API_TOKEN;if(!token)throw Error('Verification credential missing');
+const eventSession=await live('session','events');assert.equal(eventSession.data.configured,true);assert.equal((await live('queue','events')).status,401);assert.equal((await live('list','events')).status,200);
 const opts={name:'yuri-sponsor-verification',projectId:PROJECT_ID,token,consistency:'strong'};
 const storage=getStore(opts),written=new Set();
 const store={get:(...a)=>storage.get(...a),list:(...a)=>storage.list(...a),async setJSON(key,value,options){written.add(key);return storage.setJSON(key,value,options);}};
 let now=Date.now();const secret=randomBytes(32).toString('hex');
 let handler=createSponsorsHandler({store,secret,now:()=>now});
-async function call(action,body,headers={},params={}){
- const url='https://verification.invalid/api/sponsors?'+new URLSearchParams({action,...params});
+async function call(action,body,headers={},params={},path='sponsors'){
+ const url='https://verification.invalid/api/'+path+'?'+new URLSearchParams({action,...params});
  const response=await handler(new Request(url,{method:body?'POST':'GET',headers:{Origin:'https://verification.invalid',...(body?{'Content-Type':'application/json'}:{}),...headers},...(body?{body:JSON.stringify(body)}:{})}));
  const data=await response.json();return {status:response.status,data,cookie:response.headers.get('Set-Cookie')?.split(';')[0]};
 }
@@ -44,6 +45,17 @@ try{
  const item=(await call('list',undefined,{}, {id})).data.item;assert.equal(item.status,'approved');assert.equal(item.rounds[0].matchId,'1568734715984187392');assert.equal(item.rounds[0].proof,undefined);assert.equal(item.replayUrl,application.replayUrl);
  now++;reviewed=await call('review',{id,status:'rejected',reason:'隔离验收结束',version:reviewed.data.item.version},auth);assert.equal(reviewed.status,200);
  assert.equal((await call('list',undefined,{}, {id})).status,404);assert.equal((await call('receipt',{id,ticket})).data.item.status,'rejected');
- const evidence={at:new Date().toISOString(),origin,publicEndpointReady:true,anonymousQueueStatus:401,storage:'EdgeOne Blob, isolated verification namespace',freshInstanceRead:true,officialSourceImport:true,largeMatchIdPreserved:true,replayLinkPreserved:true,privatePending:true,approvalPublished:true,rejectionHidden:true,productionTestEventsCreated:0};
+ const eChallenge=(await call('challenge',undefined,{}, {},'events')).data.challenge;now+=2500;
+ const eTicket=randomBytes(32).toString('hex'),event={title:'隔离存储验收赛事',organizer:'自动验收',description:'仅在私有验收命名空间中测试，不对外发布。',format:'1v1 BO3',contact:'',opensAt:new Date(now-60000).toISOString(),closesAt:new Date(now+3600000).toISOString(),startsAt:new Date(now+7200000).toISOString(),ticket:eTicket,challenge:eChallenge};
+ const created=await call('create',event,{}, {},'events');assert.equal(created.status,201);const eventId=created.data.id;
+ assert.equal((await call('list',undefined,{}, {id:eventId},'events')).status,404);
+ assert.equal((await call('review',{id:eventId,status:'approved'},auth,{},'events')).status,200);
+ const signupChallenge=(await call('challenge',undefined,{}, {},'events')).data.challenge;now+=2500;
+ const participant=await call('join',{id:eventId,name:'隔离测试选手',platformId:'9007199254740993',contact:'private-verification-contact',ticket:randomBytes(32).toString('hex'),challenge:signupChallenge},{}, {},'events');assert.equal(participant.status,201);
+ let management;
+ for(let i=0;i<7;i++){management=await call('manage',{id:eventId,ticket:eTicket},{}, {},'events');if(management.status===200&&management.data.item.registrations===1&&management.data.participants.length===1)break;await new Promise(r=>setTimeout(r,5000));}
+ assert.equal(management.status,200);assert.equal(management.data.item.registrations,1);assert.equal(management.data.participants[0].platformId,'9007199254740993');assert.equal(management.data.participants[0].contact,'private-verification-contact');
+ const eventPublic=await call('list',undefined,{}, {id:eventId},'events');assert.equal(eventPublic.status,200);assert.ok(!JSON.stringify(eventPublic.data).includes('private-verification-contact'));
+ const evidence={at:new Date().toISOString(),origin,publicEndpointReady:true,anonymousQueueStatus:401,storage:'EdgeOne Blob, isolated verification namespace',freshInstanceRead:true,officialSourceImport:true,largeMatchIdPreserved:true,replayLinkPreserved:true,privatePending:true,approvalPublished:true,rejectionHidden:true,eventApplicationVerified:true,eventSignupVerified:true,organizerCountVerified:true,participantPrivacyVerified:true,productionTestEventsCreated:0};
  await mkdir('.runtime',{recursive:true});await writeFile('.runtime/sponsor-verification.json',JSON.stringify(evidence,null,2)+'\n');console.log(JSON.stringify(evidence));
 }finally{for(const key of written)await storage.delete(key);}

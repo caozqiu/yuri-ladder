@@ -1,6 +1,7 @@
 import {validateSponsor,publicSponsor,sponsorError,sponsorIdentity} from '../shared/lib/sponsors.mjs';
 import {fetchSponsorMatch,PLATFORM_ID,MATCH_ID,proofValue} from '../shared/lib/sponsor-source.mjs';
-const utf8=new TextEncoder(),COOKIE='yuri_sponsor_owner',ID=/^\d{13}_[a-f0-9]{64}$/;
+import {handleEvents} from './events-api.mjs';
+const utf8=new TextEncoder(),COOKIE='yuri_site_owner',ID=/^\d{13}_[a-f0-9]{64}$/;
 const json=(body,status=200,extra={})=>new Response(JSON.stringify(body),{status,headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff',Vary:'Cookie',...extra}});
 const hex=b=>[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');
 const digest=async s=>hex(await crypto.subtle.digest('SHA-256',utf8.encode(s)));
@@ -17,7 +18,7 @@ export function createSponsorsHandler({store,secret,now=Date.now,sourceMatch=fet
  // Object listings may lag behind a write. A strong point read is the
  // authoritative moderation state; immutable review objects are audit records.
  const latest=id=>get('states/'+id+'.json');
- const cookie=(request,value,age)=>COOKIE+'='+value+'; Path=/api/sponsors; HttpOnly; SameSite=Strict; Max-Age='+age+(new URL(request.url).protocol==='https:'?'; Secure':'');
+ const cookie=(request,value,age)=>COOKIE+'='+value+'; Path=/api; HttpOnly; SameSite=Strict; Max-Age='+age+(new URL(request.url).protocol==='https:'?'; Secure':'');
  const owner=async request=>{
   if(!configured)return false;
   const value=(request.headers.get('Cookie')||'').split(';').map(s=>s.trim()).find(s=>s.startsWith(COOKIE+'='))?.slice(COOKIE.length+1);
@@ -38,12 +39,14 @@ export function createSponsorsHandler({store,secret,now=Date.now,sourceMatch=fet
   const reader=request.body?.getReader();if(!reader)throw sponsorError('缺少申请内容');let size=0,parts=[];
   try{for(;;){const {done,value}=await reader.read();if(done)break;size+=value.byteLength;if(size>24576){await reader.cancel();throw sponsorError('申请内容过长',413);}parts.push(value);}}finally{reader.releaseLock();}
   const bytes=new Uint8Array(size);let offset=0;for(const p of parts){bytes.set(p,offset);offset+=p.length;}
-  try{return JSON.parse(new TextDecoder().decode(bytes));}catch{throw sponsorError('提交内容格式不正确');}
+  let parsed;try{parsed=JSON.parse(new TextDecoder().decode(bytes));}catch{throw sponsorError('提交内容格式不正确');}
+  if(!parsed||typeof parsed!=='object'||Array.isArray(parsed))throw sponsorError('提交内容须为JSON对象');return parsed;
  }
  return async function handle(request){
   try{
    const url=new URL(request.url),action=url.searchParams.get('action')||'list';
    if(!['GET','POST'].includes(request.method))return json({error:'请求方法不支持'},405,{Allow:'GET, POST'});
+   if(url.pathname==='/api/events')return await handleEvents({request,url,configured,store,get,set,list,sign,digest,equal,owner,requireOwner,rate,body,token,validToken,now,json});
    if(request.method==='GET'){
     if(action==='session')return json({configured,owner:await owner(request)});
     if(action==='challenge'){

@@ -12,7 +12,7 @@ const server=createServer(async(req,res)=>{
  try{
   const url=new URL(req.url,'http://127.0.0.1:'+server.address().port);
   if(url.pathname.startsWith('/api/')){
-   if(url.pathname==='/api/sponsors'){const chunks=[];let size=0;for await(const chunk of req){size+=chunk.length;if(size>24576){res.writeHead(413).end();return;}chunks.push(chunk);}const response=await sponsors(new Request(url,{method:req.method,headers:req.headers,...(chunks.length?{body:Buffer.concat(chunks)}:{})}));response.headers.forEach((v,k)=>res.setHeader(k,v));res.writeHead(response.status);res.end(Buffer.from(await response.arrayBuffer()));return;}
+   if(['/api/sponsors','/api/events'].includes(url.pathname)){const chunks=[];let size=0;for await(const chunk of req){size+=chunk.length;if(size>24576){res.writeHead(413).end();return;}chunks.push(chunk);}const response=await sponsors(new Request(url,{method:req.method,headers:req.headers,...(chunks.length?{body:Buffer.concat(chunks)}:{})}));response.headers.forEach((v,k)=>res.setHeader(k,v));res.writeHead(response.status);res.end(Buffer.from(await response.arrayBuffer()));return;}
    if(!['/api/stats','/api/matches','/api/history'].includes(url.pathname)){res.writeHead(404).end();return;}
    const response=await api.onRequest({request:new Request(url,{method:req.method})});
    response.headers.forEach((v,k)=>res.setHeader(k,v));res.writeHead(response.status);res.end(Buffer.from(await response.arrayBuffer()));return;
