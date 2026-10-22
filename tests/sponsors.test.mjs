@@ -1,4 +1,5 @@
 import test from 'node:test';
+import {fixtureMember} from './fixtures/member.mjs';
 import assert from 'node:assert/strict';
 import {mkdtemp,rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
@@ -13,8 +14,8 @@ const data={playerA:'甲',playerB:'乙',playedAt:'2026-10-22T10:00:00+08:00',sco
 const fixture=()=>{
  const values=new Map();let clock=1792634400000;
  const store={async get(k){return structuredClone(values.get(k)||null);},async setJSON(k,v){values.set(k,structuredClone(v));},async list({prefix,limit=30,cursor=''}){const keys=[...values.keys()].filter(k=>k.startsWith(prefix)&&k>cursor).sort();return {blobs:keys.slice(0,limit).map(key=>({key})),cursor:keys.length>limit?keys[limit-1]:null};}};
- const opts={store,secret,now:()=>clock};let handle=createSponsorsHandler(opts);
- async function call(action,body,extra={},headers={}){const url=new URL('https://fixture.example/api/sponsors');url.search=new URLSearchParams({action,...extra});const r=await handle(new Request(url,{method:body?'POST':'GET',headers:{Origin:url.origin,...(body?{'Content-Type':'application/json'}:{}),...headers},...(body?{body:JSON.stringify(body)}:{})}));return {status:r.status,json:await r.json(),cookie:r.headers.get('Set-Cookie')?.split(';')[0],headers:r.headers};}
+ const member=fixtureMember(()=>clock);const opts={store,secret,now:()=>clock,accountsStore:member.store};let handle=createSponsorsHandler(opts);
+ async function call(action,body,extra={},headers={}){await member.ready;const url=new URL('https://fixture.example/api/sponsors');url.search=new URLSearchParams({action,...extra});const r=await handle(new Request(url,{method:body?'POST':'GET',headers:{Origin:url.origin,Cookie:['submit','import'].includes(action)?member.cookie:'',...(body?{'Content-Type':'application/json'}:{}),...headers},...(body?{body:JSON.stringify(body)}:{})}));return {status:r.status,json:await r.json(),cookie:r.headers.get('Set-Cookie')?.split(';')[0],headers:r.headers};}
  return {values,store,call,opts,advance:n=>clock+=n,restart:()=>handle=createSponsorsHandler(opts),async apply(changes={}){const challenge=(await call('challenge')).json.challenge;clock+=2500;return call('submit',{...data,ticket:crypto.randomUUID().replaceAll('-','')+'a'.repeat(32),challenge,...changes});},async login(){const r=await call('login',{password:secret});assert.equal(r.status,200);return {Cookie:r.cookie};}};
 };
 test('sponsor inputs require distinct players, valid score, consistent partial rounds and timezone',()=>{
@@ -27,7 +28,7 @@ test('replay links are optional, retain normal video URLs and reject scripts, cr
  assert.equal(validateSponsor({...data,replayUrl:'https://www.bilibili.com/video/BV1test/?p=2&t=32'}).replayUrl,'https://www.bilibili.com/video/BV1test/?p=2&t=32');
  for(const replayUrl of ['javascript:alert(1)','data:text/html,x','file:///c:/secret','https://user:password@example.com/video','not a url','https://example.com/'+'x'.repeat(1000)])assert.throws(()=>validateSponsor({...data,replayUrl}));
 });
-test('anonymous submission is private until owner approval; receipt is scoped and never public',async()=>{
+test('member submission is private until owner approval; receipt is scoped and never public',async()=>{
  const f=fixture(),r=await f.apply({status:'approved'});assert.equal(r.status,201);const id=r.json.id;
  assert.deepEqual((await f.call('list')).json.items,[]);assert.equal((await f.call('list',undefined,{id})).status,404);
  assert.equal((await f.call('queue')).status,401);assert.equal((await f.call('review',{id,status:'approved'})).status,401);

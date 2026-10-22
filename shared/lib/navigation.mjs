@@ -18,5 +18,5 @@ export function parsePresets(value){
  try{const list=JSON.parse(value||'[]');return Array.isArray(list)?list.filter(p=>p&&typeof p.id==='string'&&typeof p.name==='string'&&p.name.trim()&&typeof p.query==='string').slice(0,30).map(p=>({id:p.id.slice(0,80),name:p.name.slice(0,40),query:presetQuery(p.query)})):[];}catch{return [];}
 }
 export function statsQuery(value){
- const q=new URLSearchParams(value);for(const k of ['screen','view','tierBy','own','enemy','detailMap','offset','rival','opponent','historyRange','research','historyPlayer','sponsorTab','sponsorId','eventTab','eventId','accountTab'])q.delete(k);q.sort();return q.toString();
+ const q=new URLSearchParams(value);for(const k of ['screen','view','tierBy','own','enemy','detailMap','offset','rival','opponent','historyRange','research','historyPlayer','sponsorTab','sponsorId','eventTab','eventId','eventAction','accountTab','returnTo'])q.delete(k);q.sort();return q.toString();
 }

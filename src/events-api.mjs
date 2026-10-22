@@ -9,7 +9,7 @@ export async function handleEvents({request,url,configured,store,get,set,list,si
  const summary=async(row,s,privateView=false)=>({...publicEvent(row,s,await count(row.id),now()),...(privateView?{reason:s?.reason||'',version:s?.version||null}:{})});
  async function roster(id,cursor){
   const r=await list('event-entries/'+id+'/',cursor);const participants=[];
-  for(let i=0;i<r.blobs.length;i+=4)participants.push(...await Promise.all(r.blobs.slice(i,i+4).map(async b=>{const v=await get(b.key);if(!v)return null;const {name,platformId,contact,note,createdAt}=v;return {name,platformId,contact,note,createdAt};})));
+  for(let i=0;i<r.blobs.length;i+=4)participants.push(...await Promise.all(r.blobs.slice(i,i+4).map(async b=>{const v=await get(b.key);if(!v)return null;const {name,platformId,qq,contact,note,createdAt}=v;return {name,platformId,qq,contact,note,createdAt};})));
   return {participants:participants.filter(Boolean),cursor:r.cursor||null};
  }
  async function requireOrganizer(input){
@@ -33,6 +33,7 @@ export async function handleEvents({request,url,configured,store,get,set,list,si
   return json({items,cursor:page.cursor||null});
  }
  if(!configured)throw sponsorError('赛事申请暂未开放',503);const input=await body(request);
+ if(['create','join'].includes(action)&&!account)throw sponsorError('请先登录普通用户账号',401);
  if(action==='create'){
   const at=await validToken(input.challenge,'event',20*60000);if(at===null)throw sponsorError('申请验证已过期，请刷新验证后重试');if(now()-at<2000||input.website)throw sponsorError('请稍候再提交');if(!HEX.test(input.ticket||''))throw sponsorError('管理回执格式不正确');
   const event=validateEvent(input);if(Date.parse(event.closesAt)<=now())throw sponsorError('新赛事的报名截止时间须在将来');

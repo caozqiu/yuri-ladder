@@ -10,8 +10,9 @@ export function validateEvent(input){
  return {title,organizer,description,format,contact,opensAt,closesAt,startsAt};
 }
 export function validateEntry(input){
- const name=clean(input.name,'报名昵称',64,true),platformId=clean(input.platformId,'兰博平台ID',20,true),contact=clean(input.contact,'报名联系方式',200,true),note=clean(input.note,'报名备注',500,false,true);
- if(!/^[1-9]\d{0,19}$/.test(platformId))throw sponsorError('兰博平台ID须为有效数字ID');return {name,platformId,contact,note};
+ const name=clean(input.name,'报名昵称',64,true),platformId=clean(input.platformId,'兰博平台ID',20,true),qq=clean(input.qq,'QQ号',12,true),note=clean(input.note,'报名备注',500,false,true);
+ if(!/^[1-9]\d{0,19}$/.test(platformId))throw sponsorError('兰博平台ID须为有效数字ID');
+ if(!/^[1-9]\d{4,11}$/.test(qq))throw sponsorError('QQ号须为5–12位数字，不能以0开头');return {name,platformId,qq,contact:qq,note};
 }
 export function eventPhase(item,now=Date.now()){
  if(now>=Date.parse(item.startsAt))return {key:'started',label:'赛事已开始',canJoin:false};

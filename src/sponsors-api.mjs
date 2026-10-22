@@ -85,6 +85,7 @@ export function createSponsorsHandler({store,secret,now=Date.now,sourceMatch=fet
     return json({owner:true},200,{'Set-Cookie':cookie(request,await token('owner',now()),28800)});
    }
    if(action==='logout')return json({owner:false},200,{'Set-Cookie':cookie(request,'',0)});
+   if(['submit','import'].includes(action)&&!account)throw sponsorError('请先登录普通用户账号',401);
    if(action==='import'){
     if(![input.platformA,input.platformB,input.matchId].every(v=>typeof v==='string')||!PLATFORM_ID.test(input.platformA)||!PLATFORM_ID.test(input.platformB)||input.platformA===input.platformB||!MATCH_ID.test(input.matchId))throw sponsorError('请填写双方不同的平台数字ID及有效对局编号');
     await rate(request,'import',60,10);
