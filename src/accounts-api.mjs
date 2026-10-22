@@ -25,6 +25,15 @@ export function createAccountsHandler({store,secret,now=Date.now}){
   const url=new URL(request.url),action=url.searchParams.get('action')||'session';
   if(!['GET','POST'].includes(request.method))return json({error:'请求方法不支持'},405,{Allow:'GET, POST'});
   if(request.method==='GET'){
+   if(action==='admin-users'){
+    const raw=(request.headers.get('Cookie')||'').split(';').map(s=>s.trim()).find(s=>s.startsWith('yuri_site_owner='))?.slice('yuri_site_owner='.length)||'';
+    const [kind,time,signature,...rest]=raw.split('.'),at=Number(time);
+    if(!configured||rest.length||kind!=='owner'||!Number.isSafeInteger(at)||at>now()+1000||now()-at>8*3600000||!equal(signature||'',await hmac(kind+'.'+time)))throw accountError('请先登录站主审核后台',401);
+    const cursor=url.searchParams.get('cursor')||'';if(cursor.length>1500)throw accountError('分页参数过长');
+    const page=await store.list({prefix:'profiles/',cursor:cursor||undefined,limit:25,paginate:false,consistency:'strong'}),items=[];
+    for(let i=0;i<page.blobs.length;i+=4)items.push(...(await Promise.all(page.blobs.slice(i,i+4).map(async b=>{const p=await get(store,b.key);if(!p||!ACCOUNT_ID.test(p.id||''))return null;return {...profileView(p),...(typeof p.username==='string'?{username:p.username}:{})};}))).filter(Boolean));
+    return json({items,cursor:page.cursor||null});
+   }
    if(action==='session'){const user=await currentAccount(request,store,now());return json({configured,user:user?{id:user.id,nickname:user.nickname,avatar:user.avatar,createdAt:user.createdAt}:null});}
    if(action==='challenge'){if(!configured)throw accountError('账号注册暂未开放',503);const at=now();return json({challenge:at+'.'+await hmac('register.'+at)});}
    if(action==='profile'||action==='avatar'){
