@@ -1,0 +1,35 @@
+name: Prepare public username verification key
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/username-registry-setup.yml'
+      - 'scripts/provision-username-registry.mjs'
+      - 'shared/lib/username-signing.mjs'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: yuri-username-public-key-setup
+  cancel-in-progress: false
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.22.3'
+          cache: npm
+      - run: npm ci
+      - name: Prepare public verification configuration only
+        env:
+          EDGEONE_API_TOKEN: ${{ secrets.EDGEONE_API_TOKEN }}
+          EDGEONE_SITE: ${{ vars.EDGEONE_SITE || 'china' }}
+        run: node scripts/provision-username-registry.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: username-registry-public-key
+          path: .runtime/username-registry-public.json
+          retention-days: 7
