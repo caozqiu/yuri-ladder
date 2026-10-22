@@ -103,11 +103,11 @@ test('import proof rejects edited maps, results, IDs and duplicate matches at su
  assert.equal((await f.apply({...base,platformB:'33'})).status,400);
  assert.equal((await f.apply({...base,rounds:[r,r]})).status,400);
 });
-test('edge request streams accept ArrayBuffer and string chunks while preserving size checks',async()=>{
+test('edge request JSON parsing uses the native JSON reader without relying on raw stream access',async()=>{
  const handler=createSponsorsHandler({store:fixture().store,secret}),raw=JSON.stringify({id:'unknown',status:'approved'});
- for(const chunk of [new TextEncoder().encode(raw).buffer,raw,new TextEncoder().encode(raw)]){
-  const r=new Request('https://fixture.example/api/sponsors?action=review',{method:'POST',headers:{Origin:'https://fixture.example','Content-Type':'application/json'},body:raw});
-  Object.defineProperty(r,'body',{value:new ReadableStream({start(controller){controller.enqueue(chunk);controller.close();}})});
+ for(const path of ['sponsors','events']){
+  const r=new Request('https://fixture.example/api/'+path+'?action=review',{method:'POST',headers:{Origin:'https://fixture.example','Content-Type':'application/json'},body:raw});
+  Object.defineProperty(r,'body',{get(){throw Error('Raw request stream unavailable in this edge runtime');}});
   assert.equal((await handler(r)).status,401);
  }
 });
