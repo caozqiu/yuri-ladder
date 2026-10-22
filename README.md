@@ -15,7 +15,7 @@ npm run preview
 ```
 
 打开 http://127.0.0.1:5188/ 。天梯接口只读，无采集入口；赞助赛预览使用隔离的本地文件存储。
-dist 是公开前端及函数源码。完整发布使用 node scripts/deploy.mjs，由官方CLI编译为 dist/.edgeone 后部署；直接上传原始dist仅能保证静态页面。collector 中的采集程序、状态文件不在公开产物中。
+dist 是公开前端及函数源码。完整发布使用 node scripts/deploy.mjs，由官方CLI编译为 dist/.edgeone 后部署；直接上传原始dist仅能保证静态页面。collector 中的采集程序、状态文件不在公开产物中。CLI会将项目环境变量嵌入服务端编译文件，因此原始dist/.edgeone只能作为私有部署材料，不能直接公开分享；自动流程生成的下载备用包已清空审核密码，社区申请和审核默认关闭，需使用源码经现有Actions重新编译部署才能启用。线上正式站使用有私密配置的服务端版本，下载包的处理不影响线上启用状态。
 
 ## 一次性配置
 
@@ -80,7 +80,7 @@ API：GET /api/events?action=list|session|challenge|queue；详情加id，queue�
 
 提交与审核强制同源JSON请求、24KiB正文限制、服务端字段/比分核验。提交使用20分钟签名验证、最短2秒等待和蜜罐字段；提交、来源导入及登录有持久化的尽力限流。对象存储不提供事务或原子比较交换，因此限流不是严格的分布式计数，审核版本检查用于防止常见的过期页面覆盖；仅一个站主审核，所有决定追加保存。未开通审核密码时，申请和审核均关闭。
 
-本地预览使用 .runtime/sponsors-preview 文件存储，与生产完全隔离。须自行在本地进程设置 SPONSOR_ADMIN_PASSWORD（至少24字符）才能测试申请与审核；没有默认生产密码。停止并重新启动预览后记录仍保留。云端部署后，verify-sponsors.mjs 检查正式站公开列表和拒绝访客审核，并在独立私有验收命名空间验证真实存储重读、来源导入、通过/撤回，不创建虚假公开赛事。新增12项资料/权限/来源/回放链接/边缘请求正文测试。
+本地预览使用 .runtime/sponsors-preview 文件存储，与生产完全隔离。须自行在本地进程设置 SPONSOR_ADMIN_PASSWORD（至少24字符）才能测试申请与审核；没有默认生产密码。停止并重新启动预览后记录仍保留。云端部署后，verify-sponsors.mjs 检查正式站公开列表和拒绝访客审核，并在独立私有验收命名空间验证真实存储重读、来源导入、通过/撤回，不创建虚假公开赛事。新增13项资料/权限/来源/回放链接/边缘请求正文测试，以及2项编译产物去除凭据测试。
 
 API：GET /api/sponsors?action=list|session|challenge；GET action=queue（站主）；POST action=submit|receipt|import|login|logout|review。详情使用 GET action=list&id=<编号>；分页使用返回的cursor。列表按登记先后加载，每页最多30条，搜索与状态过滤作用于已加载记录，可继续加载；网址用screen=sponsors、sponsorTab=apply/mine/review、sponsorId恢复视图。统计筛选保留但不影响赞助赛。
 

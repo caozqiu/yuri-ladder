@@ -110,6 +110,9 @@ jobs:
                   if path.is_file():
                       archive.write(path, path.relative_to(root).as_posix())
           PY
+      - name: Remove owner credentials from shareable compiled artifact
+        if: env.EDGEONE_CONFIGURED == 'true'
+        run: node scripts/compiled-artifacts.mjs .runtime/edgeone-compiled-site.zip
       - name: Save executable deployment artifact
         if: env.EDGEONE_CONFIGURED == 'true'
         uses: actions/upload-artifact@v4
