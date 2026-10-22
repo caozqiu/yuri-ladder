@@ -1,4 +1,5 @@
 import {randomBytes} from 'node:crypto';
+import {mkdir,writeFile} from 'node:fs/promises';
 import {Makers} from '@edgeone/makers-sdk';
 import {PROJECT_ID} from './deploy.mjs';
 // Runs only in the trusted deployment job. Never print credentials or write
@@ -11,6 +12,16 @@ try{
  if(project.projectId!==PROJECT_ID)throw Error('Project mismatch');
  const envs=await makers.projects.listEnvs({projectId:PROJECT_ID});
  const password=envs.find(e=>e.key==='SPONSOR_ADMIN_PASSWORD');
- if(password){if(password.value.length<24)throw Error('SPONSOR_ADMIN_PASSWORD must contain at least 24 characters');console.log('Sponsor owner access already configured; password unchanged.');}
- else{await makers.projects.setEnvs({projectId:PROJECT_ID,envVars:[{key:'SPONSOR_ADMIN_PASSWORD',value:randomBytes(32).toString('base64url'),comment:'赞助赛站主审核密码；请在控制台查看并妥善保管，切勿公开。'}]});console.log('Sponsor owner access configured. The owner can view SPONSOR_ADMIN_PASSWORD in the existing EdgeOne project environment variables.');}
+ if(password&&process.env.YURI_ROTATE_OWNER_PASSWORD!=='1'){if(password.value.length<24)throw Error('SPONSOR_ADMIN_PASSWORD must contain at least 24 characters');console.log('Sponsor owner access already configured; password unchanged.');}
+ else{
+  const next=randomBytes(32).toString('base64url');
+  await makers.projects.setEnvs({projectId:PROJECT_ID,envVars:[{key:'SPONSOR_ADMIN_PASSWORD',value:next,comment:'赞助赛站主审核密码；请在控制台查看并妥善保管，切勿公开。'}]});
+  const current=(await makers.projects.listEnvs({projectId:PROJECT_ID})).find(e=>e.key==='SPONSOR_ADMIN_PASSWORD');
+  if(current?.value!==next||password?.value===next)throw Error('Owner configuration readback failed');
+  await mkdir('.runtime',{recursive:true});
+  const evidence={at:new Date().toISOString(),ownerPasswordRotated:!!password,configurationReadbackVerified:true};
+  await writeFile('.runtime/owner-access-verification.json',JSON.stringify(evidence)+'\n');
+  console.log(JSON.stringify(evidence));
+  console.log('Sponsor owner access configured. The owner can view SPONSOR_ADMIN_PASSWORD in the existing EdgeOne project environment variables.');
+ }
 }catch(error){console.error('Sponsor access setup failed: '+String(error.code||'CONFIGURATION_FAILED'));process.exitCode=1;}

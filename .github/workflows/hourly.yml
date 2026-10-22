@@ -7,6 +7,7 @@ on:
   workflow_dispatch:
 permissions:
   contents: write
+  actions: write
 concurrency:
   group: yuri-ladder-production
   cancel-in-progress: false
@@ -37,10 +38,16 @@ jobs:
         env:
           EDGEONE_API_TOKEN: ${{ secrets.EDGEONE_API_TOKEN }}
         run: node scripts/deploy.mjs --check-only
+      - name: Remove old compiled artifacts containing embedded owner credentials
+        if: github.event_name == 'push' && github.run_attempt == 1 && contains(github.event.head_commit.message, '[rotate-owner]')
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/purge-credential-artifacts.mjs
       - name: Configure sponsor owner access without exposing credentials
         if: env.EDGEONE_CONFIGURED == 'true'
         env:
           EDGEONE_API_TOKEN: ${{ secrets.EDGEONE_API_TOKEN }}
+          YURI_ROTATE_OWNER_PASSWORD: ${{ github.event_name == 'push' && github.run_attempt == 1 && contains(github.event.head_commit.message, '[rotate-owner]') && '1' || '0' }}
         run: node scripts/provision-sponsors.mjs
       - name: Upgrade and export complete ranking observations
         id: history
@@ -130,6 +137,7 @@ jobs:
             .runtime/sponsor-verification.json
             .runtime/live-submission-verification.json
             .runtime/live-submission-cleanup.json
+            .runtime/owner-access-verification.json
           retention-days: 7
       - name: Report publishing setup still needed
         if: env.EDGEONE_CONFIGURED != 'true'
