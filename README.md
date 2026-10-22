@@ -54,7 +54,7 @@ SQLite仅在每次运行器内使用。同步状态导出为带SHA256校验的ND
 
 API：GET /api/account?action=session|challenge|profile|avatar；公开profile/avatar要求id，POST action=register|login|logout|profile|password|recover。GET /api/sponsors?action=mine及/api/events?action=mine只返回当前登录账号关联的记录；receipt/manage/entry继续支持旧回执，并额外允许对应关联账号本人读取。账号路由同样要求同源JSON、正文大小限制和尽力限流。
 
-新增9项账号及关联权限测试。verify-accounts.mjs在独立私有命名空间验证注册、刷新实例登录、头像昵称持久化、资料隐私、关联记录与恢复/退出；正式站只核对开放状态、匿名拒绝与不存在账号的密码校验，以确认边缘运行时支持实际密码校验，不创建正式站测试账号。
+新增9项账号及关联权限测试。verify-accounts.mjs在独立私有命名空间验证注册、刷新实例登录、头像昵称持久化、资料隐私、关联记录与恢复/退出；日常正式站检查只核对开放状态、匿名拒绝与不存在账号的密码校验，不创建正式站测试账号。所有者另行授权的一次性验收由verify-live-account.mjs完成，仅在推送标记[verify-member-once]的首次运行时创建1个临时普通账号，验证真实注册、登录、昵称、头像及会话后，核对恢复码散列身份，仅清理该账号与已知会话、头像和资料，不创建赛事；每小时任务不会执行此生产写入测试。
 
 ## 赛事创办与报名
 

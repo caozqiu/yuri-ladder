@@ -103,6 +103,11 @@ jobs:
         env:
           EDGEONE_API_TOKEN: ${{ secrets.EDGEONE_API_TOKEN }}
         run: node scripts/verify-accounts.mjs
+      - name: Verify one owner-authorized temporary member account once
+        if: github.event_name == 'push' && github.run_attempt == 1 && contains(github.event.head_commit.message, '[verify-member-once]') && env.EDGEONE_CONFIGURED == 'true'
+        env:
+          EDGEONE_API_TOKEN: ${{ secrets.EDGEONE_API_TOKEN }}
+        run: node scripts/verify-live-account.mjs
       - name: Verify two owner-authorized temporary pending submissions once
         if: github.event_name == 'push' && github.run_attempt == 1 && contains(github.event.head_commit.message, '[verify-pending]') && env.EDGEONE_CONFIGURED == 'true'
         env:
@@ -144,6 +149,8 @@ jobs:
             .runtime/live-submission-cleanup.json
             .runtime/owner-access-verification.json
             .runtime/account-verification.json
+            .runtime/live-account-verification.json
+            .runtime/live-account-cleanup.json
           retention-days: 7
       - name: Report publishing setup still needed
         if: env.EDGEONE_CONFIGURED != 'true'
