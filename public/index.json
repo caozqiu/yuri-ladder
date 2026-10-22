@@ -169,7 +169,7 @@
   "progress": {
     "state": "running",
     "stage": "list",
-    "done": 373,
+    "done": 659,
     "total": 1000,
     "roster": "all",
     "rankings": [
@@ -184,10 +184,10 @@
         "total": 500
       }
     ],
-    "pendingMatches": 19821
+    "pendingMatches": 34290
   },
   "automation": {
     "enabled": true,
-    "schedule": "每小时第55分钟（北京时间），平台调度可能延迟"
+    "schedule": "每小时第17分钟（北京时间），每轮最多采集45分钟，未完成自动续采；平台调度可能延迟"
   }
 }
