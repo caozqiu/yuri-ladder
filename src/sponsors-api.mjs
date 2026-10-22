@@ -1,13 +1,14 @@
 import {validateSponsor,publicSponsor,sponsorError,sponsorIdentity} from '../shared/lib/sponsors.mjs';
 import {fetchSponsorMatch,PLATFORM_ID,MATCH_ID,proofValue} from '../shared/lib/sponsor-source.mjs';
 import {handleEvents} from './events-api.mjs';
+import {currentAccount} from './accounts-api.mjs';
 const utf8=new TextEncoder(),COOKIE='yuri_site_owner',ID=/^\d{13}_[a-f0-9]{64}$/;
 const json=(body,status=200,extra={})=>new Response(JSON.stringify(body),{status,headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff',Vary:'Cookie',...extra}});
 const hex=b=>[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');
 const digest=async s=>hex(await crypto.subtle.digest('SHA-256',utf8.encode(s)));
 const equal=(a,b)=>{let d=a.length^b.length;for(let i=0;i<Math.max(a.length,b.length);i++)d|=(a.charCodeAt(i)||0)^(b.charCodeAt(i)||0);return d===0;};
 const inverse=n=>String(9999999999999-n).padStart(13,'0');
-export function createSponsorsHandler({store,secret,now=Date.now,sourceMatch=fetchSponsorMatch}){
+export function createSponsorsHandler({store,secret,now=Date.now,sourceMatch=fetchSponsorMatch,accountsStore}){
  const configured=typeof secret==='string'&&secret.length>=24;
  const sign=async value=>{const key=await crypto.subtle.importKey('raw',utf8.encode(secret),{name:'HMAC',hash:'SHA-256'},false,['sign']);return hex(await crypto.subtle.sign('HMAC',key,utf8.encode(value)));};
  const token=async(kind,at)=>kind+'.'+at+'.'+await sign(kind+'.'+at);
@@ -46,9 +47,15 @@ export function createSponsorsHandler({store,secret,now=Date.now,sourceMatch=fet
  return async function handle(request){
   try{
    const url=new URL(request.url),action=url.searchParams.get('action')||'list';
+   const account=await currentAccount(request,accountsStore,now());
    if(!['GET','POST'].includes(request.method))return json({error:'请求方法不支持'},405,{Allow:'GET, POST'});
-   if(url.pathname==='/api/events')return await handleEvents({request,url,configured,store,get,set,list,sign,digest,equal,owner,requireOwner,rate,body,token,validToken,now,json});
+   if(url.pathname==='/api/events')return await handleEvents({request,url,configured,store,get,set,list,sign,digest,equal,owner,requireOwner,rate,body,token,validToken,now,json,account});
    if(request.method==='GET'){
+    if(action==='mine'){
+     if(!account)throw sponsorError('请先登录普通用户账号',401);const page=await list('user-items/'+account.id+'/sponsors/',url.searchParams.get('cursor'));const items=[];
+     for(const b of page.blobs){const id=b.key.split('/').at(-1).slice(0,-5),row=await get('applications/'+id+'.json');if(row?.ownerId===account.id){const review=await latest(id);items.push({...publicSponsor(row,review),reason:review?.reason||''});}}
+     return json({items,cursor:page.cursor||null});
+    }
     if(action==='session')return json({configured,owner:await owner(request)});
     if(action==='challenge'){
      if(!configured)throw sponsorError('赞助赛申请暂未开放，请稍后再试',503);
@@ -94,12 +101,13 @@ export function createSponsorsHandler({store,secret,now=Date.now,sourceMatch=fet
     const key='applications/'+id+'.json',existing=await get(key);
     if(existing)return json({id,status:(await latest(id))?.status||'pending',duplicate:true});
     await rate(request,'submit',5,10);
-    const record={id,...data,createdAt:new Date(now()).toISOString(),ticketHash};
+    const record={id,...data,createdAt:new Date(now()).toISOString(),ticketHash,...(account?{ownerId:account.id}:{})};
+    if(account)await set('user-items/'+account.id+'/sponsors/'+id+'.json',{id});
     await set(key,record);return json({id,status:'pending'},201);
    }
    if(action==='receipt'){
-    if(!ID.test(input.id||'')||typeof input.ticket!=='string'||!/^[a-f0-9]{64}$/.test(input.ticket))throw sponsorError('回执不正确',404);
-    const row=await get('applications/'+input.id+'.json');if(!row||!equal(row.ticketHash,await digest(input.ticket)))throw sponsorError('回执不正确',404);
+    if(!ID.test(input.id||''))throw sponsorError('回执不正确',404);
+    const row=await get('applications/'+input.id+'.json');if(!row||!(account&&row.ownerId===account.id)&&!(typeof input.ticket==='string'&&/^[a-f0-9]{64}$/.test(input.ticket)&&equal(row.ticketHash,await digest(input.ticket))))throw sponsorError('回执不正确',404);
     const review=await latest(input.id);return json({item:{...publicSponsor(row,review),reason:review?.reason||''}});
    }
    if(action==='review'){

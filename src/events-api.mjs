@@ -1,7 +1,7 @@
 import {sponsorError,sponsorIdentity} from '../shared/lib/sponsors.mjs';
 import {validateEvent,validateEntry,eventPhase,publicEvent,eventEntryIdentity} from '../shared/lib/events.mjs';
 const ID=/^\d{13}_[a-f0-9]{64}$/,HEX=/^[a-f0-9]{64}$/;
-export async function handleEvents({request,url,configured,store,get,set,list,sign,digest,equal,owner,requireOwner,rate,body,token,validToken,now,json}){
+export async function handleEvents({request,url,configured,store,get,set,list,sign,digest,equal,owner,requireOwner,rate,body,token,validToken,now,json,account}){
  const action=url.searchParams.get('action')||'list';
  const state=id=>get('event-states/'+id+'.json');
  const count=async id=>{const r=await store.list({prefix:'event-entries/'+id+'/',limit:5000,paginate:true,consistency:'strong'});return {count:new Set(r.blobs.map(b=>b.key.split('/').at(-1).split('_')[0])).size,lowerBound:!!r.cursor};};
@@ -13,10 +13,17 @@ export async function handleEvents({request,url,configured,store,get,set,list,si
   return {participants:participants.filter(Boolean),cursor:r.cursor||null};
  }
  async function requireOrganizer(input){
-  if(!ID.test(input.id||'')||!HEX.test(input.ticket||''))throw sponsorError('管理回执不正确',404);
-  const {row,s}=await read(input.id,true);if(!equal(row.ticketHash,await digest(input.ticket)))throw sponsorError('管理回执不正确',404);return {row,s};
+  if(!ID.test(input.id||''))throw sponsorError('管理回执不正确',404);
+  const {row,s}=await read(input.id,true);if(!(account&&row.ownerId===account.id)&&!(HEX.test(input.ticket||'')&&equal(row.ticketHash,await digest(input.ticket))))throw sponsorError('管理回执不正确',404);return {row,s};
  }
  if(request.method==='GET'){
+  if(action==='mine'){
+   if(!account)throw sponsorError('请先登录普通用户账号',401);const entries=[],items=[],page=await list('user-items/'+account.id+'/events/',url.searchParams.get('cursor'));
+   for(const b of page.blobs){const id=b.key.split('/').at(-1).slice(0,-5),row=await get('events/'+id+'.json');if(row?.ownerId===account.id)items.push(await summary(row,await state(id),true));}
+   const joins=await list('user-items/'+account.id+'/entries/',url.searchParams.get('entryCursor'));
+   for(const b of joins.blobs){const ref=await get(b.key),entry=ref?await get('event-entries/'+ref.id+'/'+ref.entryId+'.json'):null;if(entry?.ownerId===account.id){const event=await get('events/'+ref.id+'.json');entries.push({id:ref.id,entryId:ref.entryId,title:event?.title||'赛事',name:entry.name,createdAt:entry.createdAt});}}
+   return json({items,cursor:page.cursor||null,entries,entryCursor:joins.cursor||null});
+  }
   if(action==='session')return json({configured,owner:await owner(request)});
   if(action==='challenge'){if(!configured)throw sponsorError('赛事申请暂未开放',503);return json({challenge:await token('event',now())});}
   if(action==='queue')await requireOwner(request);else if(action!=='list')throw sponsorError('接口不存在',404);
@@ -30,7 +37,8 @@ export async function handleEvents({request,url,configured,store,get,set,list,si
   const at=await validToken(input.challenge,'event',20*60000);if(at===null)throw sponsorError('申请验证已过期，请刷新验证后重试');if(now()-at<2000||input.website)throw sponsorError('请稍候再提交');if(!HEX.test(input.ticket||''))throw sponsorError('管理回执格式不正确');
   const event=validateEvent(input);if(Date.parse(event.closesAt)<=now())throw sponsorError('新赛事的报名截止时间须在将来');
   const {id,ticketHash}=await sponsorIdentity(event,input.ticket,input.challenge);const key='events/'+id+'.json';if(await get(key))return json({id,duplicate:true});await rate(request,'event-create',5,60);
-  await set(key,{...event,id,createdAt:new Date(now()).toISOString(),ticketHash});return json({id,status:'pending'},201);
+  if(account)await set('user-items/'+account.id+'/events/'+id+'.json',{id});
+  await set(key,{...event,id,createdAt:new Date(now()).toISOString(),ticketHash,...(account?{ownerId:account.id}:{})});return json({id,status:'pending'},201);
  }
  if(action==='manage'){
   const {row,s}=await requireOrganizer(input);if((input.cursor||'').length>1500)throw sponsorError('分页参数过长');return json({item:await summary(row,s,true),...await roster(row.id,input.cursor)});
@@ -48,11 +56,12 @@ export async function handleEvents({request,url,configured,store,get,set,list,si
   if(await get(key))return json({id:input.id,entryId,duplicate:true});
   const existing=await list('event-entries/'+input.id+'/'+person+'_',null,1);if(existing.blobs.length)throw sponsorError('该平台ID已报名，请勿重复报名',409);
   await rate(request,'event-join',10,10);const current=await state(input.id);if(current?.status!=='approved'||current.version!==s.version||!eventPhase(row,now()).canJoin)throw sponsorError('赛事状态已变化，请刷新后重试',409);
-  await set(key,{...entry,entryId,eventId:input.id,ticketHash,createdAt:new Date(now()).toISOString()});return json({id:input.id,entryId,registered:true},201);
+  if(account)await set('user-items/'+account.id+'/entries/'+entryId+'.json',{id:input.id,entryId});
+  await set(key,{...entry,entryId,eventId:input.id,ticketHash,createdAt:new Date(now()).toISOString(),...(account?{ownerId:account.id}:{})});return json({id:input.id,entryId,registered:true},201);
  }
  if(action==='entry'){
-  if(!ID.test(input.id||'')||!HEX.test(input.ticket||'')||typeof input.entryId!=='string'||!/^[a-f0-9]{64}_[a-f0-9]{64}$/.test(input.entryId))throw sponsorError('报名回执不正确',404);
-  const entry=await get('event-entries/'+input.id+'/'+input.entryId+'.json');if(!entry||!equal(entry.ticketHash,await digest(input.ticket)))throw sponsorError('报名回执不正确',404);const {ticketHash,...safe}=entry;return json({entry:safe});
+  if(!ID.test(input.id||'')||typeof input.entryId!=='string'||!/^[a-f0-9]{64}_[a-f0-9]{64}$/.test(input.entryId))throw sponsorError('报名回执不正确',404);
+  const entry=await get('event-entries/'+input.id+'/'+input.entryId+'.json');if(!entry||!(account&&entry.ownerId===account.id)&&!(HEX.test(input.ticket||'')&&equal(entry.ticketHash,await digest(input.ticket))))throw sponsorError('报名回执不正确',404);const {ticketHash,ownerId,...safe}=entry;return json({entry:safe});
  }
  throw sponsorError('接口不存在',404);
 }

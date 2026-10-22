@@ -98,6 +98,11 @@ jobs:
         env:
           EDGEONE_API_TOKEN: ${{ secrets.EDGEONE_API_TOKEN }}
         run: node scripts/verify-sponsors.mjs
+      - name: Verify member registration, profiles and privacy in isolated storage
+        if: env.EDGEONE_CONFIGURED == 'true'
+        env:
+          EDGEONE_API_TOKEN: ${{ secrets.EDGEONE_API_TOKEN }}
+        run: node scripts/verify-accounts.mjs
       - name: Verify two owner-authorized temporary pending submissions once
         if: github.event_name == 'push' && github.run_attempt == 1 && contains(github.event.head_commit.message, '[verify-pending]') && env.EDGEONE_CONFIGURED == 'true'
         env:
@@ -138,6 +143,7 @@ jobs:
             .runtime/live-submission-verification.json
             .runtime/live-submission-cleanup.json
             .runtime/owner-access-verification.json
+            .runtime/account-verification.json
           retention-days: 7
       - name: Report publishing setup still needed
         if: env.EDGEONE_CONFIGURED != 'true'

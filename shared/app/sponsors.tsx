@@ -1,6 +1,7 @@
 import {useCallback,useEffect,useRef,useState} from 'react';
 import {Check,ChevronRight,ClipboardCopy,Clock3,FilePlus2,LoaderCircle,Plus,RefreshCw,Search,ShieldCheck,Swords,Trash2,Trophy,Video,X} from 'lucide-react';
 import Dialog from './dialog';
+import {useAccount} from './accounts';
 import {COUNTRIES} from '../lib/core.mjs';
 import {SPONSOR_STATUS,validateSponsor,beijingInputToIso,sponsorIdentity} from '../lib/sponsors.mjs';
 import './sponsors.css';
@@ -24,6 +25,7 @@ function MatchCard({item,onOpen,review=false}:{item:Match;onOpen:()=>void;review
  return <article className="sponsor-match"><div className="sponsor-match-meta"><span className={'sponsor-badge '+item.status}>{SPONSOR_STATUS[item.status]}</span><time><Clock3 size={13}/>{format(item.playedAt)}</time></div><button className="sponsor-duel" onClick={onOpen} aria-label={'查看 '+item.playerA+' 对 '+item.playerB+' 的赛事详情'}><strong>{item.playerA}</strong><span className="sponsor-score">{item.scoreA}<small>:</small>{item.scoreB}</span><strong>{item.playerB}</strong></button><div className="sponsor-match-foot"><span>赞助者：{item.sponsor||'未填写'}</span>{item.replayUrl&&<a className="sponsor-video-link" href={item.replayUrl} target="_blank" rel="noopener noreferrer nofollow ugc"><Video size={14}/>观看回放</a>}<button className="text-link" onClick={onOpen}>{review?'查看并审核':'赛事详情'}<ChevronRight size={15}/></button></div></article>;
 }
 export default function Sponsors({query,update,players=[]}:{query:string;update:(v:Record<string,string|null>)=>void;players:{id:string;name:string}[]}){
+ const {user}=useAccount();
  const q=new URLSearchParams(query),tab=['apply','mine','review'].includes(q.get('sponsorTab')||'')?q.get('sponsorTab')!:'list';
  const [session,setSession]=useState<{configured:boolean;owner:boolean}|null>(null),[error,setError]=useState(''),[notice,setNotice]=useState(''),[loading,setLoading]=useState(false);
  const [items,setItems]=useState<Match[]>([]),[cursor,setCursor]=useState<string|null>(null),[search,setSearch]=useState(''),[status,setStatus]=useState('pending');
@@ -95,6 +97,7 @@ export default function Sponsors({query,update,players=[]}:{query:string;update:
  const closeDetail=useCallback(()=>{close();if(isPublic)closePublic();},[close,isPublic,closePublic]);
  return <section className="sponsors" aria-label="赞助赛"><div className="sponsor-intro"><div className="sponsor-intro-icon"><Trophy size={27}/></div><div><h2>让每一场赞助赛，都有记录</h2><p>任何人均可登记。填写双方选手、对战时间和最终比分，经站主审核后公开。</p></div><span className="sponsor-badge approved"><ShieldCheck size={14}/>人工审核</span></div>
  <div className="sponsor-tabs" role="navigation" aria-label="赞助赛导航">{[{key:'list',label:'公开赛事',icon:Trophy},{key:'apply',label:'登记申请',icon:FilePlus2},{key:'mine',label:'我的回执',icon:ClipboardCopy},{key:'review',label:'站主审核',icon:ShieldCheck}].map(t=><button key={t.key} aria-current={tab===t.key?'page':undefined} className={tab===t.key?'selected':''} onClick={()=>setTab(t.key)}><t.icon size={17}/>{t.label}</button>)}</div>
+ <p className="sponsor-note">{user?'当前以 '+user.nickname+' 登录，新提交的赞助赛登记会同步到个人中心。':'登录后提交可在个人中心跨设备查看；也可继续使用原回执。'} <button className="text-link" onClick={()=>update({screen:'account'})}>{user?'打开个人中心':'登录 / 注册'}</button></p>
  <p className="sponsor-scope"><Swords size={15}/>赞助赛为用户登记资料，不计入官方天梯胜率。时间统一为北京时间。</p>
  {notice&&<div className="sponsor-success" role="status"><Check size={18}/>{notice}</div>}{error&&<div className="sponsor-error" role="alert">{error}</div>}
  {session&&!session.configured&&<div className="sponsor-error">赞助赛申请暂未开放，站主正在完成审核账号配置。</div>}
