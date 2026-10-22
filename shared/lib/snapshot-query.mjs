@@ -109,7 +109,7 @@ export async function querySnapshot(path,q,manifest,load,now=Math.floor(Date.now
     const ownRows=personal(eligible),knownRows=ownRows.filter(r=>!missingRequiredRating(r,ratingFilters)),resultRows=personal(filtered);
     const funnel=[stage('base','基础胜负出场',mapRows),stage('own','己方范围',ownRows),stage('known','所需积分已知',knownRows),stage('matched','最终匹配',resultRows)];
     const values=[...cohort.values()].map(p=>rating(p.mmr)).filter(v=>v!==null),gaps=rows.filter(r=>r.scoreGap!==null).map(r=>Math.abs(r.scoreGap));
-    const ratingOptions={min:values.length?Math.floor(Math.min(...values)/100)*100:0,max:values.length?Math.max(100,Math.ceil(Math.max(...values)/100)*100):5000,gapMax:gaps.length?Math.max(100,Math.ceil(Math.max(...gaps)/100)*100):1000};
+    const ratingOptions={min:values.length?Math.floor(values.reduce((a,b)=>Math.min(a,b),Infinity)/100)*100:0,max:values.length?Math.max(100,Math.ceil(values.reduce((a,b)=>Math.max(a,b),0)/100)*100):5000,gapMax:gaps.length?Math.max(100,Math.ceil(gaps.reduce((a,b)=>Math.max(a,b),0)/100)*100):1000};
     return {seasons,season,snapshot:entry.snapshot,cutoff:entry.cutoff,meta:entry.meta,roster,progress:manifest.progress||null,
       ...summarize([...counts.values()],[...cohort.values()].filter(p=>inSegment(p,segment)&&ownRatingMatches(p,ratingFilters)),granularity,player,uniqueMatches),window:range,scope,granularity,
       filters:{map,segment,...ratingFilters},coverage,mapOptions,funnel,ratingOptions,

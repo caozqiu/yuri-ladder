@@ -27,7 +27,7 @@ export function rankingHistory(history,player,range='all'){
 export function rankingSummary(history,profiles=[]){
  const observations=history.observations.filter(o=>o.at<=history.asOf).sort((a,b)=>a.at-b.at||a.snapshot.localeCompare(b.snapshot));
  const names=new Map(profiles.map(p=>[p.id,p.name])),players=new Map();
- for(const o of observations)for(const p of o.players)players.set(p[0],{id:p[0],name:p[3]||names.get(p[0])||players.get(p[0])?.name||'选手 '+p[0],rank:p[1],mmr:p[2],lastSeen:o.at});
+ for(const o of observations)for(const p of o.players)players.set(p[0],{id:p[0],name:p[3]||names.get(p[0])||players.get(p[0])?.name||'昵称暂缺',rank:p[1],mmr:p[2],lastSeen:o.at});
  const last=observations.at(-1),previous=observations.at(-2),current=new Set(last?.players.map(p=>p[0])||[]),before=new Set(previous?.players.map(p=>p[0])||[]);
  const list=[...players.values()].map(p=>({...p,inLatest:current.has(p.id)})).sort((a,b)=>Number(b.inLatest)-Number(a.inLatest)||a.rank-b.rank||a.id.localeCompare(b.id));
  return {available:!!last,season:history.season,snapshot:history.snapshot,asOf:history.asOf,observations:observations.length,firstObserved:observations[0]?.at??null,players:list,changes:previous?{from:previous.at,to:last.at,entered:list.filter(p=>current.has(p.id)&&!before.has(p.id)),exited:list.filter(p=>before.has(p.id)&&!current.has(p.id))}:null};

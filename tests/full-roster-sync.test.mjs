@@ -17,6 +17,15 @@ test('hourly collector resumes ranking and match cursors, scans every ranked pla
  const module=join(dir,'sync.mjs');await writeFile(module,bundle.outputFiles[0].contents);const sync=await import(pathToFileURL(module));
  let db=new SQLiteDatabase(':memory:');db.migrate(resolve('migrations'));globalThis.__rosterDB=db;
  const calls=[],at=Math.floor(Date.now()/1000),seasons=[{seasonId:11,seasonName:'本季',startTime:at-10000,endTime:at+10000},{seasonId:10,seasonName:'上季',startTime:at-20000,endTime:at-10000}];
+ // Upgrade a real legacy top-100 shape without forcing a weekly full rescan.
+ for(const season of seasons){
+  const sid=season.seasonId,id='legacy:'+sid,cutoff=Math.min(at-1000,season.endTime);
+  db.connection.prepare('INSERT INTO seasons VALUES (?,?,?,?)').run(sid,season.seasonName,season.startTime,season.endTime);
+  db.connection.prepare('INSERT INTO snapshots VALUES (?,?,?,?,?,?)').run(id,sid,cutoff,at-1000,'complete',JSON.stringify({scanned:100,players:100,missing:0}));
+  for(let rank=1;rank<=100;rank++){const p={id:String(sid*1000+rank),name:'旧榜单'+rank,rank,mmr:5000-rank};db.connection.prepare('INSERT INTO rankings VALUES (?,?,?,?)').run(id,p.id,rank,JSON.stringify(p));}
+  db.connection.prepare('INSERT INTO site_config VALUES (?,?)').run('active:'+sid,id);
+ }
+ db.connection.prepare('INSERT INTO site_config VALUES (?,?)').run('last_full',String(at));
  let failRank=true,failMatch=true;
  globalThis.__rosterSource=async path=>{
   const url=new URL(path,'https://official.test');calls.push(url);
@@ -38,18 +47,29 @@ test('hourly collector resumes ranking and match cursors, scans every ranked pla
  try{
   await sync.startSync();await sync.syncStep();await assert.rejects(()=>sync.syncStep(),/ranking outage/);
   assert.equal((await sync.syncStatus()).state,'retry');
-  assert.equal(db.connection.prepare("SELECT COUNT(*) AS n FROM snapshots WHERE status='complete'").get().n,0);
+  assert.equal(db.connection.prepare("SELECT COUNT(*) AS n FROM snapshots WHERE status='complete'").get().n,2);
+  assert.equal(db.connection.prepare("SELECT value FROM site_config WHERE key='active:11'").get().value,'legacy:11');
   const checkpoint=join(dir,'state');await saveCheckpoint(db,checkpoint);db.close();db=new SQLiteDatabase(':memory:');db.migrate(resolve('migrations'));await restoreCheckpoint(db,checkpoint);globalThis.__rosterDB=db;
   assert.equal((await sync.startSync()).resumed,true);
   let status=await sync.syncStatus(),failed=false;
   for(let step=0;status.state!=='complete'&&step<300;step++){
-   try{status=await sync.syncStep();}catch(e){assert.match(e.message,/match outage/);failed=true;status=await sync.syncStatus();assert.equal(status.state,'retry');}
+   try{
+    status=await sync.syncStep();
+    if(status.phase==='list'){
+     const work=JSON.parse(db.connection.prepare("SELECT data FROM sync_jobs WHERE state='running' ORDER BY rowid DESC LIMIT 1").get().data);
+     assert.equal(work.players.find(p=>p.uid==='11101').stop,0,'newly included player must backfill entire season');
+     assert.ok(work.players.find(p=>p.uid==='11001').stop>0,'existing player uses 48-hour overlap');
+    }
+   }catch(e){
+    assert.match(e.message,/match outage/);failed=true;status=await sync.syncStatus();assert.equal(status.state,'retry');
+    await saveCheckpoint(db,checkpoint);db.close();db=new SQLiteDatabase(':memory:');db.migrate(resolve('migrations'));await restoreCheckpoint(db,checkpoint);globalThis.__rosterDB=db;
+   }
   }
   assert.equal(failed,true);assert.equal(status.state,'complete');assert.equal(status.playersDone,252);assert.equal(status.totalPlayers,252);
   for(const sid of [11,10]){
    const snapshot=db.connection.prepare('SELECT value FROM site_config WHERE key=?').get('active:'+sid).value;
    const meta=JSON.parse(db.connection.prepare('SELECT meta FROM snapshots WHERE id=?').get(snapshot).meta);
-   assert.equal(meta.roster,'all');assert.equal(meta.officialPlayers,126);assert.equal(meta.scanned,126);
+   assert.equal(meta.roster,'all');assert.equal(meta.officialPlayers,126);assert.equal(meta.scanned,126);assert.equal(meta.full,false);
    assert.equal(db.connection.prepare('SELECT COUNT(*) AS n FROM rankings WHERE snapshot=?').get(snapshot).n,126);
    assert.equal(db.connection.prepare('SELECT COUNT(*) AS n FROM games WHERE snapshot=?').get(snapshot).n,1);
   }

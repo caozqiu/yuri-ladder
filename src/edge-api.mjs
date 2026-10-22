@@ -21,7 +21,7 @@ export async function onRequest(context){
         const response=await fetch(new URL(entry.file,url));
         if(!response.ok)throw new Error('数据文件不可用');
         const seed=await response.json();seeds.set(key,seed);
-        if(seeds.size>2)seeds.delete(seeds.keys().next().value);
+        if(seeds.size>1)seeds.delete(seeds.keys().next().value);
       }
       return seeds.get(key);
     });
