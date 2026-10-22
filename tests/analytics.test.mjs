@@ -44,7 +44,7 @@ test('map and snapshot-point segments apply consistently to summaries, compariso
 test('tier membership uses inclusive snapshot MMR and rank boundaries and preserves appearance weighting',async()=>{
  const stats=await query();
  assert.deepEqual(stats.analytics.tiers.mmr.map(t=>t.players),[1,2,2,1]);
- assert.deepEqual(stats.analytics.tiers.rank.map(t=>t.players),[2,2,1,1]);
+ assert.deepEqual(stats.analytics.tiers.rank.map(t=>t.players),[2,2,1,1,0,0,0]);
  for(const type of ['mmr','rank']){
   const groups=stats.analytics.tiers[type];
   assert.equal(groups.reduce((n,t)=>n+t.total.games,0),stats.overview.games);

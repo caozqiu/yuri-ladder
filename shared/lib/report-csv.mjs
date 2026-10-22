@@ -8,7 +8,7 @@ export function csvCell(value){
 }
 export function reportRows(data,players,cutoffLabel){
  const f=data.filters,c=data.coverage,fields=['mmrMin','mmrMax','enemyMmrMin','enemyMmrMax','gapMin','gapMax'];
- const rows=[['赛季',data.season?.name,'周期',data.window,'对手范围',data.scope,'地图',f.map||'全部','分段',f.segment||'全部','积分依据','本次榜单快照，非比赛时积分','统计截止',cutoffLabel],
+ const rows=[['统计名单',data.roster?.mode==='all'?'全榜':'前100名','已收录选手',data.roster?.available,'赛季',data.season?.name,'周期',data.window,'对手范围',data.scope,'地图',f.map||'全部','分段',f.segment||'全部','积分依据','本次榜单快照，非比赛时积分','统计截止',cutoffLabel],
  ['精细筛选',...fields.flatMap(k=>[k,f[k]??'不限']),'gapDirection',f.gapDirection,'minSamples',f.minSamples,'门槛口径','仅榜单和地图列表，榜单按排序指标场次'],
  ['覆盖率','筛选前出场',c.before,'符合条件出场',c.matched,'双方积分已知出场',c.comparable,'未知积分排除',c.excludedUnknown,'已知积分不符条件',c.excludedByScore],
  ['排名','选手','积分','有效场次','总胜率','95%下界','95%上界',...FACTIONS.flatMap(x=>[x.name+'场次',x.name+'胜率'])],

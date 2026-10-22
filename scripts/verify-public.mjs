@@ -43,7 +43,13 @@ for(const entry of manifest.snapshots){
  const rows=archive.json.observations.filter(o=>o.at<=history.json.asOf);assert.equal(history.json.points.length,rows.length);
  const last=rows.at(-1),expectedRank=last.players.find(p=>p[0]===player);assert.equal(history.json.points.at(-1).rank,expectedRank?.[1]??null);assert.equal(history.json.points.at(-1).mmr,expectedRank?.[2]??null);
  checks.push({type:'player-research',season:entry.season.id,player,opponents:dossier.opponents,historyPoints:history.json.points.length,firstObserved:history.json.firstObserved});
- for(const changes of [{},{gapMax:'100',gapDirection:'stronger'}]){
+ const rosterProbe=await request('/api/stats?season='+entry.season.id,'GET',r=>r.status===200&&!!r.json.roster);
+ assert.equal(rosterProbe.json.roster.available,response.json.players.length);assert.ok(rosterProbe.json.players.every(p=>p.rank<=100));
+ assert.equal(rosterProbe.json.roster.complete,entry.meta.roster==='all');
+ const fullProbe=await request('/api/stats?season='+entry.season.id+'&roster=all','GET',r=>r.status===(entry.meta.roster==='all'?200:409));
+ if(entry.meta.roster==='all'){assert.equal(fullProbe.json.players.length,entry.meta.officialPlayers);assert.equal(fullProbe.json.roster.mode,'all');}
+ checks.push({type:'ranked-roster',season:entry.season.id,available:response.json.players.length,fullRoster:entry.meta.roster==='all',fullQueryStatus:fullProbe.status,progress:manifest.progress});
+ for(const changes of [{},{gapMax:'100',gapDirection:'stronger'},...(entry.meta.roster==='all'?[{roster:'all'},{roster:'all',opponents:'top100'},{roster:'all',segment:'rank:101-200'}]:[])]){
   const q=new URLSearchParams({season:String(entry.season.id),snapshot:entry.snapshot,...changes});
   const actual=await request('/api/stats?'+q);assert.equal(actual.status,200);
   const expected=await querySnapshot('/api/stats',q,manifest,async e=>seeds.get(e.snapshot));

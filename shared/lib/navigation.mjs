@@ -1,6 +1,6 @@
 export const SCREENS=['overview','players','matchups','maps','trends','sponsors','events','account'];
 export const PRESETS_KEY='yuri-ladder-filter-presets-v1';
-const keys=['season','range','opponents','group','player','map','segment','compare','bucket','tierBy','mmrMin','mmrMax','enemyMmrMin','enemyMmrMax','gapMin','gapMax','gapDirection','minSamples','screen','historyRange','research','historyPlayer'];
+const keys=['roster','season','range','opponents','group','player','map','segment','compare','bucket','tierBy','mmrMin','mmrMax','enemyMmrMin','enemyMmrMax','gapMin','gapMax','gapDirection','minSamples','screen','historyRange','research','historyPlayer'];
 export function currentScreen(q,hash=''){
  if(SCREENS.includes(q.get('screen')))return q.get('screen');
  if(q.get('view')==='maps')return 'maps';

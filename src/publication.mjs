@@ -2,7 +2,7 @@ import {mkdir,readFile,writeFile,rename,readdir,unlink} from 'node:fs/promises';
 import {join} from 'node:path';
 import {createHash} from 'node:crypto';
 export function validateSeed(seed){
-  if(!seed.players.length||seed.players.length>100||seed.meta.missing||seed.meta.scanned!==seed.players.length)throw new Error('完整度核对失败');
+  if(!seed.players.length||seed.meta.missing||seed.meta.scanned!==seed.players.length||seed.meta.roster==='all'&&seed.meta.officialPlayers!==seed.players.length)throw new Error('完整度核对失败');
   seed.players.sort((a,b)=>a.rank-b.rank);
   if(new Set(seed.players.map(p=>p.id)).size!==seed.players.length||seed.players.some((p,i)=>typeof p.id!=='string'||p.rank!==i+1))throw new Error('榜单核对失败');
   if(new Set(seed.matches.map(m=>m.id)).size!==seed.matches.length)throw new Error('比赛有重复');
@@ -36,7 +36,7 @@ export async function writePublication(directory,seeds,progress=null,automation=
   const current=new Set(snapshots.map(s=>s.snapshot));
   const history=[...(previous?.snapshots||[]),...(previous?.previous||[])].filter(s=>!current.has(s.snapshot));
   const seen=new Set();
-  const manifest={format:1,snapshots,previous:history.filter(s=>{if(seen.has(s.snapshot))return false;seen.add(s.snapshot);return true;}).slice(0,4),progress:progress?{state:progress.state,stage:progress.phase,done:progress.playersDone||0,total:progress.totalPlayers||0,...(progress.error?{error:progress.error}:{})}:null,automation};
+  const manifest={format:1,snapshots,previous:history.filter(s=>{if(seen.has(s.snapshot))return false;seen.add(s.snapshot);return true;}).slice(0,4),progress:progress?{state:progress.state,stage:progress.phase,done:progress.playersDone||0,total:progress.totalPlayers||0,roster:progress.roster||'top100',rankings:progress.rankings||[],pendingMatches:progress.pendingMatches||0,...(progress.error?{error:progress.error}:{})}:null,automation};
   await writeFile(join(directory,'index.json.tmp'),JSON.stringify(manifest,null,2)+'\n');
   await rename(join(directory,'index.json.tmp'),join(directory,'index.json'));
   // Thin records are durable in SQLite/checkpoints; public assets only need

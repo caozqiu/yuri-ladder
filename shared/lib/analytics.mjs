@@ -12,6 +12,9 @@ export const SEGMENTS = {
     {key:'rank:11-25',name:'第 11–25 名',min:11,max:25},
     {key:'rank:26-50',name:'第 26–50 名',min:26,max:50},
     {key:'rank:51-100',name:'第 51–100 名',min:51,max:100},
+    {key:'rank:101-200',name:'第 101–200 名',min:101,max:200},
+    {key:'rank:201-500',name:'第 201–500 名',min:201,max:500},
+    {key:'rank:501+',name:'第 501 名及以后',min:501,max:Infinity},
   ],
 };
 export function inSegment(profile,key){

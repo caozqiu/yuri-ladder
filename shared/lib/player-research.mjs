@@ -6,7 +6,7 @@ export function opponentDossier(rows,profiles,player){
  for(const row of rows){
   if(row.user!==player)continue;
   const other=profiles.get(row.opponent),participant=row.game.players.find(p=>p.id===row.opponent);
-  if(!rivals.has(row.opponent))rivals.set(row.opponent,{id:row.opponent,name:other?.name||participant?.name||'选手 '+row.opponent,rank:other?.rank??null,mmr:row.opponentMmr,inTop100:!!other,scoreGap:row.scoreGap,total:counter(),factions:Object.fromEntries(FACTIONS.map(f=>[f.key,counter()])),lastPlayed:0});
+  if(!rivals.has(row.opponent))rivals.set(row.opponent,{id:row.opponent,name:other?.name||participant?.name||'昵称暂缺',rank:other?.rank??null,mmr:row.opponentMmr,inTop100:!!other&&other.rank<=100,inRanked:!!other,scoreGap:row.scoreGap,total:counter(),factions:Object.fromEntries(FACTIONS.map(f=>[f.key,counter()])),lastPlayed:0});
   const rival=rivals.get(row.opponent),c=counter(row.result===1?1:0,row.result===0?1:0);
   if(!other&&participant?.name&&row.start>=rival.lastPlayed)rival.name=participant.name;
   rival.total=add(rival.total,c);rival.lastPlayed=Math.max(rival.lastPlayed,row.start);

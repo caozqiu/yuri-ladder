@@ -6,8 +6,8 @@ import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {createSponsorsHandler} from '../src/sponsors-api.mjs';
 import {createFileStore} from '../src/sponsors-file-store.mjs';
-import {validateSponsor,beijingInputToIso} from '../shared/lib/sponsors.mjs';
-import {normalizeSponsorMatch,fetchSponsorMatch} from '../shared/lib/sponsor-source.mjs';
+import {validateSponsor,beijingInputToIso,sponsorIdentity} from '../shared/lib/sponsors.mjs';
+import {normalizeSponsorMatch,normalizeSponsorMatchByNames,fetchSponsorMatch} from '../shared/lib/sponsor-source.mjs';
 import {parseSourceJSON} from '../shared/lib/source-json.mjs';
 const secret='unit-test-only-sponsor-owner-password';
 const data={playerA:'甲',playerB:'乙',playedAt:'2026-10-22T10:00:00+08:00',scoreA:2,scoreB:1,sponsor:'测试赞助者',rounds:[{map:'地图一',winner:'a'}]};
@@ -119,4 +119,28 @@ test('edge request JSON parsing uses the native JSON reader without relying on r
   Object.defineProperty(r,'body',{get(){throw Error('Raw request stream unavailable in this edge runtime');}});
   assert.equal((await handler(r)).status,401);
  }
+});
+
+test('manual round countries and separate platform nicknames survive storage, receipt and public approval',async()=>{
+ const ticket='6'.repeat(64),f=fixture(),r=await f.apply({ticket,platformNameA:'平台甲',platformNameB:'平台乙',rounds:[{map:'自填地图',winner:'a',countryA:0,countryB:6},{countryA:9}]});assert.equal(r.status,201);
+ const id=r.json.id;f.restart();assert.equal((await f.call('receipt',{id,ticket})).json.item.rounds[0].countryA,0);const headers=await f.login();assert.equal((await f.call('review',{id,status:'approved'}, {},headers)).status,200);
+ const item=(await f.call('list',undefined,{id})).json.item;assert.equal(item.playerA,'甲');assert.equal(item.platformNameA,'平台甲');assert.equal(item.platformNameB,'平台乙');assert.equal(item.rounds[0].countryA,0);assert.equal(item.rounds[0].countryB,6);assert.equal(item.rounds[1].countryA,9);assert.equal(item.rounds[1].countryB,undefined);
+ for(const countryA of [-1,10,0.5,'0',false])assert.throws(()=>validateSponsor({...data,rounds:[{map:'地图',countryA}]}));
+ for(const platformNameA of ['x'.repeat(65),'含\n换行',5])assert.throws(()=>validateSponsor({...data,platformNameA}));
+});
+
+test('nickname-only import identifies direction and internal IDs while refusing mismatched, ambiguous or changed players',async()=>{
+ const r=normalizeSponsorMatchByNames(source,source.matchId,'乙','甲');assert.equal(r.platformA,'22');assert.equal(r.platformB,'11');assert.equal(r.round.winner,'b');
+ assert.throws(()=>normalizeSponsorMatchByNames(source,source.matchId,'圈内别名','乙'));
+ assert.throws(()=>normalizeSponsorMatchByNames({...source,players:source.players.map(p=>({...p,username:'同名'}))},source.matchId,'同名','乙'));
+ const f=fixture();f.opts.sourceMatchByNames=async(id,a,b)=>normalizeSponsorMatchByNames(source,id,a,b);f.restart();
+ const imported=await f.call('import',{platformNameA:'甲',platformNameB:'乙',matchId:source.matchId});assert.equal(imported.status,200);assert.equal(imported.json.platformA,'11');assert.equal(imported.json.platformB,'22');
+ const base={platformA:imported.json.platformA,platformB:imported.json.platformB,platformNameA:'甲',platformNameB:'乙',rounds:[imported.json.round]};assert.equal((await f.apply(base)).status,201);
+ assert.equal((await f.apply({...base,rounds:[{...imported.json.round,countryA:1}]})).status,400);
+ assert.equal((await f.call('import',{platformNameA:'甲',platformNameB:'乙',platformA:'99',platformB:'22',matchId:source.matchId})).status,400);
+});
+
+test('blank optional platform nicknames preserve legacy submission retry identities',async()=>{
+ const current=validateSponsor(data),legacy={...current};delete legacy.platformNameA;delete legacy.platformNameB;
+ assert.equal((await sponsorIdentity(current,'a'.repeat(64),'apply.1792634400000.signature')).id,(await sponsorIdentity(legacy,'a'.repeat(64),'apply.1792634400000.signature')).id);
 });

@@ -8,6 +8,7 @@ const text=(v,label,max,required=false)=>{
 export function validateSponsor(input){
  if(!input||typeof input!=='object'||Array.isArray(input))throw sponsorError('请填写赛事资料');
  const playerA=text(input.playerA,'选手一',64,true),playerB=text(input.playerB,'选手二',64,true);
+ const platformNameA=text(input.platformNameA,'选手一LBW平台昵称',64),platformNameB=text(input.platformNameB,'选手二LBW平台昵称',64);
  if(playerA.normalize('NFKC').toLowerCase()===playerB.normalize('NFKC').toLowerCase())throw sponsorError('双方选手不能相同');
  const playedAt=input.playedAt;
  if(typeof playedAt!=='string'||!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2}(?:\.\d{3})?)?(?:Z|[+-]\d{2}:\d{2})$/.test(playedAt)||!Number.isFinite(Date.parse(playedAt))||Date.parse(playedAt)<946656000000||Date.parse(playedAt)>4102444800000)throw sponsorError('请填写有效的对战时间');
@@ -21,23 +22,25 @@ export function validateSponsor(input){
   if(!r||typeof r!=='object')throw sponsorError('第'+(i+1)+'局格式不正确');
   const map=text(r.map,'地图名',100);const winner=r.winner||null;
   if(winner!==null&&!['a','b'].includes(winner))throw sponsorError('第'+(i+1)+'局胜方格式不正确');
-  if(!map&&!winner)throw sponsorError('第'+(i+1)+'局请至少填写地图或胜方');
+  const country=(v,label)=>{if(v===undefined||v===null||v==='')return undefined;if(!Number.isInteger(v)||v<0||v>9)throw sponsorError('第'+(i+1)+'局'+label+'须为有效国家');return v;};
+  const countryA=country(r.countryA,'选手一国家'),countryB=country(r.countryB,'选手二国家');
+  if(!map&&!winner&&countryA===undefined&&countryB===undefined)throw sponsorError('第'+(i+1)+'局请至少填写地图、胜方或国家');
   if(r.matchId){
    if(!/^[1-9]\d{7,29}$/.test(r.matchId)||!platformA||!platformB||typeof r.proof!=='string'||!Number.isInteger(r.start)||![r.countryA,r.countryB].every(n=>Number.isInteger(n)&&n>=0&&n<=9))throw sponsorError('导入对局信息不完整，请删除后重新导入');
    return {map,winner,matchId:r.matchId,start:r.start,countryA:r.countryA,countryB:r.countryB,proof:r.proof};
   }
-  return {map,winner};
+  return {map,winner,...(countryA!==undefined?{countryA}:{}),...(countryB!==undefined?{countryB}:{})};
  });
  if(rounds.length>99||rounds.length>scoreA+scoreB)throw sponsorError('逐局数量不能超过总比分场次（最多99局）');
  if(rounds.filter(r=>r.winner==='a').length>scoreA||rounds.filter(r=>r.winner==='b').length>scoreB)throw sponsorError('逐局胜负与最终比分不一致');
  const ids=rounds.filter(r=>r.matchId).map(r=>r.matchId);if(new Set(ids).size!==ids.length)throw sponsorError('同一个对局编号不能重复登记');
  let replayUrl=text(input.replayUrl,'回放视频网址',1000);
  if(replayUrl){let url;try{url=new URL(replayUrl);}catch{throw sponsorError('请填写完整的视频网址，例如 https://www.bilibili.com/video/…');}if(!['https:','http:'].includes(url.protocol)||url.username||url.password||!url.hostname.includes('.'))throw sponsorError('视频网址只支持不含登录信息的 http/https 链接');replayUrl=url.href;}
- return {playerA,playerB,platformA,platformB,playedAt:new Date(playedAt).toISOString(),scoreA,scoreB,sponsor:text(input.sponsor,'赞助者',100),replayUrl,rounds};
+ return {playerA,playerB,platformNameA,platformNameB,platformA,platformB,playedAt:new Date(playedAt).toISOString(),scoreA,scoreB,sponsor:text(input.sponsor,'赞助者',100),replayUrl,rounds};
 }
 export function publicSponsor(record,review){
- const {id,createdAt,playerA,playerB,platformA,platformB,playedAt,scoreA,scoreB,sponsor,replayUrl,rounds}=record;
- return {id,createdAt,playerA,playerB,platformA,platformB,playedAt,scoreA,scoreB,sponsor,replayUrl:replayUrl||'',rounds:rounds.map(({proof,...r})=>r),status:review?.status||'pending',reviewedAt:review?.at||null};
+ const {id,createdAt,playerA,playerB,platformNameA,platformNameB,platformA,platformB,playedAt,scoreA,scoreB,sponsor,replayUrl,rounds}=record;
+ return {id,createdAt,playerA,playerB,platformNameA:platformNameA||'',platformNameB:platformNameB||'',platformA,platformB,playedAt,scoreA,scoreB,sponsor,replayUrl:replayUrl||'',rounds:rounds.map(({proof,...r})=>r),status:review?.status||'pending',reviewedAt:review?.at||null};
 }
 export function beijingInputToIso(value){
  if(!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value))throw sponsorError('请填写对战时间');
@@ -47,5 +50,6 @@ export async function sponsorIdentity(data,ticket,challenge){
  const hash=async s=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s)))].map(n=>n.toString(16).padStart(2,'0')).join('');
  const ticketHash=await hash(ticket),at=Number(challenge.split('.')[1]);
  const identityData={...data};if(!identityData.replayUrl)delete identityData.replayUrl;
+ for(const key of ['platformNameA','platformNameB'])if(!identityData[key])delete identityData[key];
  return {id:String(9999999999999-at).padStart(13,'0')+'_'+await hash(ticketHash+JSON.stringify(identityData)),ticketHash};
 }

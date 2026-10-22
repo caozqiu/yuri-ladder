@@ -19,7 +19,7 @@ async function load(entry:any){
       return data;
     }).catch(e=>{snapshots.delete(key);throw e;});
     snapshots.set(key,promise);
-    if(snapshots.size>8)snapshots.delete(snapshots.keys().next().value!);
+    if(snapshots.size>3)snapshots.delete(snapshots.keys().next().value!);
   }
   return snapshots.get(key)!;
 }

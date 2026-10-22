@@ -1,3 +1,4 @@
+import {isTop100} from './ranked-roster.mjs';
 import {summarize, windowStart, faction} from './core.mjs';
 import {buildAnalytics, inSegment, SEGMENTS} from './analytics.mjs';
 import {parseRatingFilters,rating,ownRatingMatches,opponentRatingMatches,ratingCoverage,missingRequiredRating} from './rating-filters.mjs';
@@ -11,8 +12,12 @@ const prepared=new WeakMap();
 function prepare(seed){
   if(prepared.has(seed))return prepared.get(seed);
   const profiles=new Map(seed.players.map(p=>[p.id,p]));
+  const names=new Map(seed.players.filter(p=>p.name).map(p=>[p.id,p.name])),observedNames=new Map();
+  for(const game of seed.matches)for(const p of game.players)if(typeof p.name==='string'&&p.name.trim()&&!names.has(p.id)&&(!observedNames.has(p.id)||observedNames.get(p.id).at<game.start))observedNames.set(p.id,{name:p.name,at:game.start});
+  for(const [id,p]of observedNames)names.set(id,p.name);
   const seen=new Set(),rows=[];
-  for(const game of seed.matches){
+  for(const original of seed.matches){
+    const game={...original,players:original.players.map(p=>({...p,...(names.has(p.id)?{name:names.get(p.id)}:{})}))};
     if(seen.has(game.id))continue;
     seen.add(game.id);
     if(game.players.length!==2||!game.players.every(p=>p.result===0||p.result===1)||game.players[0].result+game.players[1].result!==1)continue;
@@ -62,9 +67,15 @@ export async function querySnapshot(path,q,manifest,load,now=Math.floor(Date.now
   const seed=await load(entry);
   if(seed.snapshot!==entry.snapshot)throw new QueryError('数据批次不一致，请刷新后重试',503);
   const {profiles,rows}=prepare(seed),player=playerFilter(q);
-  if(player&&!profiles.has(player))throw new QueryError('该选手不在所选赛季的前100名中',404);
+  const rosterMode=q.get('roster')||'top100';
+  if(!['top100','all'].includes(rosterMode))throw new QueryError('无效的统计名单');
+  const fullRoster=entry.meta?.roster==='all';
+  if(rosterMode==='all'&&!fullRoster)throw new QueryError('全榜战绩仍在采集中，请先查看前100名，完整后自动开放全榜',409);
+  const cohort=new Map(seed.players.filter(p=>rosterMode==='all'||isTop100(p)).map(p=>[p.id,p]));
+  const roster={mode:rosterMode,available:seed.players.length,complete:fullRoster,selected:cohort.size};
+  if(player&&!cohort.has(player))throw new QueryError(profiles.has(player)?'该选手在前100名以外，请切换全榜查看':'该选手不在所选赛季的完整榜单中',404);
   const range=['7d','30d'].includes(q.get('range'))?q.get('range'):'season';
-  const scope=q.get('opponents')==='top100'?'top100':'all';
+  const scope=['top100','ranked'].includes(q.get('opponents'))?q.get('opponents'):'all';
   const granularity=q.get('group')==='country'?'country':'faction';
   const start=windowStart(season,entry.cutoff,range);
   const map=q.get('map')||'',segment=q.get('segment')||'';
@@ -74,7 +85,7 @@ export async function querySnapshot(path,q,manifest,load,now=Math.floor(Date.now
   if(segment&&!Object.values(SEGMENTS).flat().some(s=>s.key===segment))throw new QueryError('无效的分段筛选');
   if(player&&!inSegment(profiles.get(player),segment))throw new QueryError('选手不在当前分段，请先切换到全部分段',400);
   if(player&&!ownRatingMatches(profiles.get(player),ratingFilters))throw new QueryError('选手不在当前己方积分范围，请调整积分条件或返回全部选手',400);
-  const base=rows.filter(r=>r.start>=start&&r.start<=entry.cutoff&&(scope!=='top100'||profiles.has(r.opponent)));
+  const base=rows.filter(r=>cohort.has(r.user)&&r.start>=start&&r.start<=entry.cutoff&&(scope!=='top100'||isTop100(profiles.get(r.user))&&isTop100(profiles.get(r.opponent)))&&(scope!=='ranked'||profiles.has(r.opponent)));
   const mapOptions=[...new Set(base.map(r=>r.map))].sort((a,b)=>a.localeCompare(b,'zh-CN'));
   const mapRows=base.filter(r=>!map||r.map===map);
   const eligible=mapRows.filter(r=>inSegment(r.profile,segment)&&ownRatingMatches(r.profile,ratingFilters));
@@ -85,7 +96,7 @@ export async function querySnapshot(path,q,manifest,load,now=Math.floor(Date.now
     const ids=q.get('compare');
     const compare=ids?[...new Set(ids.split(','))]:[];
     if(compare.length>4||compare.some(id=>!/^\d{1,20}$/.test(id)))throw new QueryError('请选择最多4位不同选手进行对比');
-    if(compare.some(id=>!profiles.has(id)))throw new QueryError('对比选手不在本赛季前100名中',404);
+    if(compare.some(id=>!cohort.has(id)))throw new QueryError('对比选手不在当前统计名单中，请切换全榜',404);
     const counts=new Map();
     for(const r of filtered){
       const key=r.user+':'+r.country+':'+r.enemy;
@@ -97,12 +108,12 @@ export async function querySnapshot(path,q,manifest,load,now=Math.floor(Date.now
     const stage=(key,name,rs)=>({key,name,games:rs.length,uniqueMatches:new Set(rs.map(r=>r.match)).size});
     const ownRows=personal(eligible),knownRows=ownRows.filter(r=>!missingRequiredRating(r,ratingFilters)),resultRows=personal(filtered);
     const funnel=[stage('base','基础胜负出场',mapRows),stage('own','己方范围',ownRows),stage('known','所需积分已知',knownRows),stage('matched','最终匹配',resultRows)];
-    const values=seed.players.map(p=>rating(p.mmr)).filter(v=>v!==null),gaps=rows.filter(r=>r.scoreGap!==null).map(r=>Math.abs(r.scoreGap));
+    const values=[...cohort.values()].map(p=>rating(p.mmr)).filter(v=>v!==null),gaps=rows.filter(r=>r.scoreGap!==null).map(r=>Math.abs(r.scoreGap));
     const ratingOptions={min:values.length?Math.floor(Math.min(...values)/100)*100:0,max:values.length?Math.max(100,Math.ceil(Math.max(...values)/100)*100):5000,gapMax:gaps.length?Math.max(100,Math.ceil(Math.max(...gaps)/100)*100):1000};
-    return {seasons,season,snapshot:entry.snapshot,cutoff:entry.cutoff,meta:entry.meta,progress:manifest.progress||null,
-      ...summarize([...counts.values()],seed.players.filter(p=>inSegment(p,segment)&&ownRatingMatches(p,ratingFilters)),granularity,player,uniqueMatches),window:range,scope,granularity,
+    return {seasons,season,snapshot:entry.snapshot,cutoff:entry.cutoff,meta:entry.meta,roster,progress:manifest.progress||null,
+      ...summarize([...counts.values()],[...cohort.values()].filter(p=>inSegment(p,segment)&&ownRatingMatches(p,ratingFilters)),granularity,player,uniqueMatches),window:range,scope,granularity,
       filters:{map,segment,...ratingFilters},coverage,mapOptions,funnel,ratingOptions,
-      analytics:{...buildAnalytics({rows:filtered,cohortRows,profiles,player,compare,start,cutoff:entry.cutoff,bucket:q.get('bucket')==='week'?'week':'day'}),...buildMatchups(resultRows),opponents:opponentDossier(resultRows,profiles,player)},
+      analytics:{...buildAnalytics({rows:filtered,cohortRows,profiles:cohort,player,compare,start,cutoff:entry.cutoff,bucket:q.get('bucket')==='week'?'week':'day'}),...buildMatchups(resultRows),opponents:opponentDossier(resultRows,profiles,player)},
       stale:now-(season.end<=now?entry.created:entry.cutoff)>10800,automation:manifest.automation||{enabled:false}};
   }
   const own=countryFilter(q.get('own'),granularity),enemy=countryFilter(q.get('enemy'),granularity);

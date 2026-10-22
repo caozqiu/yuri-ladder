@@ -13,9 +13,20 @@ export function normalizeSponsorMatch(s,matchId,platformA,platformB){
  if(![0,1].includes(a.matchStats)||![0,1].includes(b.matchStats)||a.matchStats+b.matchStats!==1)throw sponsorError('该对局为流局、无效局或结果尚未确认');
  if(![a.country,b.country].every(n=>Number.isInteger(n)&&n>=0&&n<=9))throw sponsorError('该对局的国家信息不完整');
  if(!Number.isSafeInteger(s.startTime)||s.startTime<946656000||s.startTime>4102444800||typeof s.mapName!=='string'||!s.mapName.trim()||s.mapName.length>100)throw sponsorError('该对局的地图或时间信息不完整');
- return {round:{map:s.mapName.trim(),winner:a.matchStats===1?'a':'b',matchId,start:s.startTime,countryA:a.country,countryB:b.country},nameA:a.username||'',nameB:b.username||''};
+ return {round:{map:s.mapName.trim(),winner:a.matchStats===1?'a':'b',matchId,start:s.startTime,countryA:a.country,countryB:b.country},nameA:a.username||'',nameB:b.username||'',platformA:String(a.userId),platformB:String(b.userId)};
 }
-export async function fetchSponsorMatch(matchId,platformA,platformB){
+export function normalizeSponsorMatchByNames(s,matchId,nameA,nameB){
+ const normalize=value=>typeof value==='string'?value.normalize('NFKC').trim():'';
+ const aName=normalize(nameA),bName=normalize(nameB);
+ if(!aName||!bName||aName.length>64||bName.length>64)throw sponsorError('请填写双方在该局中显示的LBW平台昵称');
+ if(aName===bName)throw sponsorError('双方平台昵称相同，无法自动区分，请改用手动填写地图、国家与胜负');
+ const players=(s?.players||[]).filter(p=>p.colorId!==null&&PLATFORM_ID.test(String(p.userId)));
+ const as=players.filter(p=>normalize(p.username)===aName),bs=players.filter(p=>normalize(p.username)===bName);
+ if(as.length>1||bs.length>1)throw sponsorError('该对局存在同名昵称，无法自动区分，请改用手动填写地图、国家与胜负');
+ if(as.length!==1||bs.length!==1)throw sponsorError('对局中的昵称与填写的LBW平台昵称不一致，请核对该局显示的完整昵称');
+ return normalizeSponsorMatch(s,matchId,String(as[0].userId),String(bs[0].userId));
+}
+async function fetchSummary(matchId){
  let response;
  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),18000);
  try{response=await fetch('https://api.ram-bo.com/datacenter/redalert/match/v1/summary?matchId='+matchId,{headers:{device:'6',device_id:'next-h5',language:'zh_CN',platform:'3',app_version_code:'9.9.9',Referer:'https://ra2.com/',Accept:'application/json'},signal:controller.signal});}catch{throw sponsorError('兰博接口暂时无法连接，请稍后重试',502);}finally{clearTimeout(timer);}
@@ -23,5 +34,7 @@ export async function fetchSponsorMatch(matchId,platformA,platformB){
  if(!response.ok)throw sponsorError('暂时无法读取这场对局',502);
  let data;try{data=parseSourceJSON(await response.text());}catch{throw sponsorError('兰博接口暂时不可用',502);}
  if(!data.success||!data.data)throw sponsorError('兰博平台未找到该对局');
- return normalizeSponsorMatch(data.data,matchId,platformA,platformB);
+ return data.data;
 }
+export async function fetchSponsorMatch(matchId,platformA,platformB){return normalizeSponsorMatch(await fetchSummary(matchId),matchId,platformA,platformB);}
+export async function fetchSponsorMatchByNames(matchId,nameA,nameB){return normalizeSponsorMatchByNames(await fetchSummary(matchId),matchId,nameA,nameB);}

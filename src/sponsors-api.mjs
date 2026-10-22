@@ -1,5 +1,5 @@
 import {validateSponsor,publicSponsor,sponsorError,sponsorIdentity} from '../shared/lib/sponsors.mjs';
-import {fetchSponsorMatch,PLATFORM_ID,MATCH_ID,proofValue} from '../shared/lib/sponsor-source.mjs';
+import {fetchSponsorMatch,fetchSponsorMatchByNames,PLATFORM_ID,MATCH_ID,proofValue} from '../shared/lib/sponsor-source.mjs';
 import {handleEvents} from './events-api.mjs';
 import {currentAccount} from './accounts-api.mjs';
 const utf8=new TextEncoder(),COOKIE='yuri_site_owner',ID=/^\d{13}_[a-f0-9]{64}$/;
@@ -8,7 +8,7 @@ const hex=b=>[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join(
 const digest=async s=>hex(await crypto.subtle.digest('SHA-256',utf8.encode(s)));
 const equal=(a,b)=>{let d=a.length^b.length;for(let i=0;i<Math.max(a.length,b.length);i++)d|=(a.charCodeAt(i)||0)^(b.charCodeAt(i)||0);return d===0;};
 const inverse=n=>String(9999999999999-n).padStart(13,'0');
-export function createSponsorsHandler({store,secret,now=Date.now,sourceMatch=fetchSponsorMatch,accountsStore}){
+export function createSponsorsHandler({store,secret,now=Date.now,sourceMatch=fetchSponsorMatch,sourceMatchByNames=fetchSponsorMatchByNames,accountsStore}){
  const configured=typeof secret==='string'&&secret.length>=24;
  const sign=async value=>{const key=await crypto.subtle.importKey('raw',utf8.encode(secret),{name:'HMAC',hash:'SHA-256'},false,['sign']);return hex(await crypto.subtle.sign('HMAC',key,utf8.encode(value)));};
  const token=async(kind,at)=>kind+'.'+at+'.'+await sign(kind+'.'+at);
@@ -87,10 +87,15 @@ export function createSponsorsHandler({store,secret,now=Date.now,sourceMatch=fet
    if(action==='logout')return json({owner:false},200,{'Set-Cookie':cookie(request,'',0)});
    if(['submit','import'].includes(action)&&!account)throw sponsorError('请先登录普通用户账号',401);
    if(action==='import'){
-    if(![input.platformA,input.platformB,input.matchId].every(v=>typeof v==='string')||!PLATFORM_ID.test(input.platformA)||!PLATFORM_ID.test(input.platformB)||input.platformA===input.platformB||!MATCH_ID.test(input.matchId))throw sponsorError('请填写双方不同的平台数字ID及有效对局编号');
+    if(typeof input.matchId!=='string'||!MATCH_ID.test(input.matchId))throw sponsorError('请填写有效对局编号');
+    const byNames=input.platformNameA!==undefined||input.platformNameB!==undefined;
+    if(byNames){if(![input.platformNameA,input.platformNameB].every(v=>typeof v==='string'&&v.trim()&&v.length<=64))throw sponsorError('请先填写双方的LBW平台昵称');}
+    else if(![input.platformA,input.platformB].every(v=>typeof v==='string'&&PLATFORM_ID.test(v))||input.platformA===input.platformB)throw sponsorError('请先填写双方的LBW平台昵称');
     await rate(request,'import',60,10);
-    const result=await sourceMatch(input.matchId,input.platformA,input.platformB);
-    return json({...result,round:{...result.round,proof:await sign('source.'+proofValue(result.round,input.platformA,input.platformB))}});
+    const result=byNames?await sourceMatchByNames(input.matchId,input.platformNameA,input.platformNameB):await sourceMatch(input.matchId,input.platformA,input.platformB);
+    const platformA=result.platformA||input.platformA,platformB=result.platformB||input.platformB;
+    if(byNames&&((input.platformA&&input.platformA!==platformA)||(input.platformB&&input.platformB!==platformB)))throw sponsorError('该局与已导入对局不是同一组平台选手，请核对昵称或删除旧导入后重新绑定');
+    return json({...result,platformA,platformB,round:{...result.round,proof:await sign('source.'+proofValue(result.round,platformA,platformB))}});
    }
    if(action==='submit'){
     const at=await validToken(input.challenge,'apply',20*60000);

@@ -34,9 +34,11 @@ try{
  if(command==='sync'||command==='step'){
    const minutes=Math.max(1,Math.min(45,Number(process.env.YURI_SYNC_MINUTES||35)));
    const deadline=Date.now()+minutes*60000;
+   let savedAt=Date.now();
    let status=await startSync(process.env.YURI_FORCE_FULL==='1');log('sync_started',status);
    do{
      status=await syncStep();log('sync_progress',status);
+     if(Date.now()-savedAt>5*60000){await saveCheckpoint(env.DB,checkpoint);await exportPublic();savedAt=Date.now();}
      if(command==='step')break;
    }while(status.state!=='complete'&&Date.now()<deadline);
    if(status.state!=='complete'){exitCode=75;log('sync_checkpointed',status);}

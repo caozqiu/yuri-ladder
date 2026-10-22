@@ -53,3 +53,10 @@ test('invalid filters fail and matrix links can pin a retained complete snapshot
  const result=await querySnapshot('/api/matches',new URLSearchParams({snapshot:seeds[0].snapshot}),index,load);
  assert.equal(result.snapshot,seeds[0].snapshot);
 });
+
+test('match detail names use the pinned snapshot and recent match sources without mutating raw records',async()=>{
+ const game=(id,start,other,name)=>({id,start,map:'昵称验收',players:[{id:'1',country:6,result:1},{id:other,...(name?{name}:{}),country:9,result:0}]});
+ const seed={season:{id:1,start:0,end:300},snapshot:'names',cutoff:300,players:[{id:'1',name:'己方',rank:1},{id:'2',name:'榜单对手昵称',rank:2}],matches:[game('a',100,'2'),game('b',110,'3'),game('c',120,'3','来源旧昵称'),game('d',130,'3','来源新昵称'),game('e',140,'4')],meta:{scanned:2,missing:0}};
+ const rows=(await querySnapshot('/api/matches',new URLSearchParams({player:'1'}),{snapshots:[seed]},async()=>seed)).matches;
+ assert.equal(rows.find(r=>r.match==='a').game.players[1].name,'榜单对手昵称');assert.equal(rows.find(r=>r.match==='b').game.players[1].name,'来源新昵称');assert.equal(rows.find(r=>r.match==='e').game.players[1].name,undefined);assert.equal(seed.matches[0].players[1].name,undefined);
+});
