@@ -1,4 +1,4 @@
-import {ACCOUNT_ID,HEX_KEY,ACCOUNT_COOKIE,accountError,randomKey,digest,equal,normalizeAccount,accountId,validateNickname,validatePassword,profileView,validateAvatar} from '../shared/lib/accounts.mjs';
+import {ACCOUNT_ID,HEX_KEY,ACCOUNT_COOKIE,accountError,randomKey,digest,equal,normalizeAccount,accountId,validateNickname,validateUsername,normalizeUsername,validatePassword,profileView,validateAvatar} from '../shared/lib/accounts.mjs';
 import {hashPassword,verifyPassword,DUMMY_HASH} from './passwords.mjs';
 const json=(data,status=200,headers={})=>new Response(JSON.stringify(data),{status,headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'private, no-store',Vary:'Cookie','X-Content-Type-Options':'nosniff',...headers}});
 const get=(store,key)=>store.get(key,{type:'json',consistency:'strong'});
@@ -10,7 +10,7 @@ export async function currentAccount(request,store,now=Date.now()){
  const record=await get(store,'users/'+session.id+'.json');if(!record||record.version!==session.version)return null;
  const profile=await get(store,'profiles/'+record.id+'.json');return profile?{...profileView(profile),version:record.version}:null;
 }
-export function createAccountsHandler({store,secret,now=Date.now}){
+export function createAccountsHandler({store,secret,now=Date.now,registry=null}){
  const configured=typeof secret==='string'&&secret.length>=24;
  const hmac=async value=>{const key=await crypto.subtle.importKey('raw',new TextEncoder().encode(secret),{name:'HMAC',hash:'SHA-256'},false,['sign']);return [...new Uint8Array(await crypto.subtle.sign('HMAC',key,new TextEncoder().encode(value)))].map(n=>n.toString(16).padStart(2,'0')).join('');};
  const sessionCookie=(request,value,age)=>ACCOUNT_COOKIE+'='+value+'; Path=/api; HttpOnly; SameSite=Strict; Max-Age='+age+(new URL(request.url).protocol==='https:'?'; Secure':'');
@@ -34,7 +34,7 @@ export function createAccountsHandler({store,secret,now=Date.now}){
     for(let i=0;i<page.blobs.length;i+=4)items.push(...(await Promise.all(page.blobs.slice(i,i+4).map(async b=>{const p=await get(store,b.key);if(!p||!ACCOUNT_ID.test(p.id||''))return null;return {...profileView(p),...(typeof p.username==='string'?{username:p.username}:{})};}))).filter(Boolean));
     return json({items,cursor:page.cursor||null});
    }
-   if(action==='session'){const user=await currentAccount(request,store,now());return json({configured,user:user?{id:user.id,nickname:user.nickname,avatar:user.avatar,createdAt:user.createdAt}:null});}
+   if(action==='session'){const user=await currentAccount(request,store,now());return json({configured,usernameLoginEnabled:!!registry,user:user?{id:user.id,nickname:user.nickname,...(user.username?{username:user.username}:{}),avatar:user.avatar,createdAt:user.createdAt}:null});}
    if(action==='challenge'){if(!configured)throw accountError('账号注册暂未开放',503);const at=now();return json({challenge:at+'.'+await hmac('register.'+at)});}
    if(action==='profile'||action==='avatar'){
     const id=url.searchParams.get('id');if(!ACCOUNT_ID.test(id||''))throw accountError('未找到用户',404);const profile=await get(store,'profiles/'+id+'.json');if(!profile)throw accountError('未找到用户',404);
@@ -50,12 +50,17 @@ export function createAccountsHandler({store,secret,now=Date.now}){
    const nickname=validateNickname(input.nickname),password=validatePassword(input.password);if(!HEX_KEY.test(input.registrationKey||''))throw accountError('注册恢复码格式不正确');await rate(request,'register',5,60);
    const id=await accountId(input.registrationKey),key='users/'+id+'.json',recoveryHash=await digest(input.registrationKey),existing=await get(store,key);
    if(existing){if(!equal(existing.recoveryHash,recoveryHash))throw accountError('注册编号冲突，请重新生成恢复码',409);return login(request,existing,{duplicate:true});}
+   const username=input.username===undefined?null:validateUsername(input.username);
    const createdAt=new Date(now()).toISOString(),record={id,passwordAlgorithm:'bcrypt-10',passwordHash:await hashPassword(password),recoveryHash,version:randomKey(16),createdAt};
-   await set(store,'profiles/'+id+'.json',{id,nickname,createdAt,avatarVersion:null});await set(store,key,record);return login(request,record,{registered:true},201);
+   if(username){if(!registry)throw accountError('用户名服务尚未就绪，请稍后重试',503);await registry.claim(username,id);}
+   await set(store,'profiles/'+id+'.json',{id,nickname,...(username?{username}:{}),createdAt,avatarVersion:null});await set(store,key,record);return login(request,record,{registered:true},201);
   }
   if(action==='login'){
-   const id=normalizeAccount(input.id);if(!ACCOUNT_ID.test(id)||typeof input.password!=='string'||input.password.length>128)throw accountError('账号或密码不正确',401);
-   await rate(request,'login',12,15,id);const record=await get(store,'users/'+id+'.json');const valid=await verifyPassword(input.password,record?.passwordHash||DUMMY_HASH);if(!record||!valid)throw accountError('账号或密码不正确',401);return login(request,record);
+   let id=normalizeAccount(input.id),username=null;if(typeof input.password!=='string'||input.password.length>128)throw accountError('账号或密码不正确',401);
+   if(!ACCOUNT_ID.test(id)){try{username=normalizeUsername(input.id);}catch{throw accountError('账号或密码不正确',401);}if(!registry)throw accountError('用户名登录暂不可用，请使用YR账号编号',503);}
+   await rate(request,'login',12,15,username||id);if(username)id=await registry.lookup(username);
+   const record=id?await get(store,'users/'+id+'.json'):null;const valid=await verifyPassword(input.password,record?.passwordHash||DUMMY_HASH);if(!record||!valid)throw accountError('账号或密码不正确',401);
+   if(username){const profile=await get(store,'profiles/'+id+'.json');if(!profile?.username||normalizeUsername(profile.username)!==username)throw accountError('账号或密码不正确',401);}return login(request,record);
   }
   if(action==='logout'){const token=cookieToken(request);if(token&&await currentAccount(request,store,now()))await set(store,'sessions/'+await digest(token)+'.json',{revoked:true});return json({user:null},200,{'Set-Cookie':sessionCookie(request,'',0)});}
   if(action==='recover'){
@@ -67,7 +72,11 @@ export function createAccountsHandler({store,secret,now=Date.now}){
   if(action==='profile'){
    await rate(request,'profile',20,10,user.id);const profile=await get(store,'profiles/'+user.id+'.json');const nickname=validateNickname(input.nickname);let avatarVersion=profile.avatarVersion;
    if(input.avatar!==undefined){if(input.avatar===null)avatarVersion=null;else{const avatar=validateAvatar(input.avatar);avatarVersion=(await digest(avatar.data)).slice(0,24);await set(store,'avatars/'+user.id+'/'+avatarVersion+'.json',{...avatar,version:avatarVersion});}}
-   const next={...profile,nickname,avatarVersion};await set(store,'profiles/'+user.id+'.json',next);return json({user:profileView(next)});
+   let username=profile.username;if(input.username!==undefined&&String(input.username).trim()){
+    const nextName=validateUsername(input.username);if(username&&normalizeUsername(username)!==normalizeUsername(nextName))throw accountError('登录用户名设置后固定，展示昵称仍可修改',409);
+    if(!username){if(!registry)throw accountError('用户名服务尚未就绪，请稍后重试',503);await registry.claim(nextName,user.id);username=nextName;}
+   }
+   const next={...profile,nickname,avatarVersion,...(username?{username}:{})};await set(store,'profiles/'+user.id+'.json',next);return json({user:profileView(next)});
   }
   if(action==='password'){
    const password=validatePassword(input.newPassword);if(typeof input.oldPassword!=='string'||input.oldPassword.length>128)throw accountError('原密码不正确',401);await rate(request,'password',8,15,user.id);

@@ -8,8 +8,10 @@ export const equal=(a,b)=>{if(typeof a!=='string'||typeof b!=='string')return fa
 export const normalizeAccount=value=>typeof value==='string'?value.trim().toUpperCase():'';
 export const accountId=async key=>'YR-'+(await digest(key)).slice(0,24).toUpperCase();
 export function validateNickname(value){const s=typeof value==='string'?value.normalize('NFKC').trim():'';if(!s||[...s].length>24||/[\u0000-\u001f\u007f-\u009f\u202a-\u202e\u2066-\u2069]/.test(s))throw accountError('昵称须为1–24个字，不能包含控制字符');return s;}
+export function validateUsername(value){const s=typeof value==='string'?value.normalize('NFKC').trim():'';if(!s||[...s].length>24||!/^[\p{L}\p{N}_-]+$/u.test(s))throw accountError('用户名须为1–24个中文、字母、数字、下划线或短横线');return s;}
+export const normalizeUsername=value=>validateUsername(value).toLowerCase();
 export function validatePassword(value){if(typeof value!=='string'||value.length<10)throw accountError('密码至少需要10个字符');if(new TextEncoder().encode(value).length>72)throw accountError('密码过长，请使用更短的密码');return value;}
-export const profileView=profile=>({id:profile.id,nickname:profile.nickname,avatar:profile.avatarVersion?'/api/account?'+new URLSearchParams({action:'avatar',id:profile.id,v:profile.avatarVersion}):null,createdAt:profile.createdAt});
+export const profileView=profile=>({id:profile.id,nickname:profile.nickname,...(profile.username?{username:profile.username}:{}),avatar:profile.avatarVersion?'/api/account?'+new URLSearchParams({action:'avatar',id:profile.id,v:profile.avatarVersion}):null,createdAt:profile.createdAt});
 export function validateAvatar(input){
  if(typeof input!=='string'||input.length>360000||!/^data:image\/(?:jpeg|png);base64,[A-Za-z0-9+/]+={0,2}$/.test(input))throw accountError('请上传PNG或JPEG头像，处理后不超过256KB');
  const [head,data]=input.split(',');let bytes;try{bytes=Uint8Array.from(atob(data),c=>c.charCodeAt(0));}catch{throw accountError('头像编码不正确');}

@@ -6,9 +6,12 @@ const root=resolve('dist');
 const {createSponsorsHandler}=await import('../src/sponsors-api.mjs');
 const {createFileStore}=await import('../src/sponsors-file-store.mjs');
 const {createAccountsHandler}=await import('../src/accounts-api.mjs');
-const accountsStore=createFileStore(process.env.YURI_ACCOUNTS_PREVIEW_DIR||'.runtime/accounts-preview');
+const {createPreviewUsernameRegistry}=await import('../src/preview-username-registry.mjs');
+const accountsDirectory=process.env.YURI_ACCOUNTS_PREVIEW_DIR||'.runtime/accounts-preview';
+const accountsStore=createFileStore(accountsDirectory);
+const registry=createPreviewUsernameRegistry(accountsDirectory);
 const sponsors=createSponsorsHandler({store:createFileStore(process.env.YURI_SPONSOR_PREVIEW_DIR||'.runtime/sponsors-preview'),secret:process.env.SPONSOR_ADMIN_PASSWORD,accountsStore});
-const accounts=createAccountsHandler({store:accountsStore,secret:process.env.SPONSOR_ADMIN_PASSWORD});
+const accounts=createAccountsHandler({store:accountsStore,secret:process.env.SPONSOR_ADMIN_PASSWORD,registry});
 const api=await import(pathToFileURL(resolve('dist/edge-functions/api/stats.js')));
 const types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json; charset=utf-8','.svg':'image/svg+xml'};
 const server=createServer(async(req,res)=>{

@@ -9,7 +9,12 @@ import {PROJECT_ID} from './deploy.mjs';
 const origin=process.env.YURI_VERIFY_ORIGIN||'https://yuri-ladder.cn',token=process.env.EDGEONE_API_TOKEN;
 if(!token)throw Error('Verification credential missing');
 async function live(action,body){const r=await fetch(origin+'/api/account?'+new URLSearchParams({action,_verify:String(Date.now())}),{method:body?'POST':'GET',headers:{Origin:origin,...(body?{'Content-Type':'application/json'}:{})},...(body?{body:JSON.stringify(body)}:{})});return {status:r.status,data:await r.json()};}
-let session;for(let n=0;n<6;n++){session=await live('session');if(session.status===200&&session.data.configured)break;await new Promise(r=>setTimeout(r,10000));}assert.equal(session.status,200);assert.equal(session.data.configured,true);assert.equal(session.data.user,null);
+let session;for(let n=0;n<6;n++){session=await live('session');if(session.status===200&&session.data.configured&&(process.env.YURI_REQUIRE_USERNAME_REGISTRY!=='1'||session.data.usernameLoginEnabled===true))break;await new Promise(r=>setTimeout(r,10000));}assert.equal(session.status,200);assert.equal(session.data.configured,true);assert.equal(session.data.user,null);
+if(process.env.YURI_REQUIRE_USERNAME_REGISTRY==='1'){
+ assert.equal(session.data.usernameLoginEnabled,true,'deployed unique username configuration');
+ const absent='probe_'+randomKey(8),result=await live('login',{id:absent,password:'nonexistent-username-readonly-probe'});
+ assert.equal(result.status,401,'deployed signing, registry lookup and password verification; no account is created');
+}
 const denied=await live('profile',{nickname:'must-not-write'});assert.equal(denied.status,401,'deployed profile write denies anonymous visitors');
 const nonexistent='YR-'+randomKey(12).toUpperCase();const unknown=await fetch(origin+'/api/account?'+new URLSearchParams({action:'profile',id:nonexistent}));assert.equal(unknown.status,404,'deployed account storage point read');const loginDenied=await live('login',{id:nonexistent,password:'nonexistent-account-crypto-check'});assert.equal(loginDenied.status,401,'deployed native JSON and password-hash runtime: '+(loginDenied.data.code||''));
 for(const path of ['sponsors','events'])assert.equal((await fetch(origin+'/api/'+path+'?action=mine')).status,401);
