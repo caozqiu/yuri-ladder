@@ -22,6 +22,11 @@ test('sponsor inputs require distinct players, valid score, consistent partial r
  for(const bad of [{playerB:'甲'},{scoreA:0,scoreB:0},{scoreA:1.5},{scoreB:100},{rounds:[{map:'x',winner:'draw'}]},{scoreA:0},{rounds:[{map:'x',winner:'b'},{map:'y',winner:'b'}]},{playedAt:'2026-10-22T10:00'},{platformA:'42',platformB:'42'},{rounds:[{}]}])assert.throws(()=>validateSponsor({...data,...bad}));
  assert.equal(validateSponsor({...data,scoreA:1,scoreB:1,rounds:[]}).scoreB,1);
 });
+test('replay links are optional, retain normal video URLs and reject scripts, credential URLs and oversized values',()=>{
+ assert.equal(validateSponsor(data).replayUrl,'');
+ assert.equal(validateSponsor({...data,replayUrl:'https://www.bilibili.com/video/BV1test/?p=2&t=32'}).replayUrl,'https://www.bilibili.com/video/BV1test/?p=2&t=32');
+ for(const replayUrl of ['javascript:alert(1)','data:text/html,x','file:///c:/secret','https://user:password@example.com/video','not a url','https://example.com/'+'x'.repeat(1000)])assert.throws(()=>validateSponsor({...data,replayUrl}));
+});
 test('anonymous submission is private until owner approval; receipt is scoped and never public',async()=>{
  const f=fixture(),r=await f.apply({status:'approved'});assert.equal(r.status,201);const id=r.json.id;
  assert.deepEqual((await f.call('list')).json.items,[]);assert.equal((await f.call('list',undefined,{id})).status,404);

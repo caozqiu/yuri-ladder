@@ -7,3 +7,5 @@
 @media(max-width:700px){.sponsor-platform-a,.sponsor-platform-b{grid-column:1/-1}.sponsor-import{padding:15px;margin-top:22px}.sponsor-import>div{align-items:flex-start;flex-direction:column;gap:10px}.sponsor-round-source{grid-column:2;grid-row:3}.sponsor-round-editor>div>button{grid-column:3;grid-row:1/4}.sponsor-round-evidence{grid-column:2}}
 
 .sponsors-page .page-heading p{max-width:none}
+
+.sponsor-video-link{display:inline-flex;align-items:center;gap:5px;color:#dcc487;font-size:12px;white-space:nowrap;margin-left:auto}.sponsor-replay{margin:0 0 22px}.sponsor-replay>a{display:flex;align-items:center;gap:13px;padding:16px;border:1px solid #5b523b;background:#29271f;border-radius:6px;color:#e5cc94}.sponsor-replay>a>span{flex:1;min-width:0}.sponsor-replay strong{font-size:15px;display:block;font-weight:500}.sponsor-replay small{display:block;overflow-wrap:anywhere;line-height:1.8;font-size:12px;color:#9babbc;margin-top:5px}.sponsor-match-foot{flex-wrap:wrap}.sponsor-sponsor .sponsor-note{margin:0;font-size:12px}.sponsor-replay>a>svg{flex-shrink:0}

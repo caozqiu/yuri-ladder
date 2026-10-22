@@ -14,7 +14,9 @@ export function createSponsorsHandler({store,secret,now=Date.now,sourceMatch=fet
  const get=key=>store.get(key,{type:'json',consistency:'strong'});
  const set=(key,data)=>store.setJSON(key,data,{cacheControl:'no-store'});
  const list=(prefix,cursor,limit=30)=>store.list({prefix,cursor:cursor||undefined,limit,paginate:false,consistency:'strong'});
- const latest=async id=>{const r=await list('reviews/'+id+'/',null,1);return r.blobs.length?get(r.blobs[0].key):null;};
+ // Object listings may lag behind a write. A strong point read is the
+ // authoritative moderation state; immutable review objects are audit records.
+ const latest=id=>get('states/'+id+'.json');
  const cookie=(request,value,age)=>COOKIE+'='+value+'; Path=/api/sponsors; HttpOnly; SameSite=Strict; Max-Age='+age+(new URL(request.url).protocol==='https:'?'; Secure':'');
  const owner=async request=>{
   if(!configured)return false;
@@ -103,12 +105,13 @@ export function createSponsorsHandler({store,secret,now=Date.now,sourceMatch=fet
     const previous=await latest(input.id);if((input.version||null)!==(previous?.version||null))throw sponsorError('该申请已有新的审核结果，请刷新后再操作',409);
     const reason=typeof input.reason==='string'?input.reason.trim():'';if(reason.length>300||/[\u0000-\u001f]/.test(reason))throw sponsorError('审核说明最多300字，请勿换行');
     if(input.status==='rejected'&&!reason)throw sponsorError('请填写未通过或撤回原因');
-    const at=now(),version=inverse(at)+'_'+crypto.randomUUID();
+    const at=Math.max(now(),previous?Date.parse(previous.at)+1:0),version=inverse(at)+'_'+crypto.randomUUID();
     // The publication pointer is not an approval. Every public read checks
     // the latest immutable review, so a failed operation never exposes a pending item.
     if(input.status==='approved')await set('published/'+input.id+'.json',{id:input.id});
     const review={status:input.status,at:new Date(at).toISOString(),version,reason};
     await set('reviews/'+input.id+'/'+version+'.json',review);
+    await set('states/'+input.id+'.json',review);
     return json({item:{...publicSponsor(row,review),reason,version}});
    }
    throw sponsorError('接口不存在',404);

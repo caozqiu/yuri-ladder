@@ -32,7 +32,7 @@ async function call(action,body,headers={},params={}){
 try{
  const imported=await call('import',{platformA:'3764069',platformB:'2511624',matchId:'1568734715984187392'});assert.equal(imported.status,200,'official source import');assert.equal(imported.data.round.winner,'a');
  const challenge=(await call('challenge')).data.challenge;now+=2500;const ticket=randomBytes(32).toString('hex');
- const application={playerA:'存储验收A',playerB:'存储验收B',platformA:'3764069',platformB:'2511624',playedAt:new Date(imported.data.round.start*1000).toISOString(),scoreA:1,scoreB:0,sponsor:'自动验收，仅在隔离命名空间',rounds:[imported.data.round],challenge,ticket};
+ const application={playerA:'存储验收A',playerB:'存储验收B',platformA:'3764069',platformB:'2511624',playedAt:new Date(imported.data.round.start*1000).toISOString(),scoreA:1,scoreB:0,sponsor:'自动验收，仅在隔离命名空间',replayUrl:'https://www.bilibili.com/video/BV1verification/',rounds:[imported.data.round],challenge,ticket};
  const applied=await call('submit',application);assert.equal(applied.status,201);const id=applied.data.id;
  // A fresh SDK instance and handler must see the persisted object.
  const fresh=getStore(opts);handler=createSponsorsHandler({store:{...store,get:(...a)=>fresh.get(...a)},secret,now:()=>now});
@@ -41,9 +41,9 @@ try{
  assert.equal((await call('queue')).status,401);
  const login=await call('login',{password:secret});assert.equal(login.status,200);const auth={Cookie:login.cookie};
  let reviewed=await call('review',{id,status:'approved',version:null},auth);assert.equal(reviewed.status,200);
- const item=(await call('list',undefined,{}, {id})).data.item;assert.equal(item.status,'approved');assert.equal(item.rounds[0].matchId,'1568734715984187392');assert.equal(item.rounds[0].proof,undefined);
+ const item=(await call('list',undefined,{}, {id})).data.item;assert.equal(item.status,'approved');assert.equal(item.rounds[0].matchId,'1568734715984187392');assert.equal(item.rounds[0].proof,undefined);assert.equal(item.replayUrl,application.replayUrl);
  now++;reviewed=await call('review',{id,status:'rejected',reason:'隔离验收结束',version:reviewed.data.item.version},auth);assert.equal(reviewed.status,200);
  assert.equal((await call('list',undefined,{}, {id})).status,404);assert.equal((await call('receipt',{id,ticket})).data.item.status,'rejected');
- const evidence={at:new Date().toISOString(),origin,publicEndpointReady:true,anonymousQueueStatus:401,storage:'EdgeOne Blob, isolated verification namespace',freshInstanceRead:true,officialSourceImport:true,largeMatchIdPreserved:true,privatePending:true,approvalPublished:true,rejectionHidden:true,productionTestEventsCreated:0};
+ const evidence={at:new Date().toISOString(),origin,publicEndpointReady:true,anonymousQueueStatus:401,storage:'EdgeOne Blob, isolated verification namespace',freshInstanceRead:true,officialSourceImport:true,largeMatchIdPreserved:true,replayLinkPreserved:true,privatePending:true,approvalPublished:true,rejectionHidden:true,productionTestEventsCreated:0};
  await mkdir('.runtime',{recursive:true});await writeFile('.runtime/sponsor-verification.json',JSON.stringify(evidence,null,2)+'\n');console.log(JSON.stringify(evidence));
 }finally{for(const key of written)await storage.delete(key);}

@@ -31,11 +31,13 @@ export function validateSponsor(input){
  if(rounds.length>99||rounds.length>scoreA+scoreB)throw sponsorError('逐局数量不能超过总比分场次（最多99局）');
  if(rounds.filter(r=>r.winner==='a').length>scoreA||rounds.filter(r=>r.winner==='b').length>scoreB)throw sponsorError('逐局胜负与最终比分不一致');
  const ids=rounds.filter(r=>r.matchId).map(r=>r.matchId);if(new Set(ids).size!==ids.length)throw sponsorError('同一个对局编号不能重复登记');
- return {playerA,playerB,platformA,platformB,playedAt:new Date(playedAt).toISOString(),scoreA,scoreB,sponsor:text(input.sponsor,'赞助者',100),rounds};
+ let replayUrl=text(input.replayUrl,'回放视频网址',1000);
+ if(replayUrl){let url;try{url=new URL(replayUrl);}catch{throw sponsorError('请填写完整的视频网址，例如 https://www.bilibili.com/video/…');}if(!['https:','http:'].includes(url.protocol)||url.username||url.password||!url.hostname.includes('.'))throw sponsorError('视频网址只支持不含登录信息的 http/https 链接');replayUrl=url.href;}
+ return {playerA,playerB,platformA,platformB,playedAt:new Date(playedAt).toISOString(),scoreA,scoreB,sponsor:text(input.sponsor,'赞助者',100),replayUrl,rounds};
 }
 export function publicSponsor(record,review){
- const {id,createdAt,playerA,playerB,platformA,platformB,playedAt,scoreA,scoreB,sponsor,rounds}=record;
- return {id,createdAt,playerA,playerB,platformA,platformB,playedAt,scoreA,scoreB,sponsor,rounds:rounds.map(({proof,...r})=>r),status:review?.status||'pending',reviewedAt:review?.at||null};
+ const {id,createdAt,playerA,playerB,platformA,platformB,playedAt,scoreA,scoreB,sponsor,replayUrl,rounds}=record;
+ return {id,createdAt,playerA,playerB,platformA,platformB,playedAt,scoreA,scoreB,sponsor,replayUrl:replayUrl||'',rounds:rounds.map(({proof,...r})=>r),status:review?.status||'pending',reviewedAt:review?.at||null};
 }
 export function beijingInputToIso(value){
  if(!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value))throw sponsorError('请填写对战时间');
@@ -44,5 +46,6 @@ export function beijingInputToIso(value){
 export async function sponsorIdentity(data,ticket,challenge){
  const hash=async s=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s)))].map(n=>n.toString(16).padStart(2,'0')).join('');
  const ticketHash=await hash(ticket),at=Number(challenge.split('.')[1]);
- return {id:String(9999999999999-at).padStart(13,'0')+'_'+await hash(ticketHash+JSON.stringify(data)),ticketHash};
+ const identityData={...data};if(!identityData.replayUrl)delete identityData.replayUrl;
+ return {id:String(9999999999999-at).padStart(13,'0')+'_'+await hash(ticketHash+JSON.stringify(identityData)),ticketHash};
 }
