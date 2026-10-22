@@ -11,8 +11,17 @@ export const accountId=async key=>'YR-'+(await digest(key)).slice(0,24).toUpperC
 export function validateNickname(value){const s=typeof value==='string'?value.normalize('NFKC').trim():'';if(!s||[...s].length>24||/[\u0000-\u001f\u007f-\u009f\u202a-\u202e\u2066-\u2069]/.test(s))throw accountError('昵称须为1–24个字，不能包含控制字符');return s;}
 export function validatePassword(value){if(typeof value!=='string'||value.length<10||value.length>128)throw accountError('密码须为10–128个字符');return value;}
 export async function hashPassword(password,salt){
- const material=await crypto.subtle.importKey('raw',new TextEncoder().encode(password),'PBKDF2',false,['deriveBits']);
- return [...new Uint8Array(await crypto.subtle.deriveBits({name:'PBKDF2',hash:'SHA-256',iterations:PASSWORD_ITERATIONS,salt:new TextEncoder().encode(salt)},material,256))].map(n=>n.toString(16).padStart(2,'0')).join('');
+ let material;
+ try{material=await crypto.subtle.importKey('raw',new TextEncoder().encode(password),{name:'PBKDF2'},false,['deriveBits','deriveKey']);}
+ catch(error){throw Object.assign(accountError('密码加密服务暂不可用，请稍后重试',503),{code:'PASSWORD_IMPORT_'+String(error.name).replace(/[^a-zA-Z]/g,'')});}
+ const options={name:'PBKDF2',hash:{name:'SHA-256'},iterations:PASSWORD_ITERATIONS,salt:new TextEncoder().encode(salt)};
+ let bits;try{bits=await crypto.subtle.deriveBits(options,material,256);}catch{
+  // Exporting a derived AES key produces the identical 256 PBKDF2 bits.
+  // Keep the algorithm and work factor fixed on runtimes without deriveBits.
+  try{const key=await crypto.subtle.deriveKey(options,material,{name:'AES-GCM',length:256},true,['encrypt']);bits=await crypto.subtle.exportKey('raw',key);}
+  catch(error){throw Object.assign(accountError('密码加密服务暂不可用，请稍后重试',503),{code:'PASSWORD_DERIVE_'+String(error.name).replace(/[^a-zA-Z]/g,'')});}
+ }
+ return [...new Uint8Array(bits)].map(n=>n.toString(16).padStart(2,'0')).join('');
 }
 export const profileView=profile=>({id:profile.id,nickname:profile.nickname,avatar:profile.avatarVersion?'/api/account?'+new URLSearchParams({action:'avatar',id:profile.id,v:profile.avatarVersion}):null,createdAt:profile.createdAt});
 export function validateAvatar(input){

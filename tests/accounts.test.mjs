@@ -2,7 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createAccountsHandler,currentAccount} from '../src/accounts-api.mjs';
 import {createSponsorsHandler} from '../src/sponsors-api.mjs';
-import {accountId,validateAvatar,validateNickname} from '../shared/lib/accounts.mjs';
+import {accountId,validateAvatar,validateNickname,hashPassword} from '../shared/lib/accounts.mjs';
+import {pbkdf2Sync} from 'node:crypto';
 const secret='isolated-account-test-owner-configuration',password='local-account-password-123';
 import {AVATAR as png} from './fixtures/avatar.mjs';
 function memory(){const values=new Map();return {values,async get(k){return structuredClone(values.get(k)||null);},async setJSON(k,v){values.set(k,structuredClone(v));},async list({prefix='',cursor='',limit=30}={}){const keys=[...values.keys()].filter(k=>k.startsWith(prefix)&&k>cursor).sort();return {blobs:keys.slice(0,limit).map(key=>({key})),cursor:keys.length>limit?keys[limit-1]:null};}};}
@@ -54,4 +55,13 @@ test('member ownership restores sponsor applications and events across devices w
  const owner=await call('sponsors','login',{password:secret});await call('events','review',{id:created.data.id,status:'approved'},owner.cookie);c=await call('events','challenge');f.advance(2500);const joined=await call('events','join',{id:created.data.id,name:'报名者',platformId:'123456',contact:'私有联系方式',ticket:'f'.repeat(64),challenge:c.data.challenge},b.cookie);assert.equal(joined.status,201);
  assert.equal((await call('events','mine',undefined,b.cookie)).data.entries.length,1);const entry=await call('events','entry',{id:created.data.id,entryId:joined.data.entryId},b.cookie);assert.equal(entry.data.entry.contact,'私有联系方式');assert.equal(entry.data.entry.ownerId,undefined);assert.equal((await call('events','entry',{id:created.data.id,entryId:joined.data.entryId},a.cookie)).status,404);
  assert.ok(!JSON.stringify((await call('events','list',undefined,'',{id:created.data.id})).data).includes('私有联系方式'));
+});
+
+test('edge deriveKey fallback preserves standard PBKDF2 output and fails closed if unavailable',async(t)=>{
+ const expected=pbkdf2Sync('fixture-password','fixture-salt',600000,32,'sha256').toString('hex');
+ assert.equal(await hashPassword('fixture-password','fixture-salt'),expected);
+ t.mock.method(crypto.subtle,'deriveBits',()=>{throw Error('deriveBits adapter unavailable');});
+ assert.equal(await hashPassword('fixture-password','fixture-salt'),expected);
+ t.mock.method(crypto.subtle,'deriveKey',()=>{throw Object.assign(Error('unsupported'),{name:'NotSupportedError'});});
+ await assert.rejects(hashPassword('fixture-password','fixture-salt'),{status:503,code:'PASSWORD_DERIVE_NotSupportedError'});
 });

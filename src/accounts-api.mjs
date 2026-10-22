@@ -29,7 +29,7 @@ export function createAccountsHandler({store,secret,now=Date.now}){
    if(action==='profile'||action==='avatar'){
     const id=url.searchParams.get('id');if(!ACCOUNT_ID.test(id||''))throw accountError('未找到用户',404);const profile=await get(store,'profiles/'+id+'.json');if(!profile)throw accountError('未找到用户',404);
     if(action==='profile')return json({user:profileView(profile)});
-    const avatar=await get(store,'avatars/'+id+'.json');if(!avatar||avatar.version!==profile.avatarVersion)throw accountError('暂无头像',404);
+    if(!profile.avatarVersion)throw accountError('暂无头像',404);const avatar=await get(store,'avatars/'+id+'/'+profile.avatarVersion+'.json');if(!avatar||avatar.version!==profile.avatarVersion)throw accountError('暂无头像',404);
     return new Response(Uint8Array.from(atob(avatar.data),c=>c.charCodeAt(0)),{headers:{'Content-Type':avatar.type,'Cache-Control':'public, max-age=300','X-Content-Type-Options':'nosniff','Content-Security-Policy':"default-src 'none'; sandbox",'Content-Disposition':'inline'}});
    }
    throw accountError('接口不存在',404);
@@ -56,7 +56,7 @@ export function createAccountsHandler({store,secret,now=Date.now}){
   const user=await requireUser(request);
   if(action==='profile'){
    await rate(request,'profile',20,10,user.id);const profile=await get(store,'profiles/'+user.id+'.json');const nickname=validateNickname(input.nickname);let avatarVersion=profile.avatarVersion;
-   if(input.avatar!==undefined){if(input.avatar===null)avatarVersion=null;else{const avatar=validateAvatar(input.avatar);avatarVersion=(await digest(avatar.data)).slice(0,24);await set(store,'avatars/'+user.id+'.json',{...avatar,version:avatarVersion});}}
+   if(input.avatar!==undefined){if(input.avatar===null)avatarVersion=null;else{const avatar=validateAvatar(input.avatar);avatarVersion=(await digest(avatar.data)).slice(0,24);await set(store,'avatars/'+user.id+'/'+avatarVersion+'.json',{...avatar,version:avatarVersion});}}
    const next={...profile,nickname,avatarVersion};await set(store,'profiles/'+user.id+'.json',next);return json({user:profileView(next)});
   }
   if(action==='password'){
@@ -64,5 +64,5 @@ export function createAccountsHandler({store,secret,now=Date.now}){
    const record=await get(store,'users/'+user.id+'.json');if(!equal(await hashPassword(input.oldPassword,record.salt),record.passwordHash))throw accountError('原密码不正确',401);const salt=randomKey(16),next={...record,salt,passwordHash:await hashPassword(password,salt),version:randomKey(16)};await set(store,'users/'+user.id+'.json',next);return login(request,next,{passwordChanged:true});
   }
   throw accountError('接口不存在',404);
- }catch(error){return json({error:error.status?error.message:'账号服务暂时不可用，请稍后重试'},error.status||503);}};
+ }catch(error){return json({error:error.status?error.message:'账号服务暂时不可用，请稍后重试',...(error.status===503||!error.status?{code:typeof error.code==='string'?error.code:'ACCOUNT_SERVICE'}:{})},error.status||503);}};
 }
