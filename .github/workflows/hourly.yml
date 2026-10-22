@@ -3,7 +3,7 @@ on:
   push:
     branches: [main]
   schedule:
-    - cron: '55 * * * *'
+    - cron: '17 * * * *'
   workflow_dispatch:
 permissions:
   contents: write
@@ -14,12 +14,12 @@ concurrency:
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 50
+    timeout-minutes: 60
     env:
       YURI_DATA_DIR: .runtime
       YURI_CHECKPOINT_DIR: .checkpoint/state
       YURI_PUBLIC_DATA_DIR: .checkpoint/public
-      YURI_SYNC_MINUTES: '35'
+      YURI_SYNC_MINUTES: '45'
       EDGEONE_SITE: ${{ vars.EDGEONE_SITE || 'china' }}
       EDGEONE_CONFIGURED: ${{ secrets.EDGEONE_API_TOKEN != '' }}
     steps:

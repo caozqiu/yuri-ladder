@@ -7,7 +7,7 @@ import {captureRankingHistory} from './ranking-history.mjs';
 import {startSync,syncStep,syncStatus} from '../shared/lib/sync';
 const checkpoint=resolve(process.env.YURI_CHECKPOINT_DIR||'.checkpoint/state');
 const publicDirectory=resolve(process.env.YURI_PUBLIC_DATA_DIR||'.checkpoint/public');
-const automation={enabled:process.env.YURI_AUTOMATION_ENABLED==='1',schedule:'每小时第55分钟（北京时间），平台调度可能延迟'};
+const automation={enabled:process.env.YURI_AUTOMATION_ENABLED==='1',schedule:'每小时第17分钟（北京时间），每轮最多采集45分钟，未完成自动续采；平台调度可能延迟'};
 const log=(event:string,data:any={})=>console.log(JSON.stringify({event,...data}));
 async function exportPublic(){
  const rankingHistory=await captureRankingHistory(env.DB,publicDirectory,bootstrapSnapshots);
@@ -32,7 +32,7 @@ try{
  // Keep a complete publication available before starting any new staging work.
  await exportPublic();ready=true;
  if(command==='sync'||command==='step'){
-   const minutes=Math.max(1,Math.min(45,Number(process.env.YURI_SYNC_MINUTES||35)));
+   const minutes=Math.max(1,Math.min(45,Number(process.env.YURI_SYNC_MINUTES||45)));
    const deadline=Date.now()+minutes*60000;
    let savedAt=Date.now();
    let status=await startSync(process.env.YURI_FORCE_FULL==='1');log('sync_started',status);
