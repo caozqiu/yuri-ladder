@@ -11,7 +11,7 @@ async function request(path,method='GET',ready=null){
    const url=new URL(path,origin);if(url.pathname.startsWith('/api/'))url.searchParams.set('_verify',Date.now()+'-'+attempt);
    const response=await fetch(url,{method,headers:{Accept:'application/json','Cache-Control':'no-cache'},signal:AbortSignal.timeout(45000)});
    const body=await response.text();
-   if([409,502,503,504].includes(response.status))throw new Error('HTTP '+response.status);
+   if([502,503,504].includes(response.status)||response.status===409&&!ready)throw new Error('HTTP '+response.status);
    let json;try{json=JSON.parse(body);}catch{throw new Error('Expected JSON at '+path+'; got '+response.status+' '+response.headers.get('content-type'));}
    const result={status:response.status,body,json};if(ready&&!ready(result))throw new Error('New API version is not ready at '+path+'; HTTP '+response.status);
    return result;

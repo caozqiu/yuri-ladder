@@ -186,7 +186,7 @@ GET /api/stats?enemyMmrMin=4000&gapMax=300&gapDirection=stronger
 GET /api/matches?mmrMin=3500&mmrMax=4300&gapMax=100
 ```
 
-使用`node scripts/verify-rating-data.mjs dist/data`可逐场独立复核两个赛季、三个时间窗口、两种对手范围、七组积分条件，共84组合。
+使用`node scripts/verify-rating-data.mjs dist/data`可逐场独立复核两个赛季、三个时间窗口、两种对手范围、七组积分条件，旧版100人名单共126组合；两个赛季全榜完成后，前100与全榜两种名单共252组合。
 
 ## 当前验证与限制
 

@@ -10,14 +10,14 @@ const checks=[];
 for(const entry of manifest.snapshots){
  const seed=seeds.get(entry.snapshot),players=new Map(seed.players.map(p=>[p.id,p]));
  const games=[...new Map(seed.matches.map(m=>[m.id,m])).values()].filter(m=>m.players.length===2&&m.players.every(p=>p.result===0||p.result===1)&&m.players[0].result+m.players[1].result===1);
- for(const range of ['season','7d','30d'])for(const opponents of ['all','top100'])for(const filter of cases){
+ for(const roster of entry.meta.roster==='all'?['top100','all']:['top100'])for(const range of ['season','7d','30d'])for(const opponents of ['all','top100','ranked'])for(const filter of cases){
   const from=range==='season'?entry.season.start:Math.max(entry.season.start,entry.cutoff-(range==='7d'?7:30)*86400);
   const expected=[];
   for(const game of games){
    if(game.start<from||game.start>entry.cutoff)continue;
    for(let i=0;i<2;i++){
     const own=game.players[i],enemy=game.players[1-i];
-    if(!players.has(own.id)||opponents==='top100'&&!players.has(enemy.id))continue;
+    if(!players.has(own.id)||roster==='top100'&&players.get(own.id).rank>100||opponents==='top100'&&!(players.get(own.id)?.rank<=100&&players.get(enemy.id)?.rank<=100)||opponents==='ranked'&&!players.has(enemy.id))continue;
     const a=players.get(own.id)?.mmr??null,b=players.get(enemy.id)?.mmr??null;
     if(filter.mmrMin!==undefined&&(a===null||a<Number(filter.mmrMin)))continue;
     if(filter.mmrMax!==undefined&&(a===null||a>Number(filter.mmrMax)))continue;
@@ -32,14 +32,14 @@ for(const entry of manifest.snapshots){
     expected.push({match:game.id,result:own.result});
    }
   }
-  const q=new URLSearchParams({season:String(entry.season.id),range,opponents,...filter});
+  const q=new URLSearchParams({season:String(entry.season.id),roster,range,opponents,...filter});
   const stats=await querySnapshot('/api/stats',q,manifest,async e=>seeds.get(e.snapshot));
   assert.equal(stats.overview.games,expected.length,String(q));
   assert.equal(stats.overview.wins,expected.filter(p=>p.result===1).length,String(q));
   assert.equal(stats.overview.uniqueMatches,new Set(expected.map(p=>p.match)).size,String(q));
   for(const count of [stats.analytics.maps.reduce((n,m)=>n+m.total.games,0),stats.analytics.trend.points.reduce((n,p)=>n+p.total.games,0),stats.matrix.reduce((n,c)=>n+c.games,0),stats.coverage.matched])assert.equal(count,expected.length,String(q));
   assert.equal(stats.coverage.before,stats.coverage.matched+stats.coverage.excludedUnknown+stats.coverage.excludedByScore,String(q));
-  checks.push({season:entry.season.id,range,opponents,filter,games:expected.length,unique:stats.overview.uniqueMatches});
+  checks.push({season:entry.season.id,roster,range,opponents,filter,games:expected.length,unique:stats.overview.uniqueMatches});
  }
 }
 const result={at:new Date().toISOString(),passed:checks.length,checks};
