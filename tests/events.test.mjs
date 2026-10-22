@@ -2,7 +2,7 @@ import test from 'node:test';
 import {fixtureMember} from './fixtures/member.mjs';
 import assert from 'node:assert/strict';
 import {createSponsorsHandler} from '../src/sponsors-api.mjs';
-import {validateEvent,validateEntry,eventPhase} from '../shared/lib/events.mjs';
+import {validateEvent,validateEntry,eventPhase,eventEntryIdentity} from '../shared/lib/events.mjs';
 const secret='local-test-only-event-admin-password';
 function fixture(){
  let clock=Date.parse('2026-10-22T04:00:00Z');const records=new Map();
@@ -73,4 +73,26 @@ test('same-origin protection, verification and expired application deadlines are
  assert.equal((await f.call('create',{...input,website:'spam'})).status,400);
  assert.equal((await f.call('create',{...input,closesAt:new Date(f.now()-1).toISOString()})).status,400);
  const p=f.records.size;assert.equal((await f.call('manage',{id:'unknown',ticket:f.ticket})).status,404);assert.equal(f.records.size,p);
+});
+
+test('signup accepts an LBW display nickname without a numeric ID and rejects empty, multiline and oversized names',async()=>{
+ const entry=validateEntry({name:'圈内昵称',platformName:'  [战队]平台昵称_ABC  ',qq:'123456789'});
+ assert.equal(entry.platformName,'[战队]平台昵称_ABC');assert.equal(entry.platformId,undefined);
+ assert.equal(validateEntry({name:'甲',platformName:'0',qq:'12345'}).platformName,'0','numeric-looking nicknames are allowed as names');
+ for(const platformName of ['', '  ', 'x'.repeat(65),'含\n换行',42])assert.throws(()=>validateEntry({name:'甲',platformName,platformId:'123',qq:'12345'}));
+ const ticket='c'.repeat(64),a=await eventEntryIdentity('event','Ｐlatform昵称',ticket,'nickname'),b=await eventEntryIdentity('event','Platform昵称',ticket,'nickname');assert.equal(a.entryId,b.entryId);
+ assert.notEqual((await eventEntryIdentity('event','123',ticket,'nickname')).person,(await eventEntryIdentity('event','123',ticket)).person,'old numeric IDs are never silently reinterpreted as nicknames');
+});
+
+test('nickname signup survives retry, restart, organizer readback and receipt while preserving legacy registrations and privacy',async()=>{
+ const f=fixture(),id=(await f.create()).data.id;await f.approve(id);assert.equal((await f.join(id)).status,201);
+ const ticket='c'.repeat(64),challenge=await f.challenge(),body={id,name:'圈内常用昵称',platformName:'LBW-平台昵称',qq:'987654321',ticket,challenge};
+ const joined=await f.call('join',body);assert.equal(joined.status,201);assert.equal((await f.call('join',body)).data.duplicate,true);
+ assert.equal(joined.data.entryId,(await eventEntryIdentity(id,body.platformName,ticket,'nickname')).entryId);
+ assert.equal((await f.join(id,{platformName:'LBW-平台昵称',ticket:'d'.repeat(64)})).status,409);
+ f.restart();const management=(await f.call('manage',{id,ticket:f.ticket})).data;assert.equal(management.item.registrations,2);
+ assert.ok(management.participants.some(p=>p.platformId==='9007199254740993'&&!p.platformName));
+ assert.ok(management.participants.some(p=>p.platformName===body.platformName&&!p.platformId&&p.name===body.name&&p.qq===body.qq));
+ const receipt=(await f.call('entry',{id,entryId:joined.data.entryId,ticket})).data.entry;assert.equal(receipt.platformName,body.platformName);assert.equal(receipt.platformId,undefined);
+ const publicView=JSON.stringify((await f.call('list',undefined,{id})).data);assert.ok(!publicView.includes(body.platformName)&&!publicView.includes(body.qq));
 });

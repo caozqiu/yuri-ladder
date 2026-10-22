@@ -9,7 +9,7 @@ export async function handleEvents({request,url,configured,store,get,set,list,si
  const summary=async(row,s,privateView=false)=>({...publicEvent(row,s,await count(row.id),now()),...(privateView?{reason:s?.reason||'',version:s?.version||null}:{})});
  async function roster(id,cursor){
   const r=await list('event-entries/'+id+'/',cursor);const participants=[];
-  for(let i=0;i<r.blobs.length;i+=4)participants.push(...await Promise.all(r.blobs.slice(i,i+4).map(async b=>{const v=await get(b.key);if(!v)return null;const {name,platformId,qq,contact,note,createdAt}=v;return {name,platformId,qq,contact,note,createdAt};})));
+  for(let i=0;i<r.blobs.length;i+=4)participants.push(...await Promise.all(r.blobs.slice(i,i+4).map(async b=>{const v=await get(b.key);if(!v)return null;const {name,platformName,platformId,qq,contact,note,createdAt}=v;return {name,platformName,platformId,qq,contact,note,createdAt};})));
   return {participants:participants.filter(Boolean),cursor:r.cursor||null};
  }
  async function requireOrganizer(input){
@@ -53,9 +53,9 @@ export async function handleEvents({request,url,configured,store,get,set,list,si
  if(action==='join'){
   const at=await validToken(input.challenge,'event',20*60000);if(at===null||now()-at<2000||input.website)throw sponsorError('报名验证已过期或未就绪，请刷新验证重试');if(!HEX.test(input.ticket||''))throw sponsorError('报名回执格式不正确');
   const {row,s}=await read(input.id);if(!eventPhase(row,now()).canJoin)throw sponsorError(eventPhase(row,now()).label+'，当前不能报名',409);
-  const entry=validateEntry(input),{person,ticketHash,entryId}=await eventEntryIdentity(input.id,entry.platformId,input.ticket),key='event-entries/'+input.id+'/'+entryId+'.json';
+  const entry=validateEntry(input),{person,ticketHash,entryId}=await eventEntryIdentity(input.id,entry.platformName??entry.platformId,input.ticket,entry.platformName!==undefined?'nickname':'id'),key='event-entries/'+input.id+'/'+entryId+'.json';
   if(await get(key))return json({id:input.id,entryId,duplicate:true});
-  const existing=await list('event-entries/'+input.id+'/'+person+'_',null,1);if(existing.blobs.length)throw sponsorError('该平台ID已报名，请勿重复报名',409);
+  const existing=await list('event-entries/'+input.id+'/'+person+'_',null,1);if(existing.blobs.length)throw sponsorError((entry.platformName!==undefined?'该LBW平台昵称':'该旧版平台ID')+'已报名，请勿重复报名',409);
   await rate(request,'event-join',10,10);const current=await state(input.id);if(current?.status!=='approved'||current.version!==s.version||!eventPhase(row,now()).canJoin)throw sponsorError('赛事状态已变化，请刷新后重试',409);
   if(account)await set('user-items/'+account.id+'/entries/'+entryId+'.json',{id:input.id,entryId});
   await set(key,{...entry,entryId,eventId:input.id,ticketHash,createdAt:new Date(now()).toISOString(),...(account?{ownerId:account.id}:{})});return json({id:input.id,entryId,registered:true},201);

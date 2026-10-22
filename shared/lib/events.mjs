@@ -10,9 +10,17 @@ export function validateEvent(input){
  return {title,organizer,description,format,contact,opensAt,closesAt,startsAt};
 }
 export function validateEntry(input){
- const name=clean(input.name,'报名昵称',64,true),platformId=clean(input.platformId,'兰博平台ID',20,true),qq=clean(input.qq,'QQ号',12,true),note=clean(input.note,'报名备注',500,false,true);
- if(!/^[1-9]\d{0,19}$/.test(platformId))throw sponsorError('兰博平台ID须为有效数字ID');
- if(!/^[1-9]\d{4,11}$/.test(qq))throw sponsorError('QQ号须为5–12位数字，不能以0开头');return {name,platformId,qq,contact:qq,note};
+ if(!input||typeof input!=='object')throw sponsorError('请填写报名资料');
+ const name=clean(input.name,'报名昵称',64,true),qq=clean(input.qq,'QQ号',12,true),note=clean(input.note,'报名备注',500,false,true);
+ let platform;
+ if(Object.hasOwn(input,'platformName'))platform={platformName:clean(input.platformName,'LBW平台昵称',64,true)};
+ else{
+  // Older clients and receipts keep their original numeric-ID identity.
+  const platformId=clean(input.platformId,'旧版兰博平台ID',20,true);
+  if(!/^[1-9]\d{0,19}$/.test(platformId))throw sponsorError('请刷新页面，改填LBW平台昵称');
+  platform={platformId};
+ }
+ if(!/^[1-9]\d{4,11}$/.test(qq))throw sponsorError('QQ号须为5–12位数字，不能以0开头');return {name,...platform,qq,contact:qq,note};
 }
 export function eventPhase(item,now=Date.now()){
  if(now>=Date.parse(item.startsAt))return {key:'started',label:'赛事已开始',canJoin:false};
@@ -24,7 +32,8 @@ export function publicEvent(record,state,count,now=Date.now()){
  const {id,createdAt,title,organizer,description,format,contact,opensAt,closesAt,startsAt}=record;
  return {id,createdAt,title,organizer,description,format,contact,opensAt,closesAt,startsAt,status:state?.status||'pending',reviewedAt:state?.at||null,registrations:count.count,countLowerBound:count.lowerBound,phase:eventPhase(record,now)};
 }
-export async function eventEntryIdentity(id,platformId,ticket){
+export async function eventEntryIdentity(id,platformValue,ticket,kind='id'){
  const hash=async value=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(value)))].map(n=>n.toString(16).padStart(2,'0')).join('');
- const person=await hash(id+':'+platformId),ticketHash=await hash(ticket);return {person,ticketHash,entryId:person+'_'+ticketHash};
+ const identity=kind==='nickname'?'nickname:'+platformValue.normalize('NFKC').trim():platformValue;
+ const person=await hash(id+':'+identity),ticketHash=await hash(ticket);return {person,ticketHash,entryId:person+'_'+ticketHash};
 }
