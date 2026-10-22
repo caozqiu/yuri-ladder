@@ -3,7 +3,8 @@ import {mkdir,writeFile} from 'node:fs/promises';
 import {Makers} from '@edgeone/makers-sdk';
 import {PROJECT_ID} from './deploy.mjs';
 // Runs only in the trusted deployment job. Never print credentials or write
-// them into source/artifacts. An existing owner's password is always retained.
+// them into source/artifacts. Retain the existing password unless an owner-authorized
+// maintenance push explicitly requests a one-time rotation.
 const token=process.env.EDGEONE_API_TOKEN;
 try{
  if(!token)throw Error('Deployment credential missing');

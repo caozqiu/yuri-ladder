@@ -731,5 +731,179 @@
         "initialReadbackPropagationFailureResolvedByRun": 39630087333
       }
     }
+  },
+  "communityFeatures": {
+    "at": "2026-10-22T05:59:32.124Z",
+    "implemented": true,
+    "published": true,
+    "screens": {
+      "sponsors": "https://yuri-ladder.cn/?screen=sponsors",
+      "events": "https://yuri-ladder.cn/?screen=events"
+    },
+    "functionalCommit": "f82823d28cd60156b6c250ac0d7c55df24f27083",
+    "functionalRun": "https://github.com/caozqiu/yuri-ladder/actions/runs/39730017118",
+    "deployment": "dpdm4v8tpuao",
+    "cloudTests": {
+      "total": 80,
+      "passed": 80,
+      "failed": 0,
+      "skipped": 0
+    },
+    "localTestsIncludingPackaging": {
+      "total": 80,
+      "passed": 79,
+      "failed": 0,
+      "skipped": 1,
+      "reason": "Windows sandbox Git integration passed on Linux CI"
+    },
+    "deployedEndpoints": {
+      "at": "2026-10-22T07:31:26.751Z",
+      "origin": "https://yuri-ladder.cn",
+      "httpsVerified": true,
+      "assetsMatchLocalBuild": true,
+      "assets": [
+        {
+          "path": "/assets/index-7naoix5x.js",
+          "sha256": "a7b7404bfd7fa6235cbf3d26b2baeb7e9b469c70842f51b0312e47b88d86140e"
+        },
+        {
+          "path": "/assets/index-F26ESuFt.css",
+          "sha256": "87be771a4acb73452abee949486f25775490aec615312a622d0239eed0bffdee"
+        }
+      ],
+      "checks": [
+        {
+          "path": "sponsors",
+          "action": "list",
+          "status": 200,
+          "items": 0
+        },
+        {
+          "path": "sponsors",
+          "action": "queue",
+          "status": 401
+        },
+        {
+          "path": "sponsors",
+          "action": "session",
+          "status": 200,
+          "configured": true
+        },
+        {
+          "path": "sponsors",
+          "action": "anonymousReview",
+          "status": 401
+        },
+        {
+          "path": "events",
+          "action": "list",
+          "status": 200,
+          "items": 0
+        },
+        {
+          "path": "events",
+          "action": "queue",
+          "status": 401
+        },
+        {
+          "path": "events",
+          "action": "session",
+          "status": 200,
+          "configured": true
+        },
+        {
+          "path": "events",
+          "action": "anonymousReview",
+          "status": 401
+        }
+      ]
+    },
+    "livePendingSubmissions": {
+      "at": "2026-10-22T05:50:24.049Z",
+      "origin": "https://yuri-ladder.cn",
+      "deployedJsonBodyVerified": true,
+      "deployedOfficialImportVerified": true,
+      "sponsorSubmissionAndReceiptVerified": true,
+      "eventSubmissionAndManagementVerified": true,
+      "temporaryPendingRecordsCleaned": 2,
+      "publicTestRecords": 0
+    },
+    "liveCleanup": {
+      "at": "2026-10-22T05:50:24.049Z",
+      "testRecordsPlanned": 2,
+      "createdRecordsCleaned": 2,
+      "publicTestRecords": 0
+    },
+    "isolatedCloudModerationAndRegistration": {
+      "at": "2026-10-22T06:07:44.622Z",
+      "origin": "https://yuri-ladder.cn",
+      "publicEndpointReady": true,
+      "anonymousQueueStatus": 401,
+      "storage": "EdgeOne Blob, isolated verification namespace",
+      "freshInstanceRead": true,
+      "officialSourceImport": true,
+      "largeMatchIdPreserved": true,
+      "replayLinkPreserved": true,
+      "privatePending": true,
+      "approvalPublished": true,
+      "rejectionHidden": true,
+      "eventApplicationVerified": true,
+      "eventSignupVerified": true,
+      "organizerCountVerified": true,
+      "participantPrivacyVerified": true,
+      "productionTestEventsCreated": 0
+    },
+    "browser": {
+      "environment": "isolated local preview",
+      "desktop": [
+        1440,
+        1000
+      ],
+      "mobile": [
+        390,
+        844
+      ],
+      "sponsorImportSubmitApproveAndPublicDetail": true,
+      "eventReviewSignupAndOrganizerPrivateRoster": true,
+      "eventCreateDatesValidatedThroughHttp": true,
+      "eventCreateNativeDatetimeBrowserFill": false,
+      "productionVisualCheck": "browser control timed out; production assets and APIs matched"
+    },
+    "screenshots": [
+      "赞助赛_桌面详情.png",
+      "赞助赛_手机列表.png",
+      "赛事报名_手机报名表.png",
+      "赛事报名_发起人管理.png"
+    ],
+    "packaging": {
+      "ownerPasswordRemovedFromCompiledDownload": true,
+      "compiledZipCrcVerified": true,
+      "privateRuntimeExcluded": true,
+      "communityRequiresSourceDeployment": true
+    },
+    "releaseCommit": "a4fb535cf755f0ddca8f2dacb3d0529a62b68af9",
+    "releaseRun": "https://github.com/caozqiu/yuri-ladder/actions/runs/39731522440",
+    "ownerCredentialMaintenance": {
+      "at": "2026-10-22T06:05:45.934Z",
+      "run": "https://github.com/caozqiu/yuri-ladder/actions/runs/39731522440",
+      "commit": "a4fb535cf755f0ddca8f2dacb3d0529a62b68af9",
+      "deployment": "dpdm4v8tpuao",
+      "compiledArtifactsInspected": 22,
+      "credentialArtifactsRemoved": 4,
+      "downloadPackageOwnerValuesRemoved": 3,
+      "ownerPasswordRotated": true,
+      "configurationReadbackVerified": true
+    },
+    "independentScheduledUpdate": {
+      "run": "https://github.com/caozqiu/yuri-ladder/actions/runs/39732962391",
+      "event": "schedule",
+      "status": "success",
+      "deployment": "dp995n5179xa",
+      "cloudTests": 80,
+      "ownerPasswordUnchanged": true,
+      "downloadOwnerValuesRemoved": 3,
+      "publicApiVerified": true,
+      "historyPoints": 19
+    }
   }
 }
