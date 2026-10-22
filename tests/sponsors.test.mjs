@@ -6,7 +6,7 @@ import {join} from 'node:path';
 import {createSponsorsHandler} from '../src/sponsors-api.mjs';
 import {createFileStore} from '../src/sponsors-file-store.mjs';
 import {validateSponsor,beijingInputToIso} from '../shared/lib/sponsors.mjs';
-import {normalizeSponsorMatch} from '../shared/lib/sponsor-source.mjs';
+import {normalizeSponsorMatch,fetchSponsorMatch} from '../shared/lib/sponsor-source.mjs';
 import {parseSourceJSON} from '../shared/lib/source-json.mjs';
 const secret='unit-test-only-sponsor-owner-password';
 const data={playerA:'甲',playerB:'乙',playedAt:'2026-10-22T10:00:00+08:00',scoreA:2,scoreB:1,sponsor:'测试赞助者',rounds:[{map:'地图一',winner:'a'}]};
@@ -92,6 +92,14 @@ test('match import preserves big IDs, allows non-ladder sponsored rooms and veri
  const r=normalizeSponsorMatch(raw,'9223372036854775807','11','22');assert.equal(r.round.matchId,'9223372036854775807');assert.equal(r.round.winner,'a');assert.equal(r.round.countryB,9);
  assert.equal(normalizeSponsorMatch(raw,'9223372036854775807','22','11').round.winner,'b');
  for(const changes of [{gameVersion:1},{playerCount:4},{isEnd:0},{players:source.players.map(p=>({...p,matchStats:2}))},{players:[source.players[0],{...source.players[1],userId:99}]}])assert.throws(()=>normalizeSponsorMatch({...source,...changes},source.matchId,'11','22'));
+});
+test('source fetch works on edge runtimes without AbortSignal.timeout and clears its timeout',async(t)=>{
+ t.mock.method(AbortSignal,'timeout',()=>{throw Error('Unsupported static method');});
+ let signal;
+ t.mock.method(globalThis,'fetch',async(url,options)=>{assert.ok(url.endsWith(source.matchId));signal=options.signal;assert.equal(signal.aborted,false);return Response.json({success:true,data:source});});
+ const imported=await fetchSponsorMatch(source.matchId,'11','22');assert.equal(imported.round.winner,'a');assert.equal(signal.aborted,false);
+ globalThis.fetch.mock.mockImplementation(async()=>{throw Error('Upstream connection failed');});
+ await assert.rejects(fetchSponsorMatch(source.matchId,'11','22'),{status:502});
 });
 test('import proof rejects edited maps, results, IDs and duplicate matches at submission',async()=>{
  const f=fixture();f.opts.sourceMatch=async(id,a,b)=>normalizeSponsorMatch(source,id,a,b);f.restart();

@@ -17,7 +17,8 @@ export function normalizeSponsorMatch(s,matchId,platformA,platformB){
 }
 export async function fetchSponsorMatch(matchId,platformA,platformB){
  let response;
- try{response=await fetch('https://api.ram-bo.com/datacenter/redalert/match/v1/summary?matchId='+matchId,{headers:{device:'6',device_id:'next-h5',language:'zh_CN',platform:'3',app_version_code:'9.9.9',Referer:'https://ra2.com/',Accept:'application/json'},signal:AbortSignal.timeout(18000)});}catch{throw sponsorError('兰博接口暂时无法连接，请稍后重试',502);}
+ const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),18000);
+ try{response=await fetch('https://api.ram-bo.com/datacenter/redalert/match/v1/summary?matchId='+matchId,{headers:{device:'6',device_id:'next-h5',language:'zh_CN',platform:'3',app_version_code:'9.9.9',Referer:'https://ra2.com/',Accept:'application/json'},signal:controller.signal});}catch{throw sponsorError('兰博接口暂时无法连接，请稍后重试',502);}finally{clearTimeout(timer);}
  if([403,429].includes(response.status))throw sponsorError('兰博接口暂时限流，请稍后重试',429);
  if(!response.ok)throw sponsorError('暂时无法读取这场对局',502);
  let data;try{data=parseSourceJSON(await response.text());}catch{throw sponsorError('兰博接口暂时不可用',502);}
