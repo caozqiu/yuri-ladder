@@ -47,8 +47,10 @@ export function createSponsorsHandler({store,secret,now=Date.now,sourceMatch=fet
  return async function handle(request){
   try{
    const url=new URL(request.url),action=url.searchParams.get('action')||'list';
-   const account=await currentAccount(request,accountsStore,now());
    if(!['GET','POST'].includes(request.method))return json({error:'请求方法不支持'},405,{Allow:'GET, POST'});
+   // Public lists, owner-session checks and challenges never use member data.
+   // Do not make them wait for two unrelated account-storage reads.
+   const account=request.method==='POST'||action==='mine'?await currentAccount(request,accountsStore,now()):null;
    if(url.pathname==='/api/events')return await handleEvents({request,url,configured,store,get,set,list,sign,digest,equal,owner,requireOwner,rate,body,token,validToken,now,json,account});
    if(request.method==='GET'){
     if(action==='mine'){
@@ -64,14 +66,14 @@ export function createSponsorsHandler({store,secret,now=Date.now,sourceMatch=fet
     if(action==='queue')await requireOwner(request);
     else if(action!=='list')throw sponsorError('接口不存在',404);
     const id=url.searchParams.get('id');if(id&&!ID.test(id))throw sponsorError('申请编号格式不正确');
-    if(id){const row=await get('applications/'+id+'.json'),review=row?await latest(id):null;if(!row||(action!=='queue'&&review?.status!=='approved'))throw sponsorError('未找到公开赛事',404);return json({item:{...publicSponsor(row,review),...(action==='queue'?{reason:review?.reason||'',version:review?.version||null}:{})}});}
+    if(id){const [row,review]=await Promise.all([get('applications/'+id+'.json'),latest(id)]);if(!row||(action!=='queue'&&review?.status!=='approved'))throw sponsorError('未找到公开赛事',404);return json({item:{...publicSponsor(row,review),...(action==='queue'?{reason:review?.reason||'',version:review?.version||null}:{})}});}
     const cursor=url.searchParams.get('cursor')||'';if(cursor.length>1500)throw sponsorError('分页参数过长');
     const page=await list(action==='queue'?'applications/':'published/',cursor);
     const items=[];
     // Bounded batches avoid flooding the storage service when a page is full.
     for(let i=0;i<page.blobs.length;i+=4){const rows=await Promise.all(page.blobs.slice(i,i+4).map(async({key})=>{
      const id=key.slice(key.indexOf('/')+1,-5);if(!ID.test(id))return null;
-     const row=await get('applications/'+id+'.json');if(!row)return null;const review=await latest(id);
+     const [row,review]=await Promise.all([get('applications/'+id+'.json'),latest(id)]);if(!row)return null;
      if(action!=='queue'&&review?.status!=='approved')return null;
      return {...publicSponsor(row,review),...(action==='queue'?{reason:review?.reason||'',version:review?.version||null}:{})};
     }));items.push(...rows.filter(Boolean));}

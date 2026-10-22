@@ -5,8 +5,8 @@ export async function handleEvents({request,url,configured,store,get,set,list,si
  const action=url.searchParams.get('action')||'list';
  const state=id=>get('event-states/'+id+'.json');
  const count=async id=>{const r=await store.list({prefix:'event-entries/'+id+'/',limit:5000,paginate:true,consistency:'strong'});return {count:new Set(r.blobs.map(b=>b.key.split('/').at(-1).split('_')[0])).size,lowerBound:!!r.cursor};};
- const read=async(id,privileged=false)=>{if(!ID.test(id||''))throw sponsorError('赛事编号不正确');const row=await get('events/'+id+'.json'),s=row?await state(id):null;if(!row||!privileged&&s?.status!=='approved')throw sponsorError('未找到公开赛事',404);return {row,s};};
- const summary=async(row,s,privateView=false)=>({...publicEvent(row,s,await count(row.id),now()),...(privateView?{reason:s?.reason||'',version:s?.version||null}:{})});
+ const read=async(id,privileged=false)=>{if(!ID.test(id||''))throw sponsorError('赛事编号不正确');const [row,s]=await Promise.all([get('events/'+id+'.json'),state(id)]);if(!row||!privileged&&s?.status!=='approved')throw sponsorError('未找到公开赛事',404);return {row,s};};
+ const summary=async(row,s,privateView=false,attendance=null)=>({...publicEvent(row,s,attendance||await count(row.id),now()),...(privateView?{reason:s?.reason||'',version:s?.version||null}:{})});
  async function roster(id,cursor){
   const r=await list('event-entries/'+id+'/',cursor);const participants=[];
   for(let i=0;i<r.blobs.length;i+=4)participants.push(...await Promise.all(r.blobs.slice(i,i+4).map(async b=>{const v=await get(b.key);if(!v)return null;const {name,platformName,platformId,qq,contact,note,createdAt}=v;return {name,platformName,platformId,qq,contact,note,createdAt};})));
@@ -29,7 +29,7 @@ export async function handleEvents({request,url,configured,store,get,set,list,si
   if(action==='queue')await requireOwner(request);else if(action!=='list')throw sponsorError('接口不存在',404);
   const id=url.searchParams.get('id');if(id){const {row,s}=await read(id,action==='queue');return json({item:await summary(row,s,action==='queue'),...(action==='queue'?await roster(id,url.searchParams.get('cursor')):{})});}
   const cursor=url.searchParams.get('cursor')||'';if(cursor.length>1500)throw sponsorError('分页参数过长');const page=await list(action==='queue'?'events/':'event-public/',cursor,12),items=[];
-  for(let i=0;i<page.blobs.length;i+=3){const rows=await Promise.all(page.blobs.slice(i,i+3).map(async b=>{const id=b.key.split('/').at(-1).slice(0,-5);if(!ID.test(id))return null;const row=await get('events/'+id+'.json');if(!row)return null;const s=await state(id);if(action!=='queue'&&s?.status!=='approved')return null;return summary(row,s,action==='queue');}));items.push(...rows.filter(Boolean));}
+  for(let i=0;i<page.blobs.length;i+=3){const rows=await Promise.all(page.blobs.slice(i,i+3).map(async b=>{const id=b.key.split('/').at(-1).slice(0,-5);if(!ID.test(id))return null;const [row,s,attendance]=await Promise.all([get('events/'+id+'.json'),state(id),count(id)]);if(!row)return null;if(action!=='queue'&&s?.status!=='approved')return null;return summary(row,s,action==='queue',attendance);}));items.push(...rows.filter(Boolean));}
   return json({items,cursor:page.cursor||null});
  }
  if(!configured)throw sponsorError('赛事申请暂未开放',503);const input=await body(request);
