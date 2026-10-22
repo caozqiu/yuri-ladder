@@ -1,12 +1,12 @@
 {
-  "at": "2026-10-21T16:00:26.434Z",
+  "at": "2026-10-22T11:52:18.323Z",
   "build": "npm ci && node build.mjs",
   "tests": {
-    "passed": 92,
+    "passed": 102,
     "failed": 0,
     "skipped": 1,
-    "total": 93,
-    "cloudPassed": 93,
+    "total": 103,
+    "cloudPassed": 103,
     "cloudFailed": 0,
     "cloudSkipped": 0,
     "filterParityCases": 96,
@@ -69,22 +69,24 @@
     "sectionFeaturesDeployed": true,
     "publicApiVerified": true,
     "automatedPublishVerified": true,
-    "lastDeployment": "dpgvybo7dp7a",
-    "productionVersion": "53b78da495daa0ed9f983bbfc4ff44f2c1b2bfe7",
+    "lastDeployment": "dp7jn4d37xmd",
+    "productionVersion": "6653aa5362aec115b658c2e668f9adea7d9beacb",
     "cloudTests": {
-      "total": 93,
-      "passed": 93,
+      "total": 103,
+      "passed": 103,
       "failed": 0,
       "skipped": 0
     },
     "playerResearchDeployed": true,
     "userAccountsDeployed": true,
     "eventRegistrationLinksDeployed": true,
-    "communityWritesRequireMember": true
+    "communityWritesRequireMember": true,
+    "fullRosterCollectorDeployed": true,
+    "fullRosterInitialCollectionComplete": false
   },
   "domainCheck": {
     "name": "yuri-ladder.cn",
-    "status": "HTTPS 200; current event signup assets and member-only write permissions verified",
+    "status": "HTTPS 200; matching new assets; default roster, full-roster readiness and anonymous write denial verified",
     "nameservers": [
       "bike.dnspod.net",
       "puding.dnspod.net"
@@ -94,16 +96,16 @@
     "cname": "yuri-ladder.cn.pages.dnsoe6.com",
     "homepageStatus": 200,
     "currentAssets": [
-      "index-BU8SFC9V.js",
-      "index-BRyl9Xul.css"
+      "index-DXLhshMc.js",
+      "index-D3yUOcgq.css"
     ],
     "publicApiVerified": true,
-    "at": "2026-10-22T09:43:03.197Z"
+    "at": "2026-10-22T11:52:18.323Z"
   },
   "github": {
     "repository": "https://github.com/caozqiu/yuri-ladder",
     "visibility": "public",
-    "sourceCommit": "53b78da495daa0ed9f983bbfc4ff44f2c1b2bfe7",
+    "sourceCommit": "6653aa5362aec115b658c2e668f9adea7d9beacb",
     "firstRun": {
       "id": 39552054978,
       "jobId": 119063244588,
@@ -120,16 +122,16 @@
       "websiteDeployed": false
     },
     "latestRun": {
-      "id": 39757056148,
-      "jobId": 119751609061,
-      "url": "https://github.com/caozqiu/yuri-ladder/actions/runs/39757056148",
-      "commit": "53b78da495daa0ed9f983bbfc4ff44f2c1b2bfe7",
+      "id": 39773155548,
+      "jobId": 119805809011,
+      "url": "https://github.com/caozqiu/yuri-ladder/actions/runs/39773155548",
+      "commit": "6653aa5362aec115b658c2e668f9adea7d9beacb",
       "jobStatus": "success",
-      "testsPassed": 93,
+      "testsPassed": 103,
       "testsSkipped": 0,
       "siteDeployed": true,
       "publicReadbackVerified": true,
-      "isolatedCommunityAndAccountVerification": true,
+      "sourceRun": "https://github.com/caozqiu/yuri-ladder/actions/runs/39768046702",
       "productionRecordsCreated": 0
     },
     "latestScheduledSourceRun": {
@@ -1328,6 +1330,530 @@
       "privateRuntimeExcluded": true,
       "shareableCompiledOwnerValuesRemoved": 3,
       "sourceRequiredForFullCommunityDeployment": true
+    }
+  },
+  "rankedRoster": {
+    "at": "2026-10-22T11:52:18.323Z",
+    "published": true,
+    "url": "https://yuri-ladder.cn/?screen=players",
+    "releaseCommit": "6653aa5362aec115b658c2e668f9adea7d9beacb",
+    "releaseRun": "https://github.com/caozqiu/yuri-ladder/actions/runs/39773155548",
+    "jobId": 119805809011,
+    "deployment": "dp7jn4d37xmd",
+    "features": [
+      "hourly-full-official-roster",
+      "default-top100-statistics",
+      "full-roster-selector-and-search",
+      "full-roster-matrix-maps-trends-comparison-and-export",
+      "resumable-ranking-and-match-cursors",
+      "dynamic-official-player-count",
+      "snapshot-rating-coverage-across-full-roster",
+      "ranking-history-over-100",
+      "nickname-only-sponsor-import",
+      "separate-platform-and-community-nicknames",
+      "optional-round-countries",
+      "mobile-action-dialogs",
+      "nickname-based-event-signup",
+      "legacy-numeric-entry-receipts-preserved",
+      "organizer-loaded-roster-csv",
+      "match-opponent-name-recovery"
+    ],
+    "automaticCollection": {
+      "schedule": "55 * * * *",
+      "sourceScope": "all officially ranked players, current and previous seasons",
+      "expectedPlayersAtVerification": 1000,
+      "complete": false,
+      "progress": {
+        "state": "running",
+        "stage": "list",
+        "done": 239,
+        "total": 1000,
+        "roster": "all",
+        "rankings": [
+          {
+            "season": 31,
+            "collected": 500,
+            "total": 500
+          },
+          {
+            "season": 30,
+            "collected": 500,
+            "total": 500
+          }
+        ],
+        "pendingMatches": 12161
+      },
+      "sourceRun": "https://github.com/caozqiu/yuri-ladder/actions/runs/39768046702",
+      "sourceStatus": {
+        "event": "status",
+        "id": "442e1868-74ae-4d62-a4d1-4bd1d0ea52f4",
+        "state": "running",
+        "phase": "list",
+        "roster": "all",
+        "playersDone": 239,
+        "totalPlayers": 1000,
+        "pendingMatches": 12161,
+        "rankings": [
+          {
+            "season": 31,
+            "collected": 500,
+            "total": 500
+          },
+          {
+            "season": 30,
+            "collected": 500,
+            "total": 500
+          }
+        ],
+        "updated": 1792669302,
+        "error": null
+      },
+      "checkpointEveryMinutes": 5,
+      "concurrency": 2,
+      "requestIntervalMs": 2000
+    },
+    "defaultRoster": 100,
+    "liveRosters": [
+      {
+        "season": 31,
+        "available": 100,
+        "defaultPlayers": 100,
+        "complete": false,
+        "allStatus": 409
+      },
+      {
+        "season": 30,
+        "available": 100,
+        "defaultPlayers": 100,
+        "complete": false,
+        "allStatus": 409
+      }
+    ],
+    "localTests": {
+      "total": 103,
+      "passed": 102,
+      "failed": 0,
+      "windowsGitIntegrationSkipped": 1
+    },
+    "cloudTests": {
+      "total": 103,
+      "passed": 103,
+      "failed": 0,
+      "skipped": 0
+    },
+    "isolatedCloudVerification": {
+      "at": "2026-10-22T11:50:41.639Z",
+      "origin": "https://yuri-ladder.cn",
+      "publicEndpointReady": true,
+      "anonymousQueueStatus": 401,
+      "storage": "EdgeOne Blob, isolated verification namespace",
+      "freshInstanceRead": true,
+      "officialSourceImport": true,
+      "largeMatchIdPreserved": true,
+      "replayLinkPreserved": true,
+      "privatePending": true,
+      "approvalPublished": true,
+      "rejectionHidden": true,
+      "eventApplicationVerified": true,
+      "eventSignupVerified": true,
+      "organizerCountVerified": true,
+      "participantPrivacyVerified": true,
+      "memberLoginRequiredForWrites": true,
+      "privateQqVerified": true,
+      "nicknameOnlyImportVerified": true,
+      "manualCountryAndPlatformNamesVerified": true,
+      "eventSignupPlatformNicknameVerified": true,
+      "productionTestEventsCreated": 0,
+      "productionTestAccountsCreated": 0
+    },
+    "accountRegression": {
+      "at": "2026-10-22T11:51:21.068Z",
+      "origin": "https://yuri-ladder.cn",
+      "publicAccountEndpointReady": true,
+      "anonymousProfileDenied": true,
+      "anonymousPersonalRecordsDenied": true,
+      "deployedNativeJsonAndPasswordHashVerified": true,
+      "isolatedCloudRegistration": true,
+      "freshInstanceLogin": true,
+      "nicknameAndAvatarPersisted": true,
+      "publicProfileHasNoCredentials": true,
+      "accountLinkedSponsorRestored": true,
+      "memberCannotReview": true,
+      "recoveryRevokesOldSessions": true,
+      "logoutRevokesSession": true,
+      "productionAccountsCreated": 0
+    },
+    "domainReadback": {
+      "manifest": {
+        "format": 1,
+        "snapshots": [
+          {
+            "season": {
+              "id": 31,
+              "name": "2026-S5赛季",
+              "start": 1788224400,
+              "end": 1793548800
+            },
+            "snapshot": "0d6b6e0d-7ded-4d67-81ea-11c81d870491:31",
+            "cutoff": 1792664465,
+            "created": 1792664472,
+            "meta": {
+              "scanned": 100,
+              "players": 100,
+              "missing": 0,
+              "excluded": 4,
+              "unknown": 0,
+              "full": false
+            },
+            "file": "/data/snapshots/a73c285233e9590b6ac72ae96bc25c117df045cebc6095c7afcfc89e54f14f6a.json",
+            "sha256": "a73c285233e9590b6ac72ae96bc25c117df045cebc6095c7afcfc89e54f14f6a",
+            "history": {
+              "snapshot": "0d6b6e0d-7ded-4d67-81ea-11c81d870491:31",
+              "file": "/data/history/dba7b555019a182576acdee709c10988296146c526d3be3e30f4d0626de8c6be.json",
+              "sha256": "dba7b555019a182576acdee709c10988296146c526d3be3e30f4d0626de8c6be",
+              "observations": 23
+            }
+          },
+          {
+            "season": {
+              "id": 30,
+              "name": "2026-S4赛季",
+              "start": 1782864000,
+              "end": 1788191999
+            },
+            "snapshot": "0d6b6e0d-7ded-4d67-81ea-11c81d870491:30",
+            "cutoff": 1788191999,
+            "created": 1792664481,
+            "meta": {
+              "scanned": 100,
+              "players": 100,
+              "missing": 0,
+              "excluded": 4,
+              "unknown": 0,
+              "full": false
+            },
+            "file": "/data/snapshots/1daae87f75810cb4b6431079b95c0b6c68190f9544f52cac4381efc33bff9c66.json",
+            "sha256": "1daae87f75810cb4b6431079b95c0b6c68190f9544f52cac4381efc33bff9c66",
+            "history": {
+              "snapshot": "0d6b6e0d-7ded-4d67-81ea-11c81d870491:30",
+              "file": "/data/history/f738ce0dce49756ccb6a9743747bd1910171bec5ff029bc05f5c31363d8b5f4a.json",
+              "sha256": "f738ce0dce49756ccb6a9743747bd1910171bec5ff029bc05f5c31363d8b5f4a",
+              "observations": 23
+            }
+          }
+        ],
+        "previous": [
+          {
+            "season": {
+              "id": 31,
+              "name": "2026-S5赛季",
+              "start": 1788224400,
+              "end": 1793548800
+            },
+            "snapshot": "410c2420-98c7-4a39-95d4-a5d05ed865e5:31",
+            "cutoff": 1792660887,
+            "created": 1792660895,
+            "meta": {
+              "scanned": 100,
+              "players": 100,
+              "missing": 0,
+              "excluded": 4,
+              "unknown": 0,
+              "full": false
+            },
+            "file": "/data/snapshots/5797cc221fcaa6cf7820d52bf3b4a7ec939947e826d1f057a8091221f5370ba5.json",
+            "sha256": "5797cc221fcaa6cf7820d52bf3b4a7ec939947e826d1f057a8091221f5370ba5",
+            "history": {
+              "snapshot": "410c2420-98c7-4a39-95d4-a5d05ed865e5:31",
+              "file": "/data/history/f3ffaf921292930df6e122549d87433a9a22ac1f91dba5e29bddfdd3c6d42e0a.json",
+              "sha256": "f3ffaf921292930df6e122549d87433a9a22ac1f91dba5e29bddfdd3c6d42e0a",
+              "observations": 22
+            }
+          },
+          {
+            "season": {
+              "id": 30,
+              "name": "2026-S4赛季",
+              "start": 1782864000,
+              "end": 1788191999
+            },
+            "snapshot": "410c2420-98c7-4a39-95d4-a5d05ed865e5:30",
+            "cutoff": 1788191999,
+            "created": 1792660903,
+            "meta": {
+              "scanned": 100,
+              "players": 100,
+              "missing": 0,
+              "excluded": 4,
+              "unknown": 0,
+              "full": false
+            },
+            "file": "/data/snapshots/990e5c53698ee7ab1d9e3253ab2db33b208d8e98bbba5ec79e80792d2dddd936.json",
+            "sha256": "990e5c53698ee7ab1d9e3253ab2db33b208d8e98bbba5ec79e80792d2dddd936",
+            "history": {
+              "snapshot": "410c2420-98c7-4a39-95d4-a5d05ed865e5:30",
+              "file": "/data/history/3a03dcb117a4a5f599bf33fd83e84bc94d8032112eca17fb08929ce1de87fa3d.json",
+              "sha256": "3a03dcb117a4a5f599bf33fd83e84bc94d8032112eca17fb08929ce1de87fa3d",
+              "observations": 22
+            }
+          },
+          {
+            "season": {
+              "id": 31,
+              "name": "2026-S5赛季",
+              "start": 1788224400,
+              "end": 1793548800
+            },
+            "snapshot": "633e09dd-4e79-4151-8195-490480927ea7:31",
+            "cutoff": 1792657493,
+            "created": 1792657501,
+            "meta": {
+              "scanned": 100,
+              "players": 100,
+              "missing": 0,
+              "excluded": 4,
+              "unknown": 0,
+              "full": false
+            },
+            "file": "/data/snapshots/cfc8d612b5ae5cd01894fd5e89b46c8f73a413597c3e57234c4e3f871a163094.json",
+            "sha256": "cfc8d612b5ae5cd01894fd5e89b46c8f73a413597c3e57234c4e3f871a163094",
+            "history": {
+              "snapshot": "633e09dd-4e79-4151-8195-490480927ea7:31",
+              "file": "/data/history/14698d9a80cabaa0dd85c20a82ed94dd86a612e207a89d77986dc9c0a32d79b7.json",
+              "sha256": "14698d9a80cabaa0dd85c20a82ed94dd86a612e207a89d77986dc9c0a32d79b7",
+              "observations": 21
+            }
+          },
+          {
+            "season": {
+              "id": 30,
+              "name": "2026-S4赛季",
+              "start": 1782864000,
+              "end": 1788191999
+            },
+            "snapshot": "633e09dd-4e79-4151-8195-490480927ea7:30",
+            "cutoff": 1788191999,
+            "created": 1792657509,
+            "meta": {
+              "scanned": 100,
+              "players": 100,
+              "missing": 0,
+              "excluded": 4,
+              "unknown": 0,
+              "full": false
+            },
+            "file": "/data/snapshots/515ed550e372b32c8d9975b24e969dd40cd7371ef1d5fe391941c5c856f94132.json",
+            "sha256": "515ed550e372b32c8d9975b24e969dd40cd7371ef1d5fe391941c5c856f94132",
+            "history": {
+              "snapshot": "633e09dd-4e79-4151-8195-490480927ea7:30",
+              "file": "/data/history/23110709caa7effacc9d2e220be5ebf637575684a7bd95346ca4bc3dd873d28b.json",
+              "sha256": "23110709caa7effacc9d2e220be5ebf637575684a7bd95346ca4bc3dd873d28b",
+              "observations": 21
+            }
+          }
+        ],
+        "progress": {
+          "state": "running",
+          "stage": "list",
+          "done": 239,
+          "total": 1000,
+          "roster": "all",
+          "rankings": [
+            {
+              "season": 31,
+              "collected": 500,
+              "total": 500
+            },
+            {
+              "season": 30,
+              "collected": 500,
+              "total": 500
+            }
+          ],
+          "pendingMatches": 12161
+        },
+        "automation": {
+          "enabled": true,
+          "schedule": "每小时第55分钟（北京时间），平台调度可能延迟"
+        }
+      },
+      "rosterChecks": [
+        {
+          "season": 31,
+          "available": 100,
+          "defaultPlayers": 100,
+          "complete": false,
+          "allStatus": 409
+        },
+        {
+          "season": 30,
+          "available": 100,
+          "defaultPlayers": 100,
+          "complete": false,
+          "allStatus": 409
+        }
+      ],
+      "at": "2026-10-22T11:52:18.323Z",
+      "origin": "https://yuri-ladder.cn",
+      "httpsVerified": true,
+      "assetsMatchLocalBuild": true,
+      "assets": [
+        {
+          "path": "/assets/index-DXLhshMc.js",
+          "sha256": "1f1c16c70b88cfabde3c434e6fd4c3a5a37db56d391d984de4f86ed9bdc60799"
+        },
+        {
+          "path": "/assets/index-D3yUOcgq.css",
+          "sha256": "436e8c88623f7cb4491959f984d1f8124c3976bbcc8459a32dae5917a7bc4fa5"
+        }
+      ],
+      "checks": [
+        {
+          "path": "sponsors",
+          "action": "list",
+          "status": 200,
+          "items": 0
+        },
+        {
+          "path": "sponsors",
+          "action": "queue",
+          "status": 401
+        },
+        {
+          "path": "sponsors",
+          "action": "session",
+          "status": 200,
+          "configured": true
+        },
+        {
+          "path": "sponsors",
+          "action": "mine",
+          "status": 401
+        },
+        {
+          "path": "sponsors",
+          "action": "anonymousReview",
+          "status": 401
+        },
+        {
+          "path": "events",
+          "action": "list",
+          "status": 200,
+          "items": 1
+        },
+        {
+          "path": "events",
+          "action": "queue",
+          "status": 401
+        },
+        {
+          "path": "events",
+          "action": "session",
+          "status": 200,
+          "configured": true
+        },
+        {
+          "path": "events",
+          "action": "mine",
+          "status": 401
+        },
+        {
+          "path": "events",
+          "action": "anonymousReview",
+          "status": 401
+        },
+        {
+          "path": "account",
+          "action": "session",
+          "status": 200,
+          "configured": true,
+          "user": null
+        },
+        {
+          "path": "account",
+          "action": "anonymousProfile",
+          "status": 401
+        },
+        {
+          "path": "events",
+          "action": "anonymous-create",
+          "status": 401
+        },
+        {
+          "path": "events",
+          "action": "anonymous-join",
+          "status": 401
+        },
+        {
+          "path": "sponsors",
+          "action": "anonymous-submit",
+          "status": 401
+        },
+        {
+          "path": "sponsors",
+          "action": "anonymous-import",
+          "status": 401
+        }
+      ],
+      "accountsCreated": 0
+    },
+    "localBrowserVerification": {
+      "at": "2026-10-22T11:34:47.335Z",
+      "localBrowserOnly": true,
+      "fullRosterFixtureExplicitlyLabeled": true,
+      "fixturePlayers": 205,
+      "defaultRoster": 100,
+      "allRosterSwitch": true,
+      "searchAndProfileBeyondTop100": true,
+      "testedRank": 101,
+      "shareRetainsRosterAndPlayer": true,
+      "refreshRetainsRosterAndPlayer": true,
+      "mobileNavigation": true,
+      "backRestoresView": true,
+      "viewport": [
+        390,
+        844
+      ],
+      "viewportReset": true,
+      "consoleErrors": 0,
+      "sponsorManualCountries": [
+        0,
+        6
+      ],
+      "platformNicknameSeparateFromCommunityNickname": true,
+      "sponsorSubmitAndReadback": true,
+      "productionRecordsCreated": 0,
+      "sourceCountReadback": {
+        "30": 500,
+        "31": 500
+      },
+      "tests": {
+        "total": 103,
+        "passed": 102,
+        "failed": 0,
+        "windowsGitIntegrationSkipped": 1
+      },
+      "isolatedIndependentFilterAudits": {
+        "realLegacySnapshots": 126,
+        "fullRosterFixture": 126
+      },
+      "productionVisualVerified": false,
+      "signupPlatformNickname": {
+        "formAcceptsChinese": true,
+        "numericIdNotRequired": true,
+        "submittedSuccessfully": true,
+        "receiptDisplaysNickname": true,
+        "legacyNumericRecordsPreservedByIntegrationTest": true,
+        "screenshot": "赛事报名_LBW平台昵称_手机.png"
+      }
+    },
+    "productionVisualVerified": false,
+    "productionTestAccountsCreated": 0,
+    "productionTestEventsCreated": 0,
+    "packaging": {
+      "privateRuntimeExcluded": true,
+      "compiledCredentialsRemoved": true,
+      "fullCommunityRestoreRequiresSourceActions": true
     }
   }
 }
