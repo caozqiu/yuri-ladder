@@ -251,3 +251,5 @@ API新增roster=all，默认roster=top100，未知值返回400；尚无完整全
 独立的Prepare public username verification key工作流只为现有EdgeOne项目配置公开验证密钥和服务地址，不改审核密码，不新增托管项目。签名密钥由既有服务器配置在内存中分域派生，私钥不存源代码、产物或浏览器。Sites运行环境仅配置公开验证密钥YURI_USERNAME_SIGNING_PUBLIC_KEY；EdgeOne保留USERNAME_REGISTRY_PUBLIC_KEY、USERNAME_REGISTRY_URL。审核密码今后如主动轮换，须重跑此工作流并同步Sites公开验证密钥；不要把任何密码发到聊天或提交仓库。
 
 本地预览使用隔离目录中的SQLite用户名注册表，不访问生产用户名服务。需要启动社区功能时，在本地环境设置一个仅用于测试的SPONSOR_ADMIN_PASSWORD，再运行npm run preview。生产匿名访问、站主目录拒绝、未知用户名签名查询和密码校验加入发布回读，不创建正式站测试账号。此版本地109项，108通过，0失败，1项Git集成由Linux CI验证；用户名数据库后端13项全通过，包含签名与并发唯一性。
+
+正式托管兼容：服务端P-256签名使用固定版本@noble/curves 2.4.0的纯JavaScript实现，不依赖EdgeOne未实现的原生EC密钥导入。测试明确禁用原生importKey后仍验证签名通过；数据库端保留原生签名校验与原有唯一性约束。

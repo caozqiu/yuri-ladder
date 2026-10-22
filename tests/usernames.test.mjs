@@ -36,9 +36,10 @@ test('legacy accounts claim a username once without changing credentials or owne
   assert.equal(validateUsername(' 草籽_01 '),'草籽_01');for(const bad of ['', 'a'.repeat(25),'two words','bad/name','\u202e假名'])assert.throws(()=>validateUsername(bad));
  }finally{f.db.close();}
 });
-test('registry adapter sends only a name digest and account ID, verifies P-256 signatures and fails closed on service outages',async()=>{
+test('registry adapter signs without native EC import, sends only a name digest and account ID, and fails closed on service outages',async t=>{
  const ecdh=createECDH('prime256v1');ecdh.setPrivateKey(await usernameSigningScalar(secret));const point=ecdh.getPublicKey(),publicKey={kty:'EC',crv:'P-256',x:base64url(point.subarray(1,33)),y:base64url(point.subarray(33))};
  const verifier=await crypto.subtle.importKey('jwk',publicKey,{name:'ECDSA',namedCurve:'P-256'},false,['verify']);let received;
+ t.mock.method(crypto.subtle,'importKey',()=>{throw Error('Native EC key import unavailable on edge runtime');});
  const registry=createUsernameRegistry({secret,publicKey:JSON.stringify(publicKey),url:'https://yr-ladder-observatory.deep-spoon-6795.chatgpt.site/api/member-names',fetcher:async(url,init)=>{
   received=init;assert.ok(!init.body.includes(secret));assert.ok(!init.body.includes('用户名'));const data=JSON.parse(init.body);assert.equal(data.nameHash.length,64);
   const sig=Buffer.from(init.headers['X-Registry-Signature'],'base64url');assert.equal(await crypto.subtle.verify({name:'ECDSA',hash:'SHA-256'},verifier,sig,new TextEncoder().encode(init.headers['X-Registry-Time']+'\n'+init.body)),true);
