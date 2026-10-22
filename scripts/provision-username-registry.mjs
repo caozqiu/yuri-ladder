@@ -17,5 +17,6 @@ try{
  await makers.projects.setEnvs({projectId:PROJECT_ID,envVars:[{key:'USERNAME_REGISTRY_PUBLIC_KEY',value,comment:'唯一用户名服务的公开验证密钥，不含私钥。'},{key:'USERNAME_REGISTRY_URL',value:registryUrl,comment:'现有站点数据库唯一用户名服务。'}]});
  const current=await makers.projects.listEnvs({projectId:PROJECT_ID});if(current.find(e=>e.key==='SPONSOR_ADMIN_PASSWORD')?.value!==secret||current.find(e=>e.key==='USERNAME_REGISTRY_PUBLIC_KEY')?.value!==value)throw Error('Configuration readback failed');
  await mkdir('.runtime',{recursive:true});await writeFile('.runtime/username-registry-public.json',JSON.stringify({projectId:PROJECT_ID,publicKey,keyId,registryUrl,containsPrivateKey:false},null,2)+'\n');
+ try{const response=await fetch(registryUrl,{signal:AbortSignal.timeout(20000)});const data=response.headers.get('Content-Type')?.includes('application/json')?await response.json():{};console.log(JSON.stringify({registryHealthStatus:response.status,ready:data.ready===true,verificationKeyMatches:data.keyId===keyId}));}catch{console.log(JSON.stringify({registryHealthStatus:'network-unavailable'}));}
  console.log(JSON.stringify({publicVerificationKeyPrepared:true,keyId,ownerConfigurationUnchanged:true,containsPrivateKey:false}));
 }catch(error){console.error('Username registry setup failed: '+String(error.code||'CONFIGURATION_FAILED'));process.exitCode=1;}
