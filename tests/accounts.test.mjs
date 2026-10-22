@@ -2,8 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createAccountsHandler,currentAccount} from '../src/accounts-api.mjs';
 import {createSponsorsHandler} from '../src/sponsors-api.mjs';
-import {accountId,validateAvatar,validateNickname,hashPassword} from '../shared/lib/accounts.mjs';
-import {pbkdf2Sync} from 'node:crypto';
+import {accountId,validateAvatar,validateNickname} from '../shared/lib/accounts.mjs';
+import {hashPassword,verifyPassword,DUMMY_HASH} from '../src/passwords.mjs';
 const secret='isolated-account-test-owner-configuration',password='local-account-password-123';
 import {AVATAR as png} from './fixtures/avatar.mjs';
 function memory(){const values=new Map();return {values,async get(k){return structuredClone(values.get(k)||null);},async setJSON(k,v){values.set(k,structuredClone(v));},async list({prefix='',cursor='',limit=30}={}){const keys=[...values.keys()].filter(k=>k.startsWith(prefix)&&k>cursor).sort();return {blobs:keys.slice(0,limit).map(key=>({key})),cursor:keys.length>limit?keys[limit-1]:null};}};}
@@ -12,7 +12,7 @@ test('registration issues an independent member account; only salted hashes and 
  const f=fixture(),r=await f.register();assert.equal(r.status,201);assert.equal(r.data.user.id,await accountId('a'.repeat(64)));assert.equal(r.data.user.nickname,'测试昵称');
  for(const flag of ['HttpOnly','Secure','SameSite=Strict','Path=/api'])assert.ok(r.headers.get('Set-Cookie').includes(flag));
  const stored=JSON.stringify([...f.store.values.values()]);assert.ok(!stored.includes(password));assert.ok(!stored.includes('a'.repeat(64)));assert.ok(!stored.includes(r.cookie.split('=')[1]));
- const record=f.store.values.get('users/'+r.data.user.id+'.json');assert.equal(record.passwordHash.length,64);assert.equal(record.salt.length,32);
+ const record=f.store.values.get('users/'+r.data.user.id+'.json');assert.equal(record.passwordHash.length,60);assert.ok(record.passwordHash.startsWith('$2b$10$'));assert.equal(record.salt,undefined);
  const session=await f.call('session',undefined,r.cookie);assert.equal(session.data.user.id,r.data.user.id);assert.equal(session.data.user.version,undefined);f.restart();assert.equal((await f.call('session',undefined,r.cookie)).data.user.id,r.data.user.id);
 });
 test('password login rejects invalid, unknown, and tampered credentials; logout and expiration revoke sessions',async()=>{
@@ -57,11 +57,10 @@ test('member ownership restores sponsor applications and events across devices w
  assert.ok(!JSON.stringify((await call('events','list',undefined,'',{id:created.data.id})).data).includes('私有联系方式'));
 });
 
-test('edge deriveKey fallback preserves standard PBKDF2 output and fails closed if unavailable',async(t)=>{
- const expected=pbkdf2Sync('fixture-password','fixture-salt',600000,32,'sha256').toString('hex');
- assert.equal(await hashPassword('fixture-password','fixture-salt'),expected);
- t.mock.method(crypto.subtle,'deriveBits',()=>{throw Error('deriveBits adapter unavailable');});
- assert.equal(await hashPassword('fixture-password','fixture-salt'),expected);
- t.mock.method(crypto.subtle,'deriveKey',()=>{throw Object.assign(Error('unsupported'),{name:'NotSupportedError'});});
- await assert.rejects(hashPassword('fixture-password','fixture-salt'),{status:503,code:'PASSWORD_DERIVE_NotSupportedError'});
+test('password hashing uses random bcrypt salts without requiring unsupported PBKDF2 APIs',async(t)=>{
+ t.mock.method(crypto.subtle,'importKey',()=>{throw Error('Native PBKDF2 unavailable');});
+ const first=await hashPassword('fixture-password'),second=await hashPassword('fixture-password');assert.notEqual(first,second);
+ assert.equal(await verifyPassword('fixture-password',first),true);assert.equal(await verifyPassword('wrong-password',first),false);
+ assert.equal(await verifyPassword('nonexistent-account-dummy-password',DUMMY_HASH),true);
+ await assert.rejects(hashPassword('密'.repeat(25)));await assert.rejects(hashPassword('a'.repeat(73)));
 });

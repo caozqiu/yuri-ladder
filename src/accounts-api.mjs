@@ -1,4 +1,5 @@
-import {ACCOUNT_ID,HEX_KEY,ACCOUNT_COOKIE,accountError,randomKey,digest,equal,normalizeAccount,accountId,validateNickname,validatePassword,hashPassword,profileView,validateAvatar} from '../shared/lib/accounts.mjs';
+import {ACCOUNT_ID,HEX_KEY,ACCOUNT_COOKIE,accountError,randomKey,digest,equal,normalizeAccount,accountId,validateNickname,validatePassword,profileView,validateAvatar} from '../shared/lib/accounts.mjs';
+import {hashPassword,verifyPassword,DUMMY_HASH} from './passwords.mjs';
 const json=(data,status=200,headers={})=>new Response(JSON.stringify(data),{status,headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'private, no-store',Vary:'Cookie','X-Content-Type-Options':'nosniff',...headers}});
 const get=(store,key)=>store.get(key,{type:'json',consistency:'strong'});
 const set=(store,key,value)=>store.setJSON(key,value,{cacheControl:'no-store'});
@@ -40,18 +41,18 @@ export function createAccountsHandler({store,secret,now=Date.now}){
    const nickname=validateNickname(input.nickname),password=validatePassword(input.password);if(!HEX_KEY.test(input.registrationKey||''))throw accountError('注册恢复码格式不正确');await rate(request,'register',5,60);
    const id=await accountId(input.registrationKey),key='users/'+id+'.json',recoveryHash=await digest(input.registrationKey),existing=await get(store,key);
    if(existing){if(!equal(existing.recoveryHash,recoveryHash))throw accountError('注册编号冲突，请重新生成恢复码',409);return login(request,existing,{duplicate:true});}
-   const salt=randomKey(16),createdAt=new Date(now()).toISOString(),record={id,salt,passwordHash:await hashPassword(password,salt),recoveryHash,version:randomKey(16),createdAt};
+   const createdAt=new Date(now()).toISOString(),record={id,passwordAlgorithm:'bcrypt-10',passwordHash:await hashPassword(password),recoveryHash,version:randomKey(16),createdAt};
    await set(store,'profiles/'+id+'.json',{id,nickname,createdAt,avatarVersion:null});await set(store,key,record);return login(request,record,{registered:true},201);
   }
   if(action==='login'){
    const id=normalizeAccount(input.id);if(!ACCOUNT_ID.test(id)||typeof input.password!=='string'||input.password.length>128)throw accountError('账号或密码不正确',401);
-   await rate(request,'login',12,15,id);const record=await get(store,'users/'+id+'.json');const hash=await hashPassword(input.password,record?.salt||'unregistered-account-salt');if(!record||!equal(hash,record.passwordHash))throw accountError('账号或密码不正确',401);return login(request,record);
+   await rate(request,'login',12,15,id);const record=await get(store,'users/'+id+'.json');const valid=await verifyPassword(input.password,record?.passwordHash||DUMMY_HASH);if(!record||!valid)throw accountError('账号或密码不正确',401);return login(request,record);
   }
   if(action==='logout'){const token=cookieToken(request);if(token&&await currentAccount(request,store,now()))await set(store,'sessions/'+await digest(token)+'.json',{revoked:true});return json({user:null},200,{'Set-Cookie':sessionCookie(request,'',0)});}
   if(action==='recover'){
    const id=normalizeAccount(input.id),password=validatePassword(input.newPassword);if(!ACCOUNT_ID.test(id)||!HEX_KEY.test(input.recoveryKey||''))throw accountError('账号或恢复码不正确',401);await rate(request,'recover',5,60,id);
    const record=await get(store,'users/'+id+'.json');if(!record||!equal(record.recoveryHash,await digest(input.recoveryKey)))throw accountError('账号或恢复码不正确',401);
-   const salt=randomKey(16),next={...record,salt,passwordHash:await hashPassword(password,salt),version:randomKey(16)};await set(store,'users/'+id+'.json',next);return login(request,next,{recovered:true});
+   const next={...record,passwordAlgorithm:'bcrypt-10',passwordHash:await hashPassword(password),version:randomKey(16)};delete next.salt;await set(store,'users/'+id+'.json',next);return login(request,next,{recovered:true});
   }
   const user=await requireUser(request);
   if(action==='profile'){
@@ -61,7 +62,7 @@ export function createAccountsHandler({store,secret,now=Date.now}){
   }
   if(action==='password'){
    const password=validatePassword(input.newPassword);if(typeof input.oldPassword!=='string'||input.oldPassword.length>128)throw accountError('原密码不正确',401);await rate(request,'password',8,15,user.id);
-   const record=await get(store,'users/'+user.id+'.json');if(!equal(await hashPassword(input.oldPassword,record.salt),record.passwordHash))throw accountError('原密码不正确',401);const salt=randomKey(16),next={...record,salt,passwordHash:await hashPassword(password,salt),version:randomKey(16)};await set(store,'users/'+user.id+'.json',next);return login(request,next,{passwordChanged:true});
+   const record=await get(store,'users/'+user.id+'.json');if(!await verifyPassword(input.oldPassword,record.passwordHash))throw accountError('原密码不正确',401);const next={...record,passwordAlgorithm:'bcrypt-10',passwordHash:await hashPassword(password),version:randomKey(16)};delete next.salt;await set(store,'users/'+user.id+'.json',next);return login(request,next,{passwordChanged:true});
   }
   throw accountError('接口不存在',404);
  }catch(error){return json({error:error.status?error.message:'账号服务暂时不可用，请稍后重试',...(error.status===503||!error.status?{code:typeof error.code==='string'?error.code:'ACCOUNT_SERVICE'}:{})},error.status||503);}};
