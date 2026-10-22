@@ -37,7 +37,7 @@ export function createSponsorsHandler({store,secret,now=Date.now,sourceMatch=fet
   if(!request.headers.get('Content-Type')?.toLowerCase().startsWith('application/json'))throw sponsorError('请使用JSON提交',415);
   if(Number(request.headers.get('Content-Length')||0)>24576)throw sponsorError('申请内容过长',413);
   const reader=request.body?.getReader();if(!reader)throw sponsorError('缺少申请内容');let size=0,parts=[];
-  try{for(;;){const {done,value}=await reader.read();if(done)break;size+=value.byteLength;if(size>24576){await reader.cancel();throw sponsorError('申请内容过长',413);}parts.push(value);}}finally{reader.releaseLock();}
+  try{for(;;){const {done,value}=await reader.read();if(done)break;const chunk=typeof value==='string'?utf8.encode(value):ArrayBuffer.isView(value)?new Uint8Array(value.buffer,value.byteOffset,value.byteLength):new Uint8Array(value);size+=chunk.byteLength;if(size>24576){await reader.cancel();throw sponsorError('申请内容过长',413);}parts.push(chunk);}}finally{reader.releaseLock();}
   const bytes=new Uint8Array(size);let offset=0;for(const p of parts){bytes.set(p,offset);offset+=p.length;}
   let parsed;try{parsed=JSON.parse(new TextDecoder().decode(bytes));}catch{throw sponsorError('提交内容格式不正确');}
   if(!parsed||typeof parsed!=='object'||Array.isArray(parsed))throw sponsorError('提交内容须为JSON对象');return parsed;

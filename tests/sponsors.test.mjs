@@ -103,3 +103,11 @@ test('import proof rejects edited maps, results, IDs and duplicate matches at su
  assert.equal((await f.apply({...base,platformB:'33'})).status,400);
  assert.equal((await f.apply({...base,rounds:[r,r]})).status,400);
 });
+test('edge request streams accept ArrayBuffer and string chunks while preserving size checks',async()=>{
+ const handler=createSponsorsHandler({store:fixture().store,secret}),raw=JSON.stringify({id:'unknown',status:'approved'});
+ for(const chunk of [new TextEncoder().encode(raw).buffer,raw,new TextEncoder().encode(raw)]){
+  const r=new Request('https://fixture.example/api/sponsors?action=review',{method:'POST',headers:{Origin:'https://fixture.example','Content-Type':'application/json'},body:raw});
+  Object.defineProperty(r,'body',{value:new ReadableStream({start(controller){controller.enqueue(chunk);controller.close();}})});
+  assert.equal((await handler(r)).status,401);
+ }
+});

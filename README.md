@@ -80,7 +80,7 @@ API：GET /api/events?action=list|session|challenge|queue；详情加id，queue�
 
 提交与审核强制同源JSON请求、24KiB正文限制、服务端字段/比分核验。提交使用20分钟签名验证、最短2秒等待和蜜罐字段；提交、来源导入及登录有持久化的尽力限流。对象存储不提供事务或原子比较交换，因此限流不是严格的分布式计数，审核版本检查用于防止常见的过期页面覆盖；仅一个站主审核，所有决定追加保存。未开通审核密码时，申请和审核均关闭。
 
-本地预览使用 .runtime/sponsors-preview 文件存储，与生产完全隔离。须自行在本地进程设置 SPONSOR_ADMIN_PASSWORD（至少24字符）才能测试申请与审核；没有默认生产密码。停止并重新启动预览后记录仍保留。云端部署后，verify-sponsors.mjs 检查正式站公开列表和拒绝访客审核，并在独立私有验收命名空间验证真实存储重读、来源导入、通过/撤回，不创建虚假公开赛事。新增11项资料/权限/来源/回放链接测试。
+本地预览使用 .runtime/sponsors-preview 文件存储，与生产完全隔离。须自行在本地进程设置 SPONSOR_ADMIN_PASSWORD（至少24字符）才能测试申请与审核；没有默认生产密码。停止并重新启动预览后记录仍保留。云端部署后，verify-sponsors.mjs 检查正式站公开列表和拒绝访客审核，并在独立私有验收命名空间验证真实存储重读、来源导入、通过/撤回，不创建虚假公开赛事。新增12项资料/权限/来源/回放链接/边缘请求正文测试。
 
 API：GET /api/sponsors?action=list|session|challenge；GET action=queue（站主）；POST action=submit|receipt|import|login|logout|review。详情使用 GET action=list&id=<编号>；分页使用返回的cursor。列表按登记先后加载，每页最多30条，搜索与状态过滤作用于已加载记录，可继续加载；网址用screen=sponsors、sponsorTab=apply/mine/review、sponsorId恢复视图。统计筛选保留但不影响赞助赛。
 
@@ -191,3 +191,5 @@ GET /api/matches?mmrMin=3500&mmrMax=4300&gapMax=100
 非官方统计项目，与兰博平台无隶属关系。
 
 最新成功运行：https://github.com/caozqiu/yuri-ladder/actions/runs/39618628706 。独立定时采集：https://github.com/caozqiu/yuri-ladder/actions/runs/39616133026 。
+
+正式站额外的一次性提交验收仅在所有者明确授权后，以推送标记[verify-pending]且首次运行时执行：各创建一条赞助赛与办赛待审记录，核对回执后凭散列身份保护仅清理这两条，从不公开。小时定时任务和普通推送不会执行该测试；完整证据记录在live-submission-verification及cleanup产物中。
