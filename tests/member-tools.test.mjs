@@ -4,7 +4,7 @@ import {createHmac} from 'node:crypto';
 import {createAccountsHandler} from '../src/accounts-api.mjs';
 import {createSponsorsHandler} from '../src/sponsors-api.mjs';
 import {digest} from '../shared/lib/accounts.mjs';
-import {mergeSignupDefaults} from '../shared/lib/signup-defaults.mjs';
+import {mergeSignupDefaults,mergeSavedSignupProfile} from '../shared/lib/signup-defaults.mjs';
 import {currentScreen,statsQuery} from '../shared/lib/navigation.mjs';
 const now=1792731600000,secret='isolated-member-tools-secret-123456789';
 const A='YR-111111111111111111111111',B='YR-222222222222222222222222';
@@ -73,4 +73,10 @@ test('late defaults preserve manual edits and community navigation never changes
  const profile={name:'常用昵称',platformName:'平台昵称',qq:'12345678'},manual={name:'临时昵称',platformName:'',qq:'87654321',note:'本次备注'};
  assert.deepEqual(mergeSignupDefaults(manual,profile),{...manual,platformName:'平台昵称'});assert.equal(mergeSignupDefaults({name:'',platformName:'',qq:''},{name:'',platformName:'',qq:''},'展示昵称').name,'展示昵称');
  assert.equal(currentScreen(new URLSearchParams('screen=admin&adminTab=events')),'admin');assert.equal(statsQuery('screen=admin&adminTab=users&eventPhase=open&accountTab=notifications&season=31'),'season=31');
+});
+
+test('late saved profiles fill untouched fields but preserve an explicitly cleared value',()=>{
+ const profile={name:'已保存昵称',platformName:'已保存平台名',qq:'12345678'},draft={name:'刚输入的昵称',platformName:'',qq:''},touched=new Set(['name','qq']);
+ assert.deepEqual(mergeSavedSignupProfile(draft,profile,touched),{name:'刚输入的昵称',platformName:'已保存平台名',qq:''});
+ assert.deepEqual(mergeSignupDefaults(draft,profile,'备用昵称',touched),{name:'刚输入的昵称',platformName:'已保存平台名',qq:''});
 });
