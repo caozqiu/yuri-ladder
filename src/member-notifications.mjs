@@ -12,7 +12,8 @@ export async function memberNotifications({store,communityStore,accountId,kind='
   items.push({id,kind:source,type,title,body,createdAt:at,query,read:!!await read(store,'notice-read/'+accountId+'/'+id+'.json')});
  }
  for(const source of kind==='all'?['events','sponsors','entries']:[kind]){
-  const page=await communityStore.list({prefix:'user-items/'+accountId+'/'+source+'/',cursor:cursor||undefined,limit:6,paginate:false,consistency:'strong'});
+  // Keep the header's first request small across all three source types.
+  const page=await communityStore.list({prefix:'user-items/'+accountId+'/'+source+'/',cursor:cursor||undefined,limit:kind==='all'?3:6,paginate:false,consistency:'strong'});
   cursors[source]=page.cursor||null;
   for(let offset=0;offset<page.blobs.length;offset+=3)await Promise.all(page.blobs.slice(offset,offset+3).map(async b=>{
    const key=b.key.split('/').at(-1).replace(/\.json$/,'');
