@@ -1,4 +1,5 @@
-import {ACCOUNT_ID,HEX_KEY,ACCOUNT_COOKIE,accountError,randomKey,digest,equal,normalizeAccount,accountId,validateNickname,validateUsername,normalizeUsername,validatePassword,profileView,validateAvatar} from '../shared/lib/accounts.mjs';
+import {ACCOUNT_ID,HEX_KEY,ACCOUNT_COOKIE,accountError,randomKey,digest,equal,normalizeAccount,accountId,validateNickname,validateUsername,normalizeUsername,validatePassword,profileView,validateAvatar,validateSignupProfile} from '../shared/lib/accounts.mjs';
+import {memberNotifications} from './member-notifications.mjs';
 import {hashPassword,verifyPassword,DUMMY_HASH} from './passwords.mjs';
 const json=(data,status=200,headers={})=>new Response(JSON.stringify(data),{status,headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'private, no-store',Vary:'Cookie','X-Content-Type-Options':'nosniff',...headers}});
 const get=(store,key)=>store.get(key,{type:'json',consistency:'strong'});
@@ -10,7 +11,7 @@ export async function currentAccount(request,store,now=Date.now()){
  const record=await get(store,'users/'+session.id+'.json');if(!record||record.version!==session.version)return null;
  const profile=await get(store,'profiles/'+record.id+'.json');return profile?{...profileView(profile),version:record.version}:null;
 }
-export function createAccountsHandler({store,secret,now=Date.now,registry=null}){
+export function createAccountsHandler({store,secret,now=Date.now,registry=null,communityStore=null}){
  const configured=typeof secret==='string'&&secret.length>=24;
  const hmac=async value=>{const key=await crypto.subtle.importKey('raw',new TextEncoder().encode(secret),{name:'HMAC',hash:'SHA-256'},false,['sign']);return [...new Uint8Array(await crypto.subtle.sign('HMAC',key,new TextEncoder().encode(value)))].map(n=>n.toString(16).padStart(2,'0')).join('');};
  const sessionCookie=(request,value,age)=>ACCOUNT_COOKIE+'='+value+'; Path=/api; HttpOnly; SameSite=Strict; Max-Age='+age+(new URL(request.url).protocol==='https:'?'; Secure':'');
@@ -25,6 +26,8 @@ export function createAccountsHandler({store,secret,now=Date.now,registry=null})
   const url=new URL(request.url),action=url.searchParams.get('action')||'session';
   if(!['GET','POST'].includes(request.method))return json({error:'请求方法不支持'},405,{Allow:'GET, POST'});
   if(request.method==='GET'){
+   if(action==='signup-profile'){const user=await requireUser(request);return json({profile:validateSignupProfile(await get(store,'signup-profiles/'+user.id+'.json')||{})});}
+   if(action==='notifications'){const user=await requireUser(request);return json(await memberNotifications({store,communityStore,accountId:user.id,kind:url.searchParams.get('kind')||'all',cursor:url.searchParams.get('cursor')||''}));}
    if(action==='admin-users'){
     const raw=(request.headers.get('Cookie')||'').split(';').map(s=>s.trim()).find(s=>s.startsWith('yuri_site_owner='))?.slice('yuri_site_owner='.length)||'';
     const [kind,time,signature,...rest]=raw.split('.'),at=Number(time);
@@ -69,6 +72,13 @@ export function createAccountsHandler({store,secret,now=Date.now,registry=null})
    const next={...record,passwordAlgorithm:'bcrypt-10',passwordHash:await hashPassword(password),version:randomKey(16)};delete next.salt;await set(store,'users/'+id+'.json',next);return login(request,next,{recovered:true});
   }
   const user=await requireUser(request);
+  if(action==='signup-profile'){
+   const profile=validateSignupProfile(input);await rate(request,'signup-profile',20,10,user.id);await set(store,'signup-profiles/'+user.id+'.json',{...profile,updatedAt:new Date(now()).toISOString()});return json({profile});
+  }
+  if(action==='notice-read'){
+   if(!Array.isArray(input.ids)||input.ids.length>50||input.ids.some(id=>typeof id!=='string'||!HEX_KEY.test(id)))throw accountError('请选择最多50条有效通知');
+   await rate(request,'notice-read',30,10,user.id);const ids=[...new Set(input.ids)];for(let i=0;i<ids.length;i+=4)await Promise.all(ids.slice(i,i+4).map(id=>set(store,'notice-read/'+user.id+'/'+id+'.json',{at:new Date(now()).toISOString()})));return json({marked:ids});
+  }
   if(action==='profile'){
    await rate(request,'profile',20,10,user.id);const profile=await get(store,'profiles/'+user.id+'.json');const nickname=validateNickname(input.nickname);let avatarVersion=profile.avatarVersion;
    if(input.avatar!==undefined){if(input.avatar===null)avatarVersion=null;else{const avatar=validateAvatar(input.avatar);avatarVersion=(await digest(avatar.data)).slice(0,24);await set(store,'avatars/'+user.id+'/'+avatarVersion+'.json',{...avatar,version:avatarVersion});}}

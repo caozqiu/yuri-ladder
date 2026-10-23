@@ -10,6 +10,12 @@ export const accountId=async key=>'YR-'+(await digest(key)).slice(0,24).toUpperC
 export function validateNickname(value){const s=typeof value==='string'?value.normalize('NFKC').trim():'';if(!s||[...s].length>24||/[\u0000-\u001f\u007f-\u009f\u202a-\u202e\u2066-\u2069]/.test(s))throw accountError('昵称须为1–24个字，不能包含控制字符');return s;}
 export function validateUsername(value){const s=typeof value==='string'?value.normalize('NFKC').trim():'';if(!s||[...s].length>24||!/^[\p{L}\p{N}_-]+$/u.test(s))throw accountError('用户名须为1–24个中文、字母、数字、下划线或短横线');return s;}
 export const normalizeUsername=value=>validateUsername(value).toLowerCase();
+export function validateSignupProfile(input){
+ if(!input||typeof input!=='object'||Array.isArray(input))throw accountError('报名资料格式不正确');
+ const clean=(value,label)=>{if(value==null)return '';if(typeof value!=='string')throw accountError(label+'格式不正确');const text=value.trim();if([...text].length>64||/[\u0000-\u001f\u007f-\u009f\u202a-\u202e\u2066-\u2069]/.test(text))throw accountError(label+'最多64字，不能包含控制字符');return text;};
+ const name=clean(input.name,'圈内昵称'),platformName=clean(input.platformName,'LBW平台昵称'),qq=clean(input.qq,'QQ号');
+ if(qq&&!/^[1-9]\d{4,11}$/.test(qq))throw accountError('QQ号须为5–12位数字，不能以0开头');return {name,platformName,qq};
+}
 export function validatePassword(value){if(typeof value!=='string'||value.length<10)throw accountError('密码至少需要10个字符');if(new TextEncoder().encode(value).length>72)throw accountError('密码过长，请使用更短的密码');return value;}
 export const profileView=profile=>({id:profile.id,nickname:profile.nickname,...(profile.username?{username:profile.username}:{}),avatar:profile.avatarVersion?'/api/account?'+new URLSearchParams({action:'avatar',id:profile.id,v:profile.avatarVersion}):null,createdAt:profile.createdAt});
 export function validateAvatar(input){

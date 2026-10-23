@@ -53,6 +53,16 @@ export function createSponsorsHandler({store,secret,now=Date.now,sourceMatch=fet
    const account=request.method==='POST'||action==='mine'?await currentAccount(request,accountsStore,now()):null;
    if(url.pathname==='/api/events')return await handleEvents({request,url,configured,store,get,set,list,sign,digest,equal,owner,requireOwner,rate,body,token,validToken,now,json,account});
    if(request.method==='GET'){
+    if(action==='admin-summary'){
+     await requireOwner(request);
+     const summarize=async(prefix,statePrefix)=>{
+      const page=await list(prefix,null,100),counts={pending:0,approved:0,rejected:0};
+      for(let i=0;i<page.blobs.length;i+=4)await Promise.all(page.blobs.slice(i,i+4).map(async b=>{const id=b.key.split('/').at(-1).slice(0,-5);if(!ID.test(id))return;const s=await get(statePrefix+id+'.json');counts[s?.status==='approved'?'approved':s?.status==='rejected'?'rejected':'pending']++;}));
+      return {...counts,scanned:page.blobs.length,hasMore:!!page.cursor};
+     };
+     const [events,sponsors]=await Promise.all([summarize('events/','event-states/'),summarize('applications/','states/')]);
+     return json({events,sponsors,scope:'每类最近100条申请',at:new Date(now()).toISOString()});
+    }
     if(action==='mine'){
      if(!account)throw sponsorError('请先登录普通用户账号',401);const page=await list('user-items/'+account.id+'/sponsors/',url.searchParams.get('cursor'));const items=[];
      for(const b of page.blobs){const id=b.key.split('/').at(-1).slice(0,-5),row=await get('applications/'+id+'.json');if(row?.ownerId===account.id){const review=await latest(id);items.push({...publicSponsor(row,review),reason:review?.reason||''});}}

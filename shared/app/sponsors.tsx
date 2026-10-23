@@ -37,7 +37,7 @@ export default function Sponsors({query,update,players=[]}:{query:string;update:
  const initialized=useRef(false),form=useRef<HTMLFormElement>(null),revision=useRef(0);
  const close=useCallback(()=>{setDetail(null);setReason('');},[]);
  const closePublic=useCallback(()=>update({sponsorId:null}),[update]);
- const setTab=(value:string)=>{update({sponsorTab:value==='list'?null:value,sponsorId:null});setError('');setNotice('');setChecked(null);};
+ const setTab=(value:string)=>{if(value==='review'){update({screen:'admin',adminTab:'sponsors',sponsorId:null});return;}update({sponsorTab:value==='list'?null:value,sponsorId:null});setError('');setNotice('');setChecked(null);};
  useEffect(()=>{
   try{const raw=JSON.parse(localStorage.getItem(DRAFT)||'null');if(raw?.form&&['playerA','playerB','playedAt','scoreA','scoreB','sponsor'].every(k=>typeof raw.form[k]==='string')&&Array.isArray(raw.form.rounds)&&raw.form.rounds.length<=99&&raw.form.rounds.every(r=>r&&typeof r.map==='string'&&[null,'a','b'].includes(r.winner))&&typeof raw.ticket==='string'&&/^[a-f0-9]{64}$/.test(raw.ticket)){setDraft({...empty(),...raw.form});setTicket(raw.ticket);}const rs=JSON.parse(localStorage.getItem(RECEIPTS)||'[]');if(Array.isArray(rs))setReceipts(rs.filter(r=>r&&typeof r.id==='string'&&typeof r.ticket==='string').slice(0,30));}catch{}
   setTicket(t=>t||freshTicket());initialized.current=true;
@@ -86,7 +86,7 @@ export default function Sponsors({query,update,players=[]}:{query:string;update:
    const identity=await sponsorIdentity(data,ticket,challenge);keepReceipt({id:identity.id,ticket,label:data.playerA+' vs '+data.playerB});
    const j=await api('submit',{...data,ticket,challenge,website:draft.website});
    setDraft(empty());setTicket(freshTicket());
-   setNotice(j.duplicate?'申请已收到，无需重复提交。':'申请已提交，审核通过后公开展示。');setTab('mine');setChecked({...data,id:j.id,status:j.status,createdAt:new Date().toISOString(),reviewedAt:null});setNotice('申请已收到。回执已保存在当前浏览器，可复制到其他设备查询。');
+   window.dispatchEvent(new Event('yuri-notices-updated'));setNotice(j.duplicate?'申请已收到，无需重复提交。':'申请已提交，审核通过后公开展示。');setTab('mine');setChecked({...data,id:j.id,status:j.status,createdAt:new Date().toISOString(),reviewedAt:null});setNotice('申请已收到。回执已保存在当前浏览器，可复制到其他设备查询。');
   }catch(e:any){if(e.status===401)refreshAccount();setError(e.message+'；若网络中断，可到“我的回执”查询是否已收到。');}finally{setSaving(false);}
  };
  const checkReceipt=async(r:Receipt)=>{setLoading(true);setError('');try{const j=await api('receipt',{id:r.id,ticket:r.ticket});setChecked(j.item);}catch(e:any){setError(e.message==='回执不正确'?'尚未查到该申请，请确认提交已成功，或检查回执是否完整。':e.message);}finally{setLoading(false);}};
