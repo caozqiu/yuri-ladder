@@ -1,6 +1,9 @@
 import {accountError,normalizeUsername,digest} from '../shared/lib/accounts.mjs';
 import {usernameSigningScalar,base64url} from '../shared/lib/username-signing.mjs';
 import {p256} from '@noble/curves/nist.js';
+// Serverless isolates may sign only once. Avoid building the default large
+// fixed-base table on a cold request; the signature and verification stay the same.
+p256.Point.BASE.precompute(1);
 export function createUsernameRegistry({secret,publicKey,url,fetcher=fetch}){
  if(typeof secret!=='string'||secret.length<24||!publicKey||url!=='https://yr-ladder-observatory.deep-spoon-6795.chatgpt.site/api/member-names')return null;
  let publicJwk;try{publicJwk=JSON.parse(publicKey);if(publicJwk.kty!=='EC'||publicJwk.crv!=='P-256'||!publicJwk.x||!publicJwk.y)return null;}catch{return null;}
