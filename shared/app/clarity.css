@@ -1,0 +1,219 @@
+/* Shared workspace: readable type, clear actions, and a distinct community area. */
+:root{--accent:#b6a1ff;--line:#2b3243;--ui-text:#edf0f7;--ui-muted:#a2adc1;--ui-surface:#151b27;--ui-raised:#1c2433;--ui-purple:#b6a1ff;--ui-mint:#80d9b6}
+body{background:#0c1019;color:var(--ui-text);font-family:Inter,"Segoe UI","Microsoft YaHei",sans-serif;font-size:14px;line-height:1.6}
+button,input,select,textarea{font:inherit}button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.5}
+.atelier-app{background:radial-gradient(ellipse at 90% 0,#7159ab0b,transparent 45%);font-variant-numeric:tabular-nums}
+.atelier-app :is(button,a,input,select,textarea,summary):focus-visible{outline:2px solid #c1b0ff;outline-offset:4px}
+.atelier-app .sidebar{width:232px;background:#101521;padding:30px 16px 20px;border-right:1px solid #252d3e}
+.atelier-app .brand{margin:0 10px 35px;gap:12px}
+.atelier-app .brand-symbol{width:42px;height:44px;background:#b6a1ff12;border:1px solid #b6a1ff30;border-radius:13px;color:#c0afff}
+.atelier-app .brand-symbol svg{width:27px}
+.atelier-app .brand strong{font-size:18px;font-weight:700;letter-spacing:.4px}
+.atelier-app .brand small{font-size:11px;letter-spacing:1px;color:#8e9ab2}
+.atelier-app .sidebar nav{gap:26px}.atelier-app .navigation-group{gap:5px}
+.atelier-app .navigation-caption{font-size:11px;font-weight:600;letter-spacing:1px;color:#7886a0;padding:0 14px 9px}
+.atelier-app .nav-item{min-height:47px;font-size:14px;padding:12px 14px;color:#a7b1c6;border-radius:10px;gap:12px}
+.atelier-app .nav-item svg{width:19px;height:19px;color:#8b97b0}
+.atelier-app .nav-item.active{background:#a28aed20;border:1px solid #b49af033;color:#e0d6ff;box-shadow:inset 3px 0 #b6a1ff}
+.atelier-app .nav-item.active svg{color:#c2afff}.atelier-app .nav-mark{display:none}
+.atelier-app .nav-item:hover{background:#232b3d;color:#f4f1ff}
+.atelier-app .sidebar-divider{margin:24px 12px 12px}.atelier-app .sidebar-bottom{padding-top:24px}
+.atelier-app .collection-status{background:#121f26;border-color:#264039;border-radius:12px;padding:15px}
+.atelier-app .status-heading{font-size:12px;color:#b4d7c9}.atelier-app .collection-status p{font-size:11px;color:#91afa5}
+.atelier-app .sidebar-disclaimer{font-size:11px;line-height:1.8}.atelier-app .main-shell{margin-left:232px}
+.atelier-app .topbar{height:72px;padding:0 40px;position:sticky;top:0;z-index:21;background:#0e141fed;border-color:#252d3d}
+.atelier-app .breadcrumb{font-size:13px;gap:11px}.atelier-app .breadcrumb strong{font-weight:600;color:#e4e7f1}
+.atelier-app .topbar-right{gap:10px}.atelier-app .icon-button{width:38px;height:38px;border-radius:10px;border-color:#313a50;color:#9eabc3}
+.atelier-app .account-button{font-size:13px;min-height:38px;padding:6px 12px;background:#1a2232;border-color:#344056}
+.atelier-app .main-shell main{max-width:1512px;padding:32px 40px 0}
+.atelier-app .page-heading{min-height:157px;background:linear-gradient(110deg,#22263d 0,#1a2031 54%,#24233e 100%);border:1px solid #3d3c59;border-radius:20px;padding:29px 32px;margin-bottom:28px;box-shadow:0 12px 45px #00000012}
+.atelier-app.with-decoration .page-heading{padding-right:216px}
+.atelier-app .page-heading:before{content:"";position:absolute;left:0;top:28px;bottom:28px;width:3px;background:linear-gradient(#b6a1ff,#7996d9);border-radius:0 3px 3px 0}
+.atelier-app .heading-context{font-size:11px;letter-spacing:1px;color:#b4a7d4;margin-bottom:10px}.atelier-app .heading-context .status-dot{background:#b6a1ff}
+.atelier-app .page-heading h1{font-size:32px;font-weight:750;letter-spacing:.5px;line-height:1.35;margin-bottom:8px}
+.atelier-app .page-heading p{font-size:14px;color:#b1b9cd;max-width:540px;line-height:1.8}
+.atelier-app .heading-actions{max-width:180px;gap:10px}.atelier-app .last-update{font-size:12px;color:#98a6c0}
+.atelier-app .header-art{right:4px;width:202px;opacity:.85}.atelier-app .observer-portrait{height:169px;width:158px;right:15px;bottom:-15px}
+.atelier-app .observer-orbit{opacity:.6;right:-26px}.atelier-app .art-spark{opacity:.65}
+.atelier-app .secondary{background:#1c2535;border:1px solid #38445c;color:#dde3f1;font-size:13px;font-weight:500;min-height:40px;padding:9px 14px;border-radius:9px;line-height:1.5}
+.atelier-app .secondary:hover:not(:disabled){background:#29344a;border-color:#6c6791;color:#fff}
+.atelier-app .heading-primary,.atelier-app .sponsor-primary{background:#b6a1ff;border:1px solid #b6a1ff;color:#211a3a;font-weight:650;font-size:14px;border-radius:9px;padding:11px 17px;min-height:43px;box-shadow:none;line-height:1.5}
+.atelier-app :is(.heading-primary,.sponsor-primary):hover:not(:disabled){background:#c9b9ff;border-color:#c9b9ff;color:#211a3a}
+.atelier-app .text-link{font-size:13px;color:#beadf0;line-height:1.7;gap:6px}
+.atelier-app .panel{border:1px solid #2d374a;border-radius:15px;background:#151c29;box-shadow:none}
+.atelier-app .panel-heading{padding:23px 24px 0;gap:14px}.atelier-app .panel-heading h2{font-size:19px;font-weight:650;line-height:1.5;color:#e6eaf4}
+.atelier-app .section-kicker{display:none}.atelier-app .mini-badge{font-size:11px;padding:5px 9px;color:#afbbd2;background:#243047;border-radius:6px}
+.atelier-app .filter-suite{padding:4px 18px 0;border-color:#303a4f;background:#141c29;border-radius:14px;margin-bottom:24px}
+.atelier-app .filter-suite .filter-bar{gap:16px;padding:15px 0}.atelier-app .filter-bar :is(select,.segmented button){font-size:13px}
+.atelier-app .filter-season select{font-size:13px}.atelier-app .segmented button{font-size:13px;padding:8px 12px;min-height:35px}
+.atelier-app .opponents-filter,.atelier-app .analysis-filters label{font-size:13px;color:#9facbf}
+.atelier-app .filter-suite .analysis-filters{gap:18px;padding:15px 0}.atelier-app .analysis-filters select{font-size:13px;padding:8px 11px}
+.atelier-app .filter-workbench{padding:15px 0}.atelier-app .filter-workbench .secondary{font-size:13px}
+.atelier-app :is(.muted,.basis-label,.draft-status,.coverage-caption){font-size:12px;line-height:1.8;color:#a4afc3}
+.atelier-app .filter-workbench-head{gap:12px}.atelier-app .funnel-toggle{font-size:12px;padding:7px 0;line-height:1.8}
+.atelier-app .funnel-toggle>span{font-size:12px}.atelier-app .active-rating-filters button{font-size:12px;padding:5px 9px}
+.atelier-app .saved-filters{font-size:13px}.atelier-app .saved-filters summary{font-size:13px;padding:5px 0}
+.atelier-app .stat-cards{gap:16px;margin-bottom:24px}.atelier-app .stat-card{padding:22px;min-height:157px;border:1px solid #30394d;border-radius:14px;background:#161e2c}
+.atelier-app .stat-label{font-size:13px;color:#a8b4cb}.atelier-app .stat-label svg{color:#9d91c8}
+.atelier-app .stat-value{font-size:35px;letter-spacing:-1px;margin:17px 0 10px;font-weight:700;color:#f0f3fa}.atelier-app .stat-value>span{font-size:13px;letter-spacing:0}
+.atelier-app .stat-foot{font-size:12px;color:#8fa0bd;line-height:1.7}.atelier-app .accent-card{background:linear-gradient(120deg,#25223c,#1c2133);border-color:#665780}
+.atelier-app .accent-card .stat-value{color:#d5c6ff}.atelier-app .card-ticks{opacity:.1}
+.atelier-app .analysis-grid.overview-grid{gap:22px;margin-bottom:24px}.atelier-app .usage-panel{display:block}
+.atelier-app .usage-row{font-size:13px}.atelier-app .usage-count{font-size:12px}.atelier-app .panel-note{font-size:12px;line-height:1.8;color:#92a3bf}
+.atelier-app .matrix-intro{font-size:13px;line-height:1.8;padding-inline:24px}.atelier-app .matrix-table th{font-size:12px}
+.atelier-app .matrix-table td button{border-radius:10px}.atelier-app .matrix-table td button strong{font-size:24px}.atelier-app .matrix-table td button :is(span,small){font-size:12px}
+.atelier-app .matrix-footer{font-size:12px}.atelier-app .overview-shortcuts{gap:14px;grid-template-columns:repeat(3,minmax(0,1fr))}
+.atelier-app .overview-shortcuts>button{padding:21px;background:#151e2c;border-color:#303b50;border-radius:13px;gap:11px}
+.atelier-app .overview-shortcuts>button strong{font-size:15px}.atelier-app .overview-shortcuts>button>span{font-size:12px;line-height:1.8}
+.atelier-app .leaderboard-heading{padding:24px}.atelier-app .leaderboard-heading p{font-size:13px;line-height:1.8}
+.atelier-app .leaderboard thead th{font-size:12px;padding:16px 11px;color:#aab7cd;background:#1a2435}
+.atelier-app .leaderboard td{padding:18px 11px;font-size:14px;border-color:#29354a}.atelier-app .player-cell strong{font-size:14px;color:#e1e7f5}
+.atelier-app .player-cell small{font-size:11px;color:#90a0bc}.atelier-app .rate strong{font-size:15px}.atelier-app .rate span{font-size:11px}
+.atelier-app .table-tools :is(select,input){font-size:13px;min-height:38px}.atelier-app .search-box{min-height:42px;padding:9px 12px}
+.atelier-app .table-footer,.atelier-app .roster-summary{font-size:12px;padding:16px 24px}.atelier-app .pagination button{font-size:12px;min-width:32px;height:32px}
+.atelier-app .screen-label{font-size:13px;margin-bottom:12px;color:#adb9ce}.atelier-app .notice-banner{font-size:13px;padding:16px 18px;border-radius:12px}
+.atelier-app .notice-banner strong{font-size:13px}.atelier-app .notice-banner p{font-size:12px;line-height:1.8}
+.atelier-app .site-footer{font-size:12px;margin-top:32px;padding:25px 0;color:#8d9db8}.atelier-app .site-footer .text-link{font-size:12px}
+
+/* Four clear destinations replace a single strip of similar text buttons. */
+.atelier-app .community-events .event-navigation{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;padding:0;border:0;background:transparent;margin-bottom:30px;overflow:visible}
+.atelier-app .event-navigation button{display:flex;align-items:center;text-align:left;gap:12px;border:1px solid #303a50;border-radius:13px;background:#151d2c;padding:17px 15px;min-height:85px;color:#aebbd1;white-space:normal}
+.atelier-app .event-navigation button>svg:first-child{flex-shrink:0;width:39px;height:39px;padding:9px;border:1px solid #38455f;background:#202a3e;border-radius:11px;color:#9aabc9}
+.atelier-app .event-navigation button>span{font-size:14px;font-weight:600;min-width:0;line-height:1.5}.atelier-app .event-navigation small{display:block;font-size:11px;color:#8699b8;font-weight:400;margin-top:5px}
+.atelier-app .event-navigation .event-nav-arrow{margin-left:auto;flex-shrink:0;color:#7d8cab;width:14px}
+.atelier-app .event-navigation button.selected{background:#28233f;border-color:#8872b9;color:#efe6ff;box-shadow:0 3px 20px #0001}
+.atelier-app .event-navigation button.selected>svg:first-child{background:#b6a1ff24;color:#d2c1ff;border-color:#b6a1ff40}.atelier-app .event-navigation button.selected small{color:#b5a7d0}
+.atelier-app .event-navigation button:hover{background:#242d41;border-color:#67728e}
+.atelier-app .event-section-intro{display:flex;align-items:center;gap:14px;margin:0 0 20px}
+.atelier-app .section-symbol{display:grid;place-items:center;width:46px;height:46px;border:1px solid #b6a1ff29;background:#b6a1ff12;border-radius:13px;color:#b9a8ef;flex-shrink:0}
+.atelier-app .event-section-intro h2{font-size:23px;font-weight:700;color:#edf0f9;line-height:1.5;margin:0 0 5px}
+.atelier-app .event-section-intro p{font-size:13px;color:#95a6c1;line-height:1.8;margin:0}.atelier-app .event-section-intro>button{margin-left:auto;flex-shrink:0}
+.atelier-app .event-account-strip{display:flex;align-items:center;gap:15px;flex-wrap:wrap;font-size:12px;padding:12px 16px;background:#131e2c;border:1px solid #28394e;border-radius:10px;margin-bottom:22px;color:#a5b7cd}
+.atelier-app .event-account-strip>span{display:flex;align-items:center;gap:8px;min-width:0;overflow-wrap:anywhere}.atelier-app .event-account-strip .text-link{font-size:12px}
+.atelier-app .event-account-strip .event-timezone{margin-left:auto;color:#8197b2;font-size:12px;white-space:nowrap}
+.atelier-app .event-list-controls{border:1px solid #2b374d;background:#131c2a;border-radius:13px;padding:16px 18px;margin-bottom:22px}
+.atelier-app .event-status-filters{display:flex;gap:6px;flex-wrap:wrap}.atelier-app .event-status-filters button{display:flex;align-items:center;gap:8px;min-height:37px;padding:7px 13px;font-size:13px;border:1px solid transparent;border-radius:8px;color:#a3b3cc;background:transparent}
+.atelier-app .event-status-filters button>span{font-size:11px;padding:0 6px;min-width:21px;border-radius:5px;background:#28364d;color:#9caccc;text-align:center}
+.atelier-app .event-status-filters button.selected{background:#b6a1ff1c;border-color:#b6a1ff33;color:#e5d7ff}.atelier-app .event-status-filters button.selected>span{color:#decaff;background:#a387db24}
+.atelier-app .event-status-filters button:hover{background:#263247}.atelier-app .event-filter-hint{font-size:11px;line-height:1.8;color:#8195b2;margin:9px 0 14px}
+.atelier-app .community-events .sponsor-toolbar{margin:0;gap:12px}.atelier-app .sponsor-search{background:#0f1724;border-color:#33435d;border-radius:9px;min-height:43px}
+.atelier-app .sponsor-search input{font-size:14px;padding:11px 12px}.atelier-app .sponsor-search>button{margin-right:12px;flex-shrink:0}
+.atelier-app .event-grid{gap:22px;grid-template-columns:repeat(2,minmax(0,1fr))}
+.atelier-app .event-card{padding:0;overflow:hidden;border:1px solid #354059;border-radius:16px;background:#151e2e;display:flex;flex-direction:column;transition:border-color .2s,transform .2s;min-width:0}
+.atelier-app .event-card:hover{border-color:#82729f;transform:translateY(-2px)}
+.atelier-app .event-card-cover{position:relative;isolation:isolate;height:119px;background:linear-gradient(115deg,#2b2547,#303957 60%,#1c3042);overflow:hidden;border-bottom:1px solid #3c4666;flex-shrink:0}
+.atelier-app .event-card-cover>svg{position:absolute;right:53px;top:17px;color:#a9a2da;opacity:.3;transform:rotate(-13deg)}
+.atelier-app .event-cover-lines{position:absolute;inset:0;background:repeating-linear-gradient(120deg,transparent 0 27px,#c2b9fa08 28px 29px,transparent 30px 58px);mask-image:linear-gradient(90deg,transparent,#000)}
+.atelier-app .event-card-cover:after{content:"";position:absolute;width:180px;height:180px;border:1px solid #b4a4e824;transform:rotate(30deg);border-radius:28px;right:-35px;top:-68px;z-index:-1}
+.atelier-app .event-cover-label{position:absolute;bottom:18px;left:24px;color:#b7b5d6;font-size:11px;letter-spacing:2px}
+.atelier-app .event-date-stamp{position:absolute;left:22px;top:18px;display:flex;align-items:baseline;gap:7px;color:#e2dafa}.atelier-app .event-date-stamp strong{font-size:31px;line-height:1.1;font-weight:650}.atelier-app .event-date-stamp span{font-size:12px;color:#aea7c8}
+.atelier-app .event-phase-open .event-card-cover{background:linear-gradient(115deg,#1d393b,#29384b 55%,#292a45)}
+.atelier-app .event-card-content{padding:22px;display:flex;flex-direction:column;flex:1;min-width:0}
+.atelier-app .event-card-top{font-size:12px;gap:10px}.atelier-app .event-card-top>span:last-child{font-size:12px;color:#9db2cd}
+.atelier-app .sponsor-badge{font-size:11px;font-weight:550;border-radius:6px;padding:4px 9px;line-height:1.6;white-space:nowrap}
+.atelier-app .sponsor-badge.approved{background:#80d9b618;border-color:#80d9b640;color:#99e2c6}.atelier-app .sponsor-badge.pending{background:#c8b0ee13;border-color:#ad95ce3b;color:#cebaef}
+.atelier-app .event-title{font-size:21px;font-weight:650;line-height:1.55;margin:16px 0 0;padding:0;gap:10px;color:#f0edf9}
+.atelier-app .event-title svg{margin-top:7px;color:#8c9bbe}.atelier-app .event-format{font-size:12px;color:#a0b1ce;display:flex;gap:7px;align-items:baseline;margin:10px 0 18px;line-height:1.8}
+.atelier-app .event-format svg{flex-shrink:0;align-self:flex-start;margin-top:4px;color:#9b91b8}
+.atelier-app .event-card dl{font-size:13px;padding:17px 0;margin:0 0 20px;border-color:#2f3a51;gap:11px}.atelier-app .event-card dl>div{font-size:13px}
+.atelier-app .event-card dt{color:#889dbb}.atelier-app .event-card dd{color:#cbd8ec;line-height:1.7}
+.atelier-app .event-card-actions{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:auto;flex-wrap:wrap}
+.atelier-app .event-card-actions .sponsor-primary{font-size:13px;min-height:40px;padding:9px 13px}.atelier-app .event-card-actions .event-share-compact{margin:0}
+.atelier-app .sponsor-list-footer{padding:20px 0;font-size:12px;color:#8fa2c0;gap:12px;line-height:1.8;flex-wrap:wrap}
+.atelier-app .refresh-time{font-size:11px;color:#7f93b3}.atelier-app .sponsor-empty{padding:45px 24px;background:#131d2b;border:1px dashed #41506b;border-radius:15px}
+.atelier-app .empty-symbol{width:68px;height:68px;display:grid;place-items:center;margin:0 auto 18px;background:#b6a1ff12;border:1px solid #b6a1ff27;border-radius:20px;color:#b1a1d6}
+.atelier-app .sponsor-empty h3{font-size:20px;margin-bottom:10px;color:#dde4f5;font-weight:650}.atelier-app .sponsor-empty p{font-size:13px;max-width:420px;margin:0 auto 20px;line-height:1.9}
+.atelier-app .event-guide{border:1px solid #344057;border-radius:14px;background:#151e2d;padding:22px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;margin-bottom:22px}
+.atelier-app .guide-caption{grid-column:1/-1;display:flex;align-items:center;gap:8px;font-size:13px;color:#c3b3e9}
+.atelier-app .guide-step{display:flex;align-items:flex-start;gap:12px}.atelier-app .guide-step>span{font-size:13px;font-weight:650;color:#ad98d6;width:31px;min-width:31px;height:31px;border:1px solid #a68aca38;background:#a68aca12;border-radius:9px;display:grid;place-items:center}
+.atelier-app .guide-step strong{font-size:14px;color:#d8e0f0;font-weight:550;line-height:1.8}.atelier-app .guide-step p{font-size:12px;color:#8ea2c0;line-height:1.9;margin:3px 0 0}
+.atelier-app .guide-footnote{grid-column:1/-1;border-top:1px solid #2a3a50;padding-top:14px;font-size:12px;color:#8195b4;margin:0}
+.atelier-app .event-review-layout{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:24px;align-items:start}
+.atelier-app .event-review-layout .event-guide{grid-template-columns:1fr;gap:23px;margin:0;padding:27px}
+.atelier-app .event-review-layout .sponsor-login{width:100%;max-width:none;margin:0;padding:30px;background:linear-gradient(145deg,#1b2334,#161d2d);border-radius:15px;border-color:#3f4767}
+.atelier-app .sponsor-login-icon{width:52px;height:52px;border-radius:15px;background:#b6a1ff17;border:1px solid #b6a1ff35;color:#c1acff}
+.atelier-app .sponsor-login h2{font-size:24px;font-weight:700;margin:20px 0 9px;color:#e5e6f5}.atelier-app .sponsor-login p{font-size:14px;line-height:1.9;color:#a2b0c9}
+.atelier-app .sponsor-login label{font-size:14px;gap:10px;color:#c5cfe4}.atelier-app .sponsor-login>.sponsor-primary{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;margin-top:5px}
+.atelier-app .sponsor-login>small{font-size:12px;line-height:1.8;color:#869bb8;display:block;margin-top:16px}
+.atelier-app :is(.sponsor-form,.sponsor-receipts,.account-access,.account-profile,.account-password,.account-records){padding:28px;border-color:#35415b;border-radius:15px;background:#151e2e}
+.atelier-app .sponsor-form{max-width:100%}.atelier-app .sponsor-form header h2{font-size:22px;font-weight:650}.atelier-app .sponsor-form header p{font-size:13px;line-height:1.8}
+.atelier-app :is(.sponsors,.sponsor-detail,.account-center) :is(input:not([type=checkbox]):not([type=file]),textarea,select){min-height:46px;background:#0e1827;border-color:#3b4b68;border-radius:9px;font-size:14px;color:#e1e7f4}
+.atelier-app :is(.sponsors,.account-center) :is(input,textarea)::placeholder{color:#7488a9}
+.atelier-app :is(.sponsor-form,.event-join,.account-center) label{font-size:14px;color:#c2cfe5;gap:10px}
+.atelier-app .sponsor-note,.atelier-app .sponsor-scope{font-size:13px;line-height:1.9;color:#97abc8}
+.atelier-app .sponsor-form :is(.sponsor-consent,.sponsor-submit p){font-size:13px;line-height:1.9}
+.atelier-app .sponsor-form-section-heading{grid-column:1/-1;display:flex;align-items:center;gap:11px;border-bottom:1px solid #334059;padding:6px 0 13px;color:#e1e4f4;font-size:16px;font-weight:600}
+.atelier-app .sponsor-form-section-heading>span{display:grid;place-items:center;width:26px;height:26px;background:#b6a1ff16;border:1px solid #b6a1ff30;border-radius:7px;font-size:12px;color:#bda6ef}
+.atelier-app .dialog-mask{background:#050913c7;backdrop-filter:blur(8px)}.atelier-app .dialog-panel{border:1px solid #48536e;background:#151e2d;border-radius:16px}
+.atelier-app .dialog-panel>header{padding:21px 25px;background:#1a2537;border-color:#35425b}.atelier-app .dialog-panel>header h2{font-size:19px;font-weight:650}
+.atelier-app .dialog-content{padding:25px}.atelier-app .event-detail-title{font-size:27px;color:#f0edf9;line-height:1.5}
+.atelier-app .sponsor-detail-facts{gap:16px}.atelier-app .sponsor-detail-facts dt{font-size:12px;color:#91a5c0}.atelier-app .sponsor-detail-facts dd{font-size:14px;color:#dce4f2}
+.atelier-app .toast:not(:empty){background:#27233c;border-color:#8772b8;color:#eadfff;padding:14px 18px;border-radius:10px;font-size:13px}
+.atelier-app .event-skeleton-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
+.atelier-app .event-skeleton{height:360px;background:#141e2d;border:1px solid #303d55;border-radius:15px;overflow:hidden;padding-bottom:25px}
+.atelier-app .event-skeleton i{display:block;height:119px;background:#252d43;margin-bottom:26px}.atelier-app .event-skeleton span{display:block;height:15px;border-radius:4px;background:#26334a;margin:18px 24px;width:62%}.atelier-app .event-skeleton span:last-child{width:45%}
+.mobile-dock{display:none}
+
+@media(min-width:1550px){.atelier-app .main-shell main{padding-top:38px}.atelier-app .event-card-cover{height:137px}}
+@media(max-width:1250px){.atelier-app .main-shell main{padding-inline:26px}.atelier-app .topbar{padding-inline:26px}.atelier-app .event-navigation button{padding:15px 12px;gap:9px}.atelier-app .event-navigation small{font-size:11px}.atelier-app .event-navigation .event-nav-arrow{display:none}.atelier-app .overview-shortcuts{grid-template-columns:repeat(2,minmax(0,1fr))}.atelier-app .analysis-grid.overview-grid{grid-template-columns:1fr}.atelier-app .stat-cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:1100px) and (min-width:701px){.atelier-app .sidebar{width:196px;padding:26px 10px}.atelier-app .main-shell{margin-left:196px}.atelier-app .brand{margin:0 4px 30px;gap:9px}.atelier-app .brand>span:last-child{display:block}.atelier-app .brand strong{font-size:16px}.atelier-app .brand small{font-size:10px;letter-spacing:0}.atelier-app .nav-item{justify-content:flex-start;gap:10px;padding:12px;font-size:13px}.atelier-app .nav-item>span{display:block}.atelier-app .navigation-caption{display:block}.atelier-app .sidebar-divider,.atelier-app .sidebar-bottom,.atelier-app .external-nav{display:block}.atelier-app .external-nav{display:flex}.atelier-app .sidebar nav{gap:25px}.atelier-app .page-heading{padding:25px}.atelier-app.with-decoration .page-heading{padding-right:155px}.atelier-app .header-art{width:147px}.atelier-app .observer-portrait{width:135px;right:0}.atelier-app .page-heading h1{font-size:28px}.atelier-app .page-heading p{font-size:13px}.atelier-app .heading-actions{max-width:125px}.atelier-app .event-navigation{grid-template-columns:repeat(2,minmax(0,1fr))!important}.atelier-app .event-grid{grid-template-columns:1fr}.atelier-app .event-review-layout{grid-template-columns:1fr}.atelier-app .event-review-layout .event-guide{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.atelier-app .event-guide{gap:16px}.atelier-app .guide-step{gap:8px}}
+@media(max-width:700px){
+ .atelier-app .sidebar{display:none}.atelier-app .main-shell{margin-left:0}.atelier-app .main-shell main{padding:20px 16px calc(90px + env(safe-area-inset-bottom))}
+ .atelier-app .topbar{height:64px;padding-inline:14px}.atelier-app .breadcrumb{font-size:12px;gap:7px}.atelier-app .breadcrumb>span{display:none}.atelier-app .topbar-right{gap:7px}
+ .atelier-app .topbar-right>.icon-button:last-child{display:none}.atelier-app .icon-button{width:35px;height:35px}.atelier-app .account-button{font-size:12px;max-width:116px;min-height:35px;padding:5px 8px}
+ .atelier-app .page-heading{min-height:148px;padding:24px 22px;margin-bottom:22px;border-radius:15px;display:block}.atelier-app.with-decoration .page-heading{padding-right:102px}
+ .atelier-app .page-heading h1{font-size:28px;margin-bottom:8px}.atelier-app .page-heading p{font-size:12px;line-height:1.85}.atelier-app .heading-context{font-size:10px;letter-spacing:0;margin-bottom:9px}
+ .atelier-app .header-art{width:98px;right:-4px;opacity:.7}.atelier-app .observer-portrait{width:103px;height:138px;right:-5px;bottom:-7px}.atelier-app .observer-orbit{display:none}.atelier-app .art-spark{display:none}
+ .atelier-app .heading-actions{flex-direction:row;align-items:center;max-width:none;margin-top:14px;gap:10px}.atelier-app .heading-actions .secondary{min-height:35px;padding:7px 11px;font-size:12px}.atelier-app .last-update{font-size:11px;white-space:normal}
+ .atelier-app .header-context-note{font-size:12px}.atelier-app .secondary,.atelier-app .sponsor-primary{font-size:13px;min-height:42px}.atelier-app .text-link{font-size:12px}
+ .atelier-app .community-events .event-navigation{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:25px}
+ .atelier-app .event-navigation button{padding:13px 12px;min-height:75px;gap:10px;border-radius:11px}.atelier-app .event-navigation button>svg:first-child{width:33px;height:33px;padding:7px;border-radius:9px}
+ .atelier-app .event-navigation button>span{font-size:14px}.atelier-app .event-navigation small{font-size:10px;margin-top:5px}.atelier-app .event-navigation .event-nav-arrow{display:none}
+ .atelier-app .event-section-intro{flex-wrap:wrap;gap:11px;margin-bottom:18px}.atelier-app .event-section-intro>div:nth-child(2){flex:1;min-width:0}
+ .atelier-app .section-symbol{width:39px;height:39px;border-radius:11px}.atelier-app .event-section-intro h2{font-size:20px}.atelier-app .event-section-intro p{font-size:12px;line-height:1.9}
+ .atelier-app .event-section-intro>button{margin-left:50px;font-size:12px;min-height:38px;padding:8px 13px}
+ .atelier-app .event-account-strip{font-size:12px;padding:12px;gap:8px 12px;line-height:1.8;margin-bottom:18px}.atelier-app .event-account-strip>span:first-child{flex:1 1 200px}.atelier-app .event-account-strip .event-timezone{display:none}
+ .atelier-app .event-list-controls{padding:13px 12px;margin-bottom:18px}.atelier-app .event-status-filters{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:thin;padding-bottom:4px;gap:4px}
+ .atelier-app .event-status-filters button{flex-shrink:0;font-size:12px;padding:7px 10px;gap:6px;min-height:37px}.atelier-app .event-filter-hint{font-size:11px;margin:8px 0 12px}
+ .atelier-app .community-events .sponsor-toolbar{gap:9px;flex-wrap:wrap}.atelier-app .community-events .sponsor-search{flex:1 1 180px;min-width:0}.atelier-app .sponsor-search input{font-size:13px!important;width:100%;padding:10px;min-height:43px}
+ .atelier-app .sponsor-search>svg{margin-left:11px;flex-shrink:0}.atelier-app .sponsor-toolbar>.secondary{font-size:12px;min-height:43px;padding:9px 11px}
+ .atelier-app .event-grid{grid-template-columns:1fr;gap:18px}.atelier-app .event-card{border-radius:14px;transform:none!important}.atelier-app .event-card-cover{height:110px}
+ .atelier-app .event-cover-label{left:20px;font-size:10px;letter-spacing:1px;bottom:17px}.atelier-app .event-date-stamp{left:19px;top:17px}.atelier-app .event-date-stamp strong{font-size:29px}
+ .atelier-app .event-card-content{padding:19px}.atelier-app .event-title{font-size:20px;line-height:1.55;margin-top:16px}.atelier-app .event-card-top>span:last-child{font-size:12px}
+ .atelier-app .event-card dl>div{font-size:12px;gap:15px}.atelier-app .event-card dl{gap:11px;padding:16px 0}.atelier-app .event-format{font-size:12px}
+ .atelier-app .event-card-actions{gap:10px}.atelier-app .event-card-actions .sponsor-primary{font-size:12px}.atelier-app .event-card-actions .text-link{font-size:12px}
+ .atelier-app .sponsor-list-footer{font-size:12px;padding:16px 0;align-items:flex-start}.atelier-app .refresh-time{display:block;margin:5px 0 0;font-size:11px}
+ .atelier-app .sponsor-empty{padding:33px 19px}.atelier-app .sponsor-empty h3{font-size:18px}.atelier-app .sponsor-empty p{font-size:12px;line-height:1.9}.atelier-app .empty-symbol{width:58px;height:58px;border-radius:17px}
+ .atelier-app .event-guide{grid-template-columns:1fr;padding:19px;gap:17px;margin-bottom:19px}.atelier-app .guide-caption{font-size:13px}.atelier-app .guide-step strong{font-size:14px}.atelier-app .guide-step p{font-size:12px;line-height:1.8}
+ .atelier-app .event-review-layout{grid-template-columns:1fr;gap:18px}.atelier-app .event-review-layout .sponsor-login{padding:24px 21px}.atelier-app .event-review-layout .event-guide{padding:21px;gap:20px}
+ .atelier-app .sponsor-login h2{font-size:23px}.atelier-app .sponsor-login p{font-size:13px}.atelier-app .sponsor-login>small{font-size:12px}
+ .atelier-app :is(.sponsor-form,.sponsor-receipts,.account-access,.account-profile,.account-password,.account-records){padding:22px 18px}
+ .atelier-app :is(.sponsors,.sponsor-detail,.account-center) :is(input:not([type=checkbox]):not([type=file]),textarea,select){font-size:16px;min-height:46px}
+ .atelier-app .sponsor-search input{font-size:13px!important}.atelier-app .sponsor-form header h2{font-size:21px}.atelier-app .sponsor-form :is(label,.sponsor-consent,.sponsor-submit p){font-size:13px;line-height:1.8}
+ .atelier-app .sponsor-form-section-heading{font-size:15px}.atelier-app .sponsor-note,.atelier-app .sponsor-scope{font-size:12px;line-height:1.9}
+ .atelier-app .filter-suite{padding:2px 13px 0;border-radius:12px;margin-bottom:20px}.atelier-app .filter-suite .filter-bar{gap:12px 8px;padding:12px 0}
+ .atelier-app .filter-season select{font-size:12px}.atelier-app .segmented button{font-size:12px;padding:7px 9px;min-height:33px}
+ .atelier-app .opponents-filter>span,.atelier-app .opponents-filter select{font-size:12px}.atelier-app .analysis-filters label{font-size:12px}.atelier-app .analysis-filters select{font-size:12px;width:73%;max-width:73%}
+ .atelier-app .filter-workbench .secondary{font-size:12px;min-height:38px}.atelier-app .basis-label{font-size:11px}.atelier-app .active-rating-filters :is(button,.muted){font-size:11px}
+ .atelier-app .funnel-toggle,.atelier-app .funnel-toggle>span,.atelier-app .coverage-caption{font-size:11px;line-height:1.85}.atelier-app .saved-filters,.atelier-app .saved-filters summary{font-size:12px}
+ .atelier-app .stat-cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;margin-bottom:20px}.atelier-app .stat-card{padding:17px 15px;min-height:145px;border-radius:12px}
+ .atelier-app .stat-label{font-size:12px}.atelier-app .stat-label svg{width:15px}.atelier-app .stat-value{font-size:29px;margin:15px 0 9px}.atelier-app .stat-foot{font-size:11px;line-height:1.8}
+ .atelier-app .panel-heading{padding:20px 17px 0}.atelier-app .panel-heading h2{font-size:17px}.atelier-app .mini-badge{font-size:11px}
+ .atelier-app .matrix-intro{font-size:12px;padding-inline:17px}.atelier-app .matrix-table th{font-size:11px}.atelier-app .matrix-table td button{height:96px}.atelier-app .matrix-table td button strong{font-size:20px}.atelier-app .matrix-table td button :is(span,small){font-size:11px}
+ .atelier-app .matrix-footer{font-size:11px;gap:9px;line-height:1.8}.atelier-app .overview-shortcuts{grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+ .atelier-app .overview-shortcuts>button{padding:16px 13px;gap:9px}.atelier-app .overview-shortcuts>button strong{font-size:14px}.atelier-app .overview-shortcuts>button>span{font-size:11px;line-height:1.8}
+ .atelier-app .leaderboard-heading{padding:20px 16px}.atelier-app .leaderboard-heading p{font-size:12px}.atelier-app .leaderboard thead th{font-size:11px;padding:14px 8px}
+ .atelier-app .leaderboard td{font-size:13px;padding:17px 8px}.atelier-app .player-cell strong{font-size:13px}.atelier-app .player-cell small{font-size:11px}.atelier-app .rate strong{font-size:14px}
+ .atelier-app .table-tools :is(select,input){font-size:12px}.atelier-app .table-footer,.atelier-app .roster-summary{font-size:11px;padding:15px 16px;line-height:1.8}
+ .atelier-app .notice-banner strong{font-size:12px}.atelier-app .notice-banner p{font-size:11px;line-height:1.85}.atelier-app .site-footer{font-size:11px;line-height:1.9;margin-top:24px}.atelier-app .site-footer .text-link{font-size:11px}
+ .atelier-app .dialog-panel{border:0;border-radius:0;height:100dvh;max-height:100dvh}.atelier-app .dialog-panel>header{padding:19px 17px}.atelier-app .dialog-panel>header h2{font-size:18px}.atelier-app .dialog-content{padding:22px 17px}
+ .atelier-app .event-detail-title{font-size:24px}.atelier-app .sponsor-detail-facts dt{font-size:12px}.atelier-app .sponsor-detail-facts dd{font-size:14px}
+ .atelier-app .navigation-dialog{max-width:330px;border-radius:0 16px 16px 0}.atelier-app .navigation-dialog .nav-item{min-height:47px;font-size:14px}.atelier-app .navigation-dialog .navigation-caption{font-size:11px}
+ .atelier-app .event-skeleton-grid{grid-template-columns:1fr}.atelier-app .event-skeleton{height:340px}
+ .atelier-app .mobile-dock{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));position:fixed;bottom:0;left:0;right:0;z-index:30;padding:8px 10px calc(8px + env(safe-area-inset-bottom));background:#121a29f5;backdrop-filter:blur(16px);border-top:1px solid #39425b;box-shadow:0 -7px 30px #0002}
+ .atelier-app .mobile-dock button{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;min-height:49px;background:transparent;border-radius:10px;color:#879bb9;font-size:10px;border:1px solid transparent}
+ .atelier-app .mobile-dock button.selected{color:#d6c4ff;background:#a88fe515;border-color:#b9a1ee26}.atelier-app .mobile-dock button.selected svg{color:#c6adff}.atelier-app .mobile-dock button:hover{background:#263149;color:#d6e0ef}
+ .atelier-app .toast:not(:empty){bottom:calc(85px + env(safe-area-inset-bottom));font-size:12px;max-width:calc(100vw - 32px)}
+}
+@media(max-width:370px){.atelier-app .main-shell main{padding-inline:12px}.atelier-app .event-navigation button{padding:11px 10px;gap:8px}.atelier-app .event-navigation small{font-size:9px}.atelier-app .event-navigation button>svg:first-child{width:29px;height:29px;padding:6px}.atelier-app .topbar-right .decoration-toggle{display:none}.atelier-app .event-card-content{padding:17px}}
+@media(prefers-reduced-motion:reduce){.atelier-app *{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
