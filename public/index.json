@@ -179,9 +179,9 @@
     }
   ],
   "progress": {
-    "state": "complete",
-    "stage": "complete",
-    "done": 1000,
+    "state": "retry",
+    "stage": "list",
+    "done": 98,
     "total": 1000,
     "roster": "all",
     "rankings": [
@@ -196,7 +196,8 @@
         "total": 500
       }
     ],
-    "pendingMatches": 0
+    "pendingMatches": 1939,
+    "error": "兰博数据暂不可读：fetch failed"
   },
   "automation": {
     "enabled": true,
