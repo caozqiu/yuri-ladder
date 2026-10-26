@@ -2,3 +2,5 @@
 {"id":"0076a6ff-f0b3-42e9-9711-5265008f92bf:31","season":31,"cutoff":1792979847,"created":1792979847,"status":"complete","meta":"{\"scanned\":500,\"players\":500,\"missing\":0,\"excluded\":29,\"unknown\":0,\"full\":false,\"roster\":\"all\",\"officialPlayers\":500}"}
 {"id":"1615b602-5136-495b-9eeb-808d3ebe6550:30","season":30,"cutoff":1788191999,"created":1792983027,"status":"complete","meta":"{\"scanned\":500,\"players\":500,\"missing\":0,\"excluded\":29,\"unknown\":0,\"full\":false,\"roster\":\"all\",\"officialPlayers\":500}"}
 {"id":"1615b602-5136-495b-9eeb-808d3ebe6550:31","season":31,"cutoff":1792983027,"created":1792983027,"status":"complete","meta":"{\"scanned\":500,\"players\":500,\"missing\":0,\"excluded\":29,\"unknown\":0,\"full\":false,\"roster\":\"all\",\"officialPlayers\":500}"}
+{"id":"43879e97-7b47-4606-bebf-80697d5b96d0:30","season":30,"cutoff":1788191999,"created":1792986679,"status":"staging","meta":"{}"}
+{"id":"43879e97-7b47-4606-bebf-80697d5b96d0:31","season":31,"cutoff":1792986679,"created":1792986679,"status":"staging","meta":"{}"}
