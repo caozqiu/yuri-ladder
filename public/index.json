@@ -179,9 +179,9 @@
     }
   ],
   "progress": {
-    "state": "complete",
-    "stage": "complete",
-    "done": 1000,
+    "state": "running",
+    "stage": "list",
+    "done": 207,
     "total": 1000,
     "roster": "all",
     "rankings": [
@@ -196,7 +196,7 @@
         "total": 500
       }
     ],
-    "pendingMatches": 0
+    "pendingMatches": 14225
   },
   "automation": {
     "enabled": true,
