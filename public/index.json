@@ -179,10 +179,10 @@
     }
   ],
   "progress": {
-    "state": "complete",
-    "stage": "complete",
-    "done": 1000,
-    "total": 1000,
+    "state": "retry",
+    "stage": "rankings",
+    "done": 0,
+    "total": 500,
     "roster": "all",
     "rankings": [
       {
@@ -191,12 +191,13 @@
         "total": 500
       },
       {
-        "season": 30,
-        "collected": 500,
-        "total": 500
+        "season": 32,
+        "collected": 0,
+        "total": null
       }
     ],
-    "pendingMatches": 0
+    "pendingMatches": 0,
+    "error": "来源榜单人数或分页变化，保留完整快照"
   },
   "automation": {
     "enabled": true,
