@@ -8,6 +8,66 @@
         "start": 1793325600,
         "end": 1798646400
       },
+      "snapshot": "f9bb5cc5-3ae1-47ed-8a98-8342440cc54a:32",
+      "cutoff": 1793440522,
+      "created": 1793440522,
+      "meta": {
+        "scanned": 117,
+        "players": 117,
+        "missing": 0,
+        "excluded": 20,
+        "unknown": 0,
+        "full": false,
+        "roster": "all",
+        "officialPlayers": 117
+      },
+      "file": "/data/snapshots/53449ec1f189ca0dcf511ee5dbe28ce9dd35fdf22a6fa6b9cc49f6c1c7c0fab0.json",
+      "sha256": "53449ec1f189ca0dcf511ee5dbe28ce9dd35fdf22a6fa6b9cc49f6c1c7c0fab0",
+      "history": {
+        "snapshot": "f9bb5cc5-3ae1-47ed-8a98-8342440cc54a:32",
+        "file": "/data/history/05e073d82721afe9b196a9e63a931bf8fb1a6f907d43b855c09b3604abb816a5.json",
+        "sha256": "05e073d82721afe9b196a9e63a931bf8fb1a6f907d43b855c09b3604abb816a5",
+        "observations": 27
+      }
+    },
+    {
+      "season": {
+        "id": 31,
+        "name": "2026-S5赛季",
+        "start": 1788224400,
+        "end": 1793203200
+      },
+      "snapshot": "f9bb5cc5-3ae1-47ed-8a98-8342440cc54a:31",
+      "cutoff": 1793203200,
+      "created": 1793440522,
+      "meta": {
+        "scanned": 500,
+        "players": 500,
+        "missing": 0,
+        "excluded": 20,
+        "unknown": 0,
+        "full": false,
+        "roster": "all",
+        "officialPlayers": 500
+      },
+      "file": "/data/snapshots/90989809e853c76329d9a39456ed2c47affab1c20cdd6b3fc525f10f4a61be99.json",
+      "sha256": "90989809e853c76329d9a39456ed2c47affab1c20cdd6b3fc525f10f4a61be99",
+      "history": {
+        "snapshot": "f9bb5cc5-3ae1-47ed-8a98-8342440cc54a:31",
+        "file": "/data/history/d12f702af858e36a7bc0b35a817ffc3ed052dacaf5ff8282d56680b0275396f2.json",
+        "sha256": "d12f702af858e36a7bc0b35a817ffc3ed052dacaf5ff8282d56680b0275396f2",
+        "observations": 151
+      }
+    }
+  ],
+  "previous": [
+    {
+      "season": {
+        "id": 32,
+        "name": "2026-S6赛季",
+        "start": 1793325600,
+        "end": 1798646400
+      },
       "snapshot": "b3e8042c-f097-4e7d-86ac-680b70831ad5:32",
       "cutoff": 1793437083,
       "created": 1793437083,
@@ -58,9 +118,7 @@
         "sha256": "2d685998e14b0e9c86d3f5ac93407cd7bec7562afa604dc0a9467ee72beea0c3",
         "observations": 150
       }
-    }
-  ],
-  "previous": [
+    },
     {
       "season": {
         "id": 32,
@@ -118,77 +176,19 @@
         "sha256": "cf97ba88956d48d01cabf535b228ed2603e151ad36a664ff3418f040f2750b8c",
         "observations": 149
       }
-    },
-    {
-      "season": {
-        "id": 32,
-        "name": "2026-S6赛季",
-        "start": 1793325600,
-        "end": 1798646400
-      },
-      "snapshot": "5f2b1e34-78c6-4ac5-ad19-17de9556fceb:32",
-      "cutoff": 1793430560,
-      "created": 1793430560,
-      "meta": {
-        "scanned": 98,
-        "players": 98,
-        "missing": 0,
-        "excluded": 19,
-        "unknown": 0,
-        "full": false,
-        "roster": "all",
-        "officialPlayers": 98
-      },
-      "file": "/data/snapshots/6dea4aa8ab4f697443ab4b263839b5828d48ed65ab1b8d5570f50c1ee79b691e.json",
-      "sha256": "6dea4aa8ab4f697443ab4b263839b5828d48ed65ab1b8d5570f50c1ee79b691e",
-      "history": {
-        "snapshot": "5f2b1e34-78c6-4ac5-ad19-17de9556fceb:32",
-        "file": "/data/history/f3b8ec072f76f07dca5022f6c47edf7ce2d05707bc0a3040065938f090d99d3f.json",
-        "sha256": "f3b8ec072f76f07dca5022f6c47edf7ce2d05707bc0a3040065938f090d99d3f",
-        "observations": 24
-      }
-    },
-    {
-      "season": {
-        "id": 31,
-        "name": "2026-S5赛季",
-        "start": 1788224400,
-        "end": 1793203200
-      },
-      "snapshot": "5f2b1e34-78c6-4ac5-ad19-17de9556fceb:31",
-      "cutoff": 1793203200,
-      "created": 1793430560,
-      "meta": {
-        "scanned": 500,
-        "players": 500,
-        "missing": 0,
-        "excluded": 19,
-        "unknown": 0,
-        "full": false,
-        "roster": "all",
-        "officialPlayers": 500
-      },
-      "file": "/data/snapshots/a0a5ecebe53823d5a47e9e4bfa8d50a35db40a02feaaeb75973d438c3e4003ee.json",
-      "sha256": "a0a5ecebe53823d5a47e9e4bfa8d50a35db40a02feaaeb75973d438c3e4003ee",
-      "history": {
-        "snapshot": "5f2b1e34-78c6-4ac5-ad19-17de9556fceb:31",
-        "file": "/data/history/bc258969cb48a7810e6d874ce0fc52eede6e49138edb9ebf131e63c01e0236eb.json",
-        "sha256": "bc258969cb48a7810e6d874ce0fc52eede6e49138edb9ebf131e63c01e0236eb",
-        "observations": 148
-      }
     }
   ],
   "progress": {
     "state": "complete",
     "stage": "complete",
-    "done": 607,
-    "total": 607,
+    "done": 617,
+    "total": 617,
     "roster": "all",
     "rankings": [
       {
         "season": 32,
-        "collected": 107,
-        "total": 107
+        "collected": 117,
+        "total": 117
       },
       {
         "season": 31,
