@@ -18,11 +18,11 @@
       "rows": 137861
     },
     "pending.ndjson": {
-      "sha256": "f74ac8fa07b7881f919cdcc0f22848b64aef10fe01b71e966828862bb3843e0f",
-      "rows": 34649
+      "sha256": "bee5642834159e07e593a85441ee591cf23d1ff91e3f0da6b71201cdb828871d",
+      "rows": 49216
     },
     "sync_jobs.ndjson": {
-      "sha256": "ae889a0dab086532d1591f04111c6f9515e4ce7bf905dd5f5b794f17131c2f17",
+      "sha256": "1360a1a77bb1be7023db3e94f121ff6f0b6384ab6f16b9463b341827f9533e1e",
       "rows": 231
     },
     "site_config.ndjson": {
