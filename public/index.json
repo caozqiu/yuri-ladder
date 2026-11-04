@@ -179,16 +179,16 @@
     }
   ],
   "progress": {
-    "state": "complete",
-    "stage": "complete",
-    "done": 890,
-    "total": 890,
+    "state": "running",
+    "stage": "summary",
+    "done": 926,
+    "total": 926,
     "roster": "all",
     "rankings": [
       {
         "season": 32,
-        "collected": 390,
-        "total": 390
+        "collected": 426,
+        "total": 426
       },
       {
         "season": 31,
@@ -196,7 +196,7 @@
         "total": 500
       }
     ],
-    "pendingMatches": 0
+    "pendingMatches": 13171
   },
   "automation": {
     "enabled": true,
