@@ -14,15 +14,15 @@
       "rows": 3656
     },
     "games.ndjson": {
-      "sha256": "d7eaa4f446f48c836fb07858ec5ad36c16474d46da788c23724e41a60348a71d",
-      "rows": 171551
+      "sha256": "c5004ceae31a01ee32dbb990d1ac0646c651c8db271959facd5d7eb8ee217074",
+      "rows": 173807
     },
     "pending.ndjson": {
-      "sha256": "f9daaa83cc0a40b3a1c977b88805ea3772a401fd55a034288755bd6dcbe32e02",
-      "rows": 4261
+      "sha256": "b82dad8785c4e7a709f661caaf55790b15dc234c8cfc5501ab3ba2f23f5cb485",
+      "rows": 1092
     },
     "sync_jobs.ndjson": {
-      "sha256": "380542c1265379cfa4f6ac4871403c9283f7d2591a240ce13ab98fc2c6f16144",
+      "sha256": "9eba9546513d26f56f140ca29109ca53f5c21ca4005266ceca03bd7861e1c8ac",
       "rows": 231
     },
     "site_config.ndjson": {
