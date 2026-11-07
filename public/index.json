@@ -179,25 +179,24 @@
     }
   ],
   "progress": {
-    "state": "retry",
-    "stage": "rankings",
-    "done": 0,
-    "total": 0,
+    "state": "running",
+    "stage": "summary",
+    "done": 1000,
+    "total": 1000,
     "roster": "all",
     "rankings": [
       {
         "season": 32,
-        "collected": 0,
-        "total": null
+        "collected": 500,
+        "total": 500
       },
       {
         "season": 31,
-        "collected": 0,
-        "total": null
+        "collected": 500,
+        "total": 500
       }
     ],
-    "pendingMatches": 0,
-    "error": "全榜名单不完整或跨页重复，保留原统计"
+    "pendingMatches": 14298
   },
   "automation": {
     "enabled": true,
