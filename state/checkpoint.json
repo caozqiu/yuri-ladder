@@ -6,8 +6,8 @@
       "rows": 3
     },
     "snapshots.ndjson": {
-      "sha256": "6b0026389b177f3f5556ca2fd419d1025b88ad7d729e2ffac932868b3946c168",
-      "rows": 6
+      "sha256": "e771b5dd699f266f7301c52578d0c5d9e62d31806426f7a35e7d998daa5662ab",
+      "rows": 8
     },
     "rankings.ndjson": {
       "sha256": "dfa605ef85560fe7f2d3d6b83b7e3cab4b5acd5606701badb5005dc5611a944a",
@@ -22,8 +22,8 @@
       "rows": 0
     },
     "sync_jobs.ndjson": {
-      "sha256": "06f53e7c1e5639bdcc7ff199d5bf2dbcecfb403fd23ef759224bf722a397a256",
-      "rows": 239
+      "sha256": "8a80fc0ef0beaf94bf3984656b65afaeac4596c1d7cb7bc15f362f0e5ead2076",
+      "rows": 240
     },
     "site_config.ndjson": {
       "sha256": "f44612a35af2c957c2c799659c474e53effa00fd753792d08d5c3f288034fddd",
